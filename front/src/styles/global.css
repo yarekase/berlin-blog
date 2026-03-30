@@ -1,23 +1,28 @@
 /* 1. 引入 Tailwind 核心功能 */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* 2. 定義基礎樣式 */
+/* 2. 定義風格 */
+@theme {
+  /* --開頭是自定義CSS變數屬性 */
+  --color-void-black: #0a0a0a;
+  --color-primary: #ec1313;
+  --color-stucco-white: #f1f5f9;
+  /* 使用的自己，並且最後加個備案 */
+  --font-display: "Inter", "Noto Sans TC", sans-serif;    /* 無襯線體 (sans-serif) */
+  --font-serif: "Playfair Display", "Noto Serif TC", serif;  /* 襯線體 (serif) */
+}
+
+/* 3. 定義基礎樣式 */
 @layer base {
   body {
-    /* 使用我們自定義的顏色與字體 */
-    @apply
-    bg-void-black
-    text-slate-100
-    selection:bg-primary
-    selection:text-white
-    antialiased
-    font-display;
+    background-color: var(--color-void-black);
+    color: var(--color-stucco-white);
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-/* 3. 氛圍特效：膠卷顆粒感 */
+/* 4. 氛圍特效：膠卷顆粒感 */
 .film-grain {
   position: fixed;
   inset: 0;
@@ -27,7 +32,7 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* 4. 氛圍特效：建築網格 */
+/* 5. 氛圍特效：建築網格 */
 .concrete-grid {
   background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
   background-size: 40px 40px;
