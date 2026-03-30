@@ -1,0 +1,36 @@
+---
+// 1. 引入我們之前寫好的全域樣式（包含顆粒感、網格、Tailwind 設定）
+import '../styles/global.css';
+
+// 2. 定義這個 Layout 接受的參數（Props）
+interface Props {
+	title: string;
+}
+
+// 3. 從 Astro 傳入的參數中解構出 title
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-Hant">
+	<head>  
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>{title}</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Noto+Sans+TC:wght@300;400;700;900&family=Noto+Serif+TC:wght@400;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+	</head>
+
+	<body class="relative min-h-screen overflow-x-hidden">
+		<div class="film-grain"></div>
+
+		<div class="fixed inset-0 concrete-grid z-0 opacity-40"></div>
+
+		<main class="relative z-10">
+			<slot />
+		</main>
+	</body>
+</html>

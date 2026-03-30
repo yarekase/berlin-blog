@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Yoshua | 數位野獸派首頁">
+	
+	<section class="flex flex-col items-center justify-center min-h-screen px-4 text-center">
+		
+		<h1 class="text-6xl md:text-8xl font-black tracking-tighter text-slate-100 uppercase mb-4">
+			Yoshua <br class="md:hidden" /> <span class="text-outline">Dev</span>
+		</h1>
+		
+		<p class="text-xl md:text-2xl font-light tracking-[0.2em] text-slate-400 uppercase">
+			Software Engineer in Progress / Kaohsiung
+		</p>
+
+		<div class="w-12 h-1 bg-slate-100 mt-8 opacity-50"></div>
+
+	</section>
+
+</Layout>
+
+<style>
+	/* 這裡加一點點首頁專屬的特殊效果：空心字 */
+	.text-outline {
+		-webkit-text-stroke: 1px rgba(241, 245, 249, 0.5);
+		color: transparent;
+	}
+</style>
