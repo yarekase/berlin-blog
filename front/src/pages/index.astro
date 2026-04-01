@@ -2,32 +2,62 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Yoshua | 數位野獸派首頁">
+<Layout title="子迂的蠹酸齋">
 	
+	<!-- 全域布局：彈性布局 直向排列 內容物橫向置中 內容物直向置中 最小高度為整個螢幕 x方向邊距4 文字置中  -->
 	<section class="flex flex-col items-center justify-center min-h-screen px-4 text-center">
 		
-		<h1 class="text-6xl md:text-8xl font-black tracking-tighter text-slate-100 uppercase mb-4">
-			Yoshua <br class="md:hidden" /> <span class="text-outline">Dev</span>
+		<!-- 最上方的標題 -->
+		 <!-- 字體6xl大小 中等螢幕尺寸變成8xl 字重(粗細)黑色(約900) 字體間距(窄) 字體顏色淺白色 強制大寫 margin-bottom下方間距4-->
+		<h1 class="text-3xl md:text-5xl font-[500] tracking-tighter text-slate-100 uppercase mb-4">
+					<!-- br為換行，但中等螢幕尺寸時這個標籤隱藏 / span無異議包裹標籤，使用下方定義的空心字 -->
+			子迂的蠹酸齋
 		</h1>
 		
-		<p class="text-xl md:text-2xl font-light tracking-[0.2em] text-slate-400 uppercase">
-			Software Engineer in Progress / Kaohsiung
+		<!-- 中間的內文 -->
+		<p class="text-[10] md:text-[12] font-light tracking-[0.2em] text-slate-400 uppercase">
+			對閱讀有所信仰。相信只有靠著大眾有意識的閱讀，以及浸淫於文化藝術，台灣社會才會更好。</br>
+			歡迎畫廊、文化單位及出版社來信合作。</br>
+			只要是我能力所及並有所認同的內容，我將不遺餘力地提供協助。
 		</p>
 
-		<div class="mt-12 w-full max-w-md px-4">
-			<div class="flex justify-between mb-2 font-display text-xs tracking-widest uppercase">
-        		<span class="text-stucco-white">Development Progress</span>
-        		<span class="text-primary font-bold">5%</span>
-    		</div>
+		<!-- 下方區塊(開發進度與進度條) 與上方外邊距12 寬度填滿空間 限制最大寬度為中等 x方向內邊距4 -->
+		<div class="mt-6 w-full max-w-md px-4">
 
-    		<div class="h-4 w-full bg-void-black border border-stucco-white/20 overflow-hidden">
+			<div class="mt-5 w-full max-w-4xl px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
+    
+    			<article class="group relative border border-stucco-white/10 p-6 hover:border-primary/50 transition-colors cursor-pointer">
+      			  	<div class="absolute top-0 right-0 w-2 h-2 bg-primary"></div>
         
-        		<div class="h-full bg-primary w-[5%] shadow-[0_0_15px_rgba(236,19,19,0.4)]"></div>
+        			<span class="text-[10px] text-slate-500 uppercase tracking-[0.3em]">2026.04.01 / Tech</span>
+        			<h3 class="text-2xl font-bold mt-2 group-hover:text-primary transition-colors">
+            			從機械銷售到軟體工程：轉職者的數位覺醒
+        			</h3>
+        			<p class="text-sm text-slate-400 mt-4 line-clamp-2">
+            			這是一段關於跨領域轉職的心路歷程，從銷售零件到編寫代碼，邏輯的底層結構其實驚人地相似...
+        			</p>
+        			<div class="mt-6 flex items-center text-xs font-bold uppercase tracking-widest text-stucco-white">
+            			Read More <span class="ml-2 group-hover:translate-x-2 transition-transform">→</span>
+        			</div>
+   				</article>
+
+    			<article class="group relative border border-stucco-white/10 p-6 hover:border-primary/50 transition-colors cursor-pointer">
+        			<div class="absolute top-0 right-0 w-2 h-2 bg-slate-500"></div>
         
-    		</div>
-			<p class="mt-3 text-[10px] text-slate-500 uppercase tracking-tighter">
-        		Current Stack: React / Node.js / Astro / SQL
-    		</p>
+        			<span class="text-[10px] text-slate-500 uppercase tracking-[0.3em]">2026.03.15 / Design</span>
+        			<h3 class="text-2xl font-bold mt-2 group-hover:text-primary transition-colors">
+            			數位野獸派：為什麼醜得很有個性？
+        			</h3>
+        			<p class="text-sm text-slate-400 mt-4 line-clamp-2">
+            			打破現代網頁的平滑感，我們追求的是原始的網格、粗獷的字體，以及不妥協的視覺張力...
+        			</p>
+        			<div class="mt-6 flex items-center text-xs font-bold uppercase tracking-widest text-stucco-white">
+            			Read More <span class="ml-2 group-hover:translate-x-2 transition-transform">→</span>
+        			</div>
+    			</article>
+
+			</div>
+			
 		</div>
 
 
@@ -38,7 +68,7 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <style>
-	/* 這裡加一點點首頁專屬的特殊效果：空心字 */
+	/* 空心字 */
 	.text-outline {
 		-webkit-text-stroke: 1px rgba(241, 245, 249, 0.5);
 		color: transparent;
