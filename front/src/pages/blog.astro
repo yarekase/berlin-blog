@@ -18,7 +18,7 @@ import Layout from '../layouts/Layout.astro';
         <div class="max-w-[1200px] mx-auto px-6">
           
 
-          <div class="relative -mt-4 mb-12 flex flex-col md:flex-row items-end gap-6">
+          <div class="relative -mt-4 mb-12 flex flex-col md:flex-row items-start gap-6">
               <div class="w-32 h-32 bg-primary border-[6px] border-void-black shadow-xl shrink-0 flex items-center justify-center">
               <span class="text-white font-black text-xs uppercase">Profile</span>
             </div>
@@ -41,7 +41,7 @@ import Layout from '../layouts/Layout.astro';
           
           </div>
 
-          <nav class="flex gap-10 border-y border-white/5 py-4 mb-16 overflow-x-auto no-scrollbar">
+          <nav class="flex flex-nowrap gap-10 border-y border-white/5 py-4 mb-16 overflow-x-auto no-scrollbar w-full relative">
             
             {['Coding', 'Finance', 'Design', 'Kaohsiung', 'Life'].map(item => (
               <a href="#" class="text-sm font-medium text-slate-400 hover:text-primary tracking-wide transition-colors uppercase">{item}</a>
