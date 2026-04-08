@@ -1,0 +1,332 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="後台儀表板 - 子迂的蠹酸齋">
+  <main class="min-h-screen bg-void-black text-stucco-white font-display pb-24">
+    
+    <!-- 頂部導航 -->
+    <nav class="border-b border-white/10 bg-void-black sticky top-0 z-50">
+      <div class="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
+        <h1 class="text-xl font-bold">後台管理</h1>
+        <button 
+          id="logoutBtn"
+          class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-primary transition-colors"
+        >
+          登出
+        </button>
+      </div>
+    </nav>
+
+    <!-- 主要內容 -->
+    <div class="max-w-[1400px] mx-auto px-6 py-8">
+      
+      <!-- 儀表板統計 -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="border border-white/10 rounded-lg p-6 bg-void-black/50">
+          <div class="text-slate-400 text-sm font-medium mb-2">發佈文章</div>
+          <div class="text-4xl font-bold text-white" id="publishedCount">0</div>
+        </div>
+        <div class="border border-white/10 rounded-lg p-6 bg-void-black/50">
+          <div class="text-slate-400 text-sm font-medium mb-2">草稿</div>
+          <div class="text-4xl font-bold text-white" id="draftCount">0</div>
+        </div>
+        <div class="border border-white/10 rounded-lg p-6 bg-void-black/50">
+          <div class="text-slate-400 text-sm font-medium mb-2">總文章數</div>
+          <div class="text-4xl font-bold text-white" id="totalCount">0</div>
+        </div>
+      </section>
+
+      <!-- 文章管理區 -->
+      <section>
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold">文章管理</h2>
+          <button 
+            id="newPostBtn"
+            class="bg-primary text-white px-6 py-2 rounded font-bold hover:bg-primary/80 transition-all"
+          >
+            新增文章
+          </button>
+        </div>
+
+        <!-- 文章列表 -->
+        <div class="border border-white/10 rounded-lg overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-void-black/50 border-b border-white/10">
+                <tr>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-400">標題</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-400">分類</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-400">狀態</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-400">建立日期</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-400">操作</th>
+                </tr>
+              </thead>
+              <tbody id="postsList">
+                <tr>
+                  <td colspan="5" class="px-6 py-8 text-center text-slate-500">
+                    暫無文章
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- 編輯模態框 -->
+  <div id="editModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-void-black border border-white/10 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="sticky top-0 bg-void-black border-b border-white/10 px-6 py-4 flex items-center justify-between">
+        <h3 class="text-xl font-bold" id="modalTitle">新增文章</h3>
+        <button 
+          id="closeModalBtn"
+          class="text-slate-400 hover:text-white transition-colors"
+        >
+          ✕
+        </button>
+      </div>
+
+      <form id="postForm" class="p-6 space-y-6">
+        <div>
+          <label for="title" class="block text-sm font-medium text-slate-400 mb-2">文章標題</label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title"
+            class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="category" class="block text-sm font-medium text-slate-400 mb-2">分類</label>
+          <select 
+            id="category" 
+            name="category"
+            class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+            required
+          >
+            <option value="">選擇分類</option>
+            <option value="coding">Coding</option>
+            <option value="finance">Finance</option>
+            <option value="design">Design</option>
+            <option value="kaohsiung">Kaohsiung</option>
+            <option value="life">Life</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="excerpt" class="block text-sm font-medium text-slate-400 mb-2">摘要</label>
+          <textarea 
+            id="excerpt" 
+            name="excerpt"
+            rows="3"
+            class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+          ></textarea>
+        </div>
+
+        <div>
+          <label for="content" class="block text-sm font-medium text-slate-400 mb-2">內容</label>
+          <textarea 
+            id="content" 
+            name="content"
+            rows="8"
+            class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+            required
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="status" class="block text-sm font-medium text-slate-400 mb-2">狀態</label>
+            <select 
+              id="status" 
+              name="status"
+              class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+            >
+              <option value="draft">草稿</option>
+              <option value="published">發佈</option>
+            </select>
+          </div>
+          <div>
+            <label for="publishedAt" class="block text-sm font-medium text-slate-400 mb-2">發佈日期</label>
+            <input 
+              type="datetime-local" 
+              id="publishedAt" 
+              name="publishedAt"
+              class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+            />
+          </div>
+        </div>
+
+        <div class="flex gap-4 pt-4">
+          <button 
+            type="submit"
+            id="submitBtn"
+            class="flex-1 bg-primary text-white px-6 py-2 rounded font-bold hover:bg-primary/80 transition-all"
+          >
+            保存
+          </button>
+          <button 
+            type="button"
+            class="flex-1 bg-void-black border border-white/20 text-white px-6 py-2 rounded font-bold hover:border-white/40 transition-all"
+            onclick="document.getElementById('editModal').classList.add('hidden')"
+          >
+            取消
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</Layout>
+
+<script is:inline>
+  // 認證檢查
+  function checkAuth() {
+    if (!localStorage.getItem('adminToken')) {
+      window.location.href = '/admin/login';
+    }
+  }
+  checkAuth();
+
+  // 模態框控制
+  const editModal = document.getElementById('editModal');
+  const newPostBtn = document.getElementById('newPostBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+
+  newPostBtn.addEventListener('click', () => {
+    document.getElementById('postForm').reset();
+    document.getElementById('modalTitle').textContent = '新增文章';
+    document.getElementById('submitBtn').textContent = '新增';
+    editModal.classList.remove('hidden');
+  });
+
+  closeModalBtn.addEventListener('click', () => {
+    editModal.classList.add('hidden');
+  });
+
+  editModal.addEventListener('click', (e) => {
+    if (e.target === editModal) {
+      editModal.classList.add('hidden');
+    }
+  });
+
+  // 登出
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem('adminToken');
+    window.location.href = '/admin/login';
+  });
+
+  // 文章管理（本地存儲示例）
+  let posts = JSON.parse(localStorage.getItem('adminPosts')) || [];
+
+  function renderPosts() {
+    const postsList = document.getElementById('postsList');
+    
+    if (posts.length === 0) {
+      postsList.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">暫無文章</td></tr>';
+    } else {
+      postsList.innerHTML = posts.map((post, index) => `
+        <tr class="border-t border-white/10 hover:bg-void-black/50 transition-colors">
+          <td class="px-6 py-4 text-white">${post.title}</td>
+          <td class="px-6 py-4 text-slate-400 text-sm">${post.category}</td>
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 text-xs font-medium rounded ${
+              post.status === 'published' 
+                ? 'bg-green-500/20 text-green-400' 
+                : 'bg-yellow-500/20 text-yellow-400'
+            }">
+              ${post.status === 'published' ? '發佈' : '草稿'}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-slate-400 text-sm">${new Date(post.createdAt).toLocaleDateString()}</td>
+          <td class="px-6 py-4 text-sm">
+            <button class="text-primary hover:text-primary/80 transition-colors mr-4" onclick="editPost(${index})">編輯</button>
+            <button class="text-red-500 hover:text-red-400 transition-colors" onclick="deletePost(${index})">刪除</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // 更新統計
+    document.getElementById('publishedCount').textContent = posts.filter(p => p.status === 'published').length;
+    document.getElementById('draftCount').textContent = posts.filter(p => p.status === 'draft').length;
+    document.getElementById('totalCount').textContent = posts.length;
+  }
+
+  function editPost(index) {
+    const post = posts[index];
+    document.getElementById('title').value = post.title;
+    document.getElementById('category').value = post.category;
+    document.getElementById('excerpt').value = post.excerpt || '';
+    document.getElementById('content').value = post.content;
+    document.getElementById('status').value = post.status;
+    document.getElementById('publishedAt').value = post.publishedAt || '';
+
+    document.getElementById('modalTitle').textContent = '編輯文章';
+    document.getElementById('submitBtn').textContent = '更新';
+
+    document.getElementById('postForm').onsubmit = (e) => {
+      e.preventDefault();
+      posts[index] = {
+        ...post,
+        title: document.getElementById('title').value,
+        category: document.getElementById('category').value,
+        excerpt: document.getElementById('excerpt').value,
+        content: document.getElementById('content').value,
+        status: document.getElementById('status').value,
+        publishedAt: document.getElementById('publishedAt').value,
+        updatedAt: new Date().toISOString()
+      };
+      savePosts();
+      renderPosts();
+      editModal.classList.add('hidden');
+    };
+
+    editModal.classList.remove('hidden');
+  }
+
+  function deletePost(index) {
+    if (confirm('確定要刪除嗎？')) {
+      posts.splice(index, 1);
+      savePosts();
+      renderPosts();
+    }
+  }
+
+  // 新增文章
+  document.getElementById('postForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const newPost = {
+      id: Date.now(),
+      title: document.getElementById('title').value,
+      category: document.getElementById('category').value,
+      excerpt: document.getElementById('excerpt').value,
+      content: document.getElementById('content').value,
+      status: document.getElementById('status').value,
+      publishedAt: document.getElementById('publishedAt').value,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    posts.push(newPost);
+    savePosts();
+    renderPosts();
+    editModal.classList.add('hidden');
+  });
+
+  function savePosts() {
+    localStorage.setItem('adminPosts', JSON.stringify(posts));
+  }
+
+  renderPosts();
+</script>
+
+<style>
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--color-primary);
+  }
+</style>

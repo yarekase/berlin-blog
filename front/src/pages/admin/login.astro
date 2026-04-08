@@ -1,0 +1,66 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="後台登入 - 子迂的蠹酸齋">
+  <main class="min-h-screen bg-void-black text-stucco-white font-display flex items-center justify-center pb-24">
+    <div class="w-full max-w-sm px-6">
+      <div class="bg-void-black border border-white/10 rounded-lg p-8">
+        
+        <h1 class="text-2xl font-bold text-center mb-8 text-white">後台管理系統</h1>
+        
+        <form id="loginForm" class="space-y-6">
+          <div>
+            <label for="password" class="block text-sm font-medium text-slate-400 mb-2">
+              密碼
+            </label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password"
+              class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white placeholder-slate-600 focus:outline-none focus:border-primary transition-colors"
+              placeholder="請輸入密碼"
+              required
+            />
+          </div>
+
+          <button 
+            type="submit"
+            class="w-full bg-primary text-white px-6 py-2 rounded font-bold hover:bg-primary/80 transition-all"
+          >
+            登入
+          </button>
+        </form>
+
+        <div id="errorMsg" class="mt-4 text-red-500 text-sm text-center hidden"></div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const password = (document.getElementById('password') as HTMLInputElement).value;
+    
+    // 簡單密碼驗證（實際應該用 API）
+    const ADMIN_PASSWORD = 'admin123'; // TODO: 換成環境變數
+    
+    if (password === ADMIN_PASSWORD) {
+      localStorage.setItem('adminToken', 'authenticated');
+      window.location.href = '/admin/dashboard';
+    } else {
+      const errorMsg = document.getElementById('errorMsg');
+      if (errorMsg) {
+        errorMsg.textContent = '密碼錯誤';
+        errorMsg.classList.remove('hidden');
+      }
+    }
+  });
+</script>
+
+<style>
+  input:focus {
+    border-color: var(--color-primary);
+  }
+</style>

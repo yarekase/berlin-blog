@@ -3,67 +3,120 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="子迂的蠹酸齋">
-	
-	<!-- 全域布局：彈性布局 直向排列 內容物橫向置中 內容物直向置中 最小高度為整個螢幕 x方向邊距4 文字置中  -->
-	<section class="flex flex-col items-center justify-center min-h-screen px-4 text-center">
-		
-		<!-- 最上方的標題 -->
-		 <!-- 字體6xl大小 中等螢幕尺寸變成8xl 字重(粗細)黑色(約900) 字體間距(窄) 字體顏色淺白色 強制大寫 margin-bottom下方間距4-->
-		<h1 class="text-3xl md:text-5xl font-[500] tracking-tighter text-slate-100 uppercase mb-4">
-					<!-- br為換行，但中等螢幕尺寸時這個標籤隱藏 / span無異議包裹標籤，使用下方定義的空心字 -->
-			子迂的蠹酸齋
-		</h1>
-		
-		<!-- 中間的內文 -->
-		<p class="text-[10] md:text-[12] font-light tracking-[0.2em] text-slate-400 uppercase">
-			對閱讀有所信仰。相信只有靠著大眾有意識的閱讀，以及浸淫於文化藝術，台灣社會才會更好。</br>
-			歡迎畫廊、文化單位及出版社來信合作。</br>
-			只要是我能力所及並有所認同的內容，我將不遺餘力地提供協助。
-		</p>
+  <!-- 最小高度螢幕高 自定義黑色背景 自定義白色文字 字體使用無襯線體 內邊間距24(最最下面，墊高內容) -->
+    <main class="min-h-screen bg-void-black text-stucco-white font-display pb-24">
 
-		<!-- 下方區塊(開發進度與進度條) 與上方外邊距12 寬度填滿空間 限制最大寬度為中等 x方向內邊距4 -->
-		<div class="mt-6 w-full max-w-md px-4">
+		<!-- 搜尋區塊容器 -->
+		<div class="relative w-full max-w-md mb-8 group">
+  		
+			<!-- 搜尋圖示 (Lucide Icon 風格) -->
+  			<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+    			<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500 group-focus-within:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    			</svg>
+  			</div>
 
-			<div class="mt-5 w-full max-w-4xl px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
-    
-    			<article class="group relative border border-stucco-white/10 p-6 hover:border-primary/50 transition-colors cursor-pointer">
-      			  	<div class="absolute top-0 right-0 w-2 h-2 bg-primary"></div>
-        
-        			<span class="text-[10px] text-slate-500 uppercase tracking-[0.3em]">2026.04.01 / Tech</span>
-        			<h3 class="text-2xl font-bold mt-2 group-hover:text-primary transition-colors">
-            			從機械銷售到軟體工程：轉職者的數位覺醒
-        			</h3>
-        			<p class="text-sm text-slate-400 mt-4 line-clamp-2">
-            			這是一段關於跨領域轉職的心路歷程，從銷售零件到編寫代碼，邏輯的底層結構其實驚人地相似...
-        			</p>
-        			<div class="mt-6 flex items-center text-xs font-bold uppercase tracking-widest text-stucco-white">
-            			Read More <span class="ml-2 group-hover:translate-x-2 transition-transform">→</span>
-        			</div>
-   				</article>
+  			<!-- 輸入框 -->
+  			<input 
+    			type="text" 
+    			placeholder="搜尋文章、分類或關鍵字..." 
+    			class="w-full bg-white/5 border border-white/10 text-slate-200 text-sm rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-primary/50 focus:bg-white/10 focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-slate-600"
+  			/>
 
-    			<article class="group relative border border-stucco-white/10 p-6 hover:border-primary/50 transition-colors cursor-pointer">
-        			<div class="absolute top-0 right-0 w-2 h-2 bg-slate-500"></div>
-        
-        			<span class="text-[10px] text-slate-500 uppercase tracking-[0.3em]">2026.03.15 / Design</span>
-        			<h3 class="text-2xl font-bold mt-2 group-hover:text-primary transition-colors">
-            			數位野獸派：為什麼醜得很有個性？
-        			</h3>
-        			<p class="text-sm text-slate-400 mt-4 line-clamp-2">
-            			打破現代網頁的平滑感，我們追求的是原始的網格、粗獷的字體，以及不妥協的視覺張力...
-        			</p>
-        			<div class="mt-6 flex items-center text-xs font-bold uppercase tracking-widest text-stucco-white">
-            			Read More <span class="ml-2 group-hover:translate-x-2 transition-transform">→</span>
-        			</div>
-    			</article>
-
-			</div>
-			
+  			<!-- 裝飾用快捷鍵提示 (選配) -->
+  			<div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+    			<kbd class="hidden sm:inline-block px-2 py-1 text-xs font-semibold text-slate-500 bg-white/5 border border-white/10 rounded-md">
+      			Search
+    			</kbd>
+  			</div>
 		</div>
+        
+        <!-- 首頁圖區，寬滿版，高32(128px) relative子元素的基準點 border邊界線有底線 邊界線顏色白色透明 -->
+        <div class="w-full h-32 relative border-b border-white/10" >
+            <!-- 預計要放圖 -->
+            <div class="absolute inset-0 flex items-center justify-center bg-linear-to-t from-void-black/80 to-transparent">
+              <span>首頁圖</span>
+            </div>
+        </div>
 
+        <!-- 內容區 最大寬度1200px 外邊界自動 x軸兩側預留6(24px) -->
+        <div class="max-w-[1200px] mx-auto px-6">
+          
+			<!-- 自介區域 -->
+          	<div class="relative -mt-4 mb-12 flex flex-row items-end gap-6 md:flex-nowrap">
 
-		<div class="w-20 h-1 bg-slate-100 mt-8 opacity-50"></div>
+				<!-- 大頭照 -->
+				<img src="/img/self.jpg" alt="柏林的大頭照" class="w-32 h-32 object-cover border-[6px] border-void-black shadow-xl shrink-0"/>
+				
+				<!-- 部落格名稱 -->
+            	<div class="flex-1 self-end overflow-hidden">
+               		<h1 class="text-3xl overflow-hidden text-ellipsis whitespace-nowrap font-bold tracking-tight text-white mb-1">子迂的蠢酸齋</h1>
+              
+            		<div class="flex items-center gap-3 text-primary text-sm">
+                		<span class="shrink-0 font-medium">424 followers</span>
+              		</div>        
+        		</div>
+				
+				<!-- Follow 按鈕 -->
+            	<button class="bg-[#222] text-primary px-6 py-2 rounded-full text-sm font-bold hover:bg-slate-600 transition-all self-end">
+              		Follow
+            	</button>
+          
+          	</div>
 
-	</section>
+			<!-- 分類導航 -->
+          	<nav class="flex flex-nowrap gap-10 border-y border-white/5 py-4 mb-16 overflow-x-auto no-scrollbar w-full relative">
+            
+            	{['有品有閒', '烏合之眾', '藝術', '電影', '隨筆'].map(item => (
+              		<a href="#" class="text-sm font-medium text-slate-400 hover:text-primary tracking-wide transition-colors uppercase">{item}</a>
+            	))}   
+          	</nav>
+
+		  	<!-- 特色文章區 -->
+          	<section class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24 items-center group cursor-pointer">
+            
+            <div class="aspect-[16/10] bg-[#151515] border border-white/10 overflow-hidden relative">
+              
+              	<img src="/img/pic01.webp" alt="入陣者" class="object-contain border-[6px] border-void-black shadow-xl shrink-0"/>
+            
+            </div>
+      
+            <div class="flex flex-col gap-4">
+              	<h2 class="text-4xl font-bold leading-[1.2] text-white group-hover:text-primary transition-colors">
+                	《入陣者》孫友聯的勞運回憶
+              	</h2>
+        
+              	<p class="text-slate-400 text-lg leading-relaxed">        
+                	《入陣者：台灣勞工運動三十年，一場尊嚴與抵抗的對話》除了簡單談及台灣鮮少被談及的勞工運動史之外，更是把整個台灣經濟發展的觀看角度，從那些經濟奇蹟的倖存者偏差敘事中抽離出來，重新排列。
+              	</p>
+        
+              	<div class="flex items-center gap-2 text-xs text-slate-500 uppercase tracking-widest font-bold">   
+                	<span>Berlin</span> <span class="text-primary">·</span> <span>1d ago</span> <span class="text-primary">·</span> <span>5 min read</span>
+              	</div>     
+            </div> 
+          
+    		</section>
+
+    
+			<section class="grid grid-cols-1 md:grid-cols-3 gap-10"> 
+				{[1, 2, 3].map(i => (
+					<div class="group cursor-pointer">
+					
+						<div class="aspect-video bg-[#111] border border-white/10 mb-6 relative">
+					
+							<div class="absolute inset-0 flex items-center justify-center text-slate-800 font-bold text-xs uppercase tracking-widest opacity-30">Image {i}</div>
+						</div>
+			
+						<h4 class="text-xl font-bold text-white leading-snug group-hover:text-primary transition-colors">
+							房價、藝術品、單價、坪數
+						</h4>
+				
+					</div>
+				))}
+			</section>
+
+      	</div>
+    </main>
 
 </Layout>
 
