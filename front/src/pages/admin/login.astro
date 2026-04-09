@@ -11,6 +11,19 @@ import Layout from '../../layouts/Layout.astro';
         
         <form id="loginForm" class="space-y-6">
           <div>
+            <label for="email" class="block text-sm font-medium text-slate-400 mb-2">
+              信箱
+            </label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email"
+              class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white placeholder-slate-600 focus:outline-none focus:border-primary transition-colors"
+              placeholder="請輸入信箱"
+              required
+            />
+          </div>
+          <div>
             <label for="password" class="block text-sm font-medium text-slate-400 mb-2">
               密碼
             </label>
@@ -39,24 +52,29 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <script>
-  document.getElementById('loginForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const password = (document.getElementById('password') as HTMLInputElement).value;
-    
-    // 簡單密碼驗證（實際應該用 API）
-    const ADMIN_PASSWORD = 'admin123'; // TODO: 換成環境變數
-    
-    if (password === ADMIN_PASSWORD) {
-      localStorage.setItem('adminToken', 'authenticated');
-      window.location.href = '/admin/dashboard';
-    } else {
-      const errorMsg = document.getElementById('errorMsg');
-      if (errorMsg) {
-        errorMsg.textContent = '密碼錯誤';
-        errorMsg.classList.remove('hidden');
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = (document.getElementById('email') as HTMLInputElement).value;
+      const password = (document.getElementById('password') as HTMLInputElement).value;
+      
+      // 簡單驗證（實際應該用 API）
+      const ADMIN_EMAIL = 'admin@example.com'; // TODO: 換成環境變數
+      const ADMIN_PASSWORD = 'admin123'; // TODO: 換成環境變數
+      
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        localStorage.setItem('adminToken', 'authenticated');
+        window.location.href = '/admin/dashboard';
+      } else {
+        const errorMsg = document.getElementById('errorMsg');
+        if (errorMsg) {
+          errorMsg.textContent = '信箱或密碼錯誤';
+          errorMsg.classList.remove('hidden');
+        }
       }
-    }
-  });
+    });
+  }
 </script>
 
 <style>
