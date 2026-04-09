@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>THE VOID - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec1313",
+                        "background-light": "#000000",
+                        "background-dark": "#000000",
+                        "neutral-gray": "#1a1a1a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["'Playfair Display'", "serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .film-grain {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        .concrete-texture {
+            background-color: #000000;
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .border-strict {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-background-light text-slate-100 font-display selection:bg-primary selection:text-white">
+<div class="film-grain"></div>
+<div class="relative flex min-h-screen w-full flex-col concrete-texture overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-40 bg-black/90 backdrop-blur-sm border-b border-strict px-6 lg:px-20 py-6">
+<div class="max-w-[1400px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-12">
+<div class="flex items-center gap-3">
+<div class="size-6 bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-black font-bold text-lg">vertical_align_center</span>
+</div>
+<h1 class="text-slate-100 text-2xl font-black tracking-tighter font-display uppercase">THE VOID</h1>
+</div>
+<nav class="hidden md:flex items-center gap-8 border-l border-strict pl-12">
+<a class="text-slate-400 hover:text-primary text-xs font-bold tracking-[0.2em] transition-colors" href="#">ARCHIVE</a>
+<a class="text-slate-400 hover:text-primary text-xs font-bold tracking-[0.2em] transition-colors" href="#">MANIFESTO</a>
+<a class="text-slate-400 hover:text-primary text-xs font-bold tracking-[0.2em] transition-colors" href="#">STUDIO</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden sm:flex items-center bg-neutral-gray border border-strict px-4 py-2">
+<span class="material-symbols-outlined text-slate-500 text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-32 lg:w-48 placeholder:text-slate-600 font-display" placeholder="SEARCH ARCHIVE"/>
+</div>
+<button class="material-symbols-outlined text-slate-100 hover:text-primary transition-colors">grid_view</button>
+<button class="material-symbols-outlined text-slate-100 hover:text-primary transition-colors">account_circle</button>
+</div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-[1400px] mx-auto px-6 lg:px-20 py-12">
+<!-- Hero Section -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-24 items-end">
+<div class="lg:col-span-7 border-l-4 border-primary pl-8">
+<p class="text-primary text-xs font-bold tracking-[0.4em] mb-4 uppercase">Volume 01: The Silence of Form</p>
+<h2 class="text-5xl lg:text-8xl font-serif italic text-slate-100 leading-tight mb-8">
+                        Less is only more where more is <span class="text-primary not-italic font-bold">no good.</span>
+</h2>
+<p class="text-slate-400 text-lg max-w-xl font-display leading-relaxed">
+                        A digital archive exploring the intersection of Brutalism, the Bauhaus school, and the minimalist philosophy of Mies van der Rohe. Form follows function. Silence follows noise.
+                    </p>
+</div>
+<div class="lg:col-span-5 aspect-square bg-neutral-gray relative overflow-hidden group border border-strict">
+<img alt="Monochromatic concrete architecture skyscraper" class="object-cover w-full h-full grayscale opacity-80 hover:scale-105 transition-transform duration-700" data-alt="Modernist concrete skyscraper facade black and white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAs_5EnpigKFRCfA5H_eDPmbbZ-zSR_HYryEjZi2cjkI27iwbYReOb6mH6Aumu4Gu3KJxBPU7-Y9xOyaQ1EtPY3Sgh5T13GdENE4h3_QrYhvAzpxPDX4zIrLmjOHSCHZVPqL19Eepq2Oq3EUQ0eDTsxSgj_wT_V2L9oYfv7DCm_aY-7VfbyxIKDrF3vXmEpTaarugHc5dzcNN7qM_Yl00_MYqlb7GdwMIeMNoXmF-qTqmHkHbM-K_5iv6ajg42OOIFlIIv8JsUoCdie"/>
+<div class="absolute bottom-6 right-6">
+<span class="bg-black text-white text-[10px] px-3 py-1 border border-strict font-bold tracking-widest">BERLIN, 1929</span>
+</div>
+</div>
+</section>
+<!-- Grid Header -->
+<div class="flex items-center justify-between border-b-2 border-slate-100 pb-4 mb-12">
+<h3 class="text-xs font-black tracking-[0.5em] uppercase">LATEST ENTRIES</h3>
+<div class="flex gap-4">
+<span class="text-[10px] text-primary font-bold">01</span>
+<span class="text-[10px] text-slate-500 font-bold">02</span>
+<span class="text-[10px] text-slate-500 font-bold">03</span>
+</div>
+</div>
+<!-- Article Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-20 gap-x-12">
+<!-- Article 1 -->
+<article class="flex flex-col group">
+<div class="aspect-[4/5] bg-neutral-gray mb-6 relative border border-strict overflow-hidden">
+<img alt="Brutalist concrete structure" class="w-full h-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0 group-hover:opacity-90" data-alt="Black and white brutalist building stairwell" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKjweFH35MAW4UeGIzgkXR1Io0MHC7bG7ZvbSILae9Eh8eU7hSpaOaEO7fiN4EbrJUfgpszGnX7JTCGHvPv1YizsiXMxP45FTg2tj4hDQpFjSVsouy2Y5OPRiZAwEeNsl3BP4P0vMrPgHAw0pQxbTD1sS8Bxp9E4pJ8f9QiC_LABJfIXGnhAbuEylraAt0dD_xyQBmP1sK4Y7cZUzIoU7JKUyIrYfN-KQ0qkzDWb9c287SqLJRFar8gPYmdMkvrbIlRyetZOZGZRcw"/>
+<div class="absolute top-0 left-0 p-4">
+<span class="bg-primary text-white text-[10px] px-2 py-1 font-bold">ESSAY</span>
+</div>
+</div>
+<div class="flex items-center gap-2 mb-3">
+<time class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">October 24, 1954</time>
+<span class="w-8 h-[1px] bg-slate-800"></span>
+<span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">7 min read</span>
+</div>
+<h4 class="text-3xl font-serif text-slate-100 group-hover:text-primary transition-colors mb-4 italic">The Weight of Concrete: A Study in Gravity</h4>
+<p class="text-slate-500 text-sm leading-relaxed line-clamp-3 font-display">
+                        How the brutalist movement redefined our relationship with urban density and the tactile honesty of raw materials.
+                    </p>
+</article>
+<!-- Article 2 -->
+<article class="flex flex-col group">
+<div class="aspect-[4/5] bg-neutral-gray mb-6 relative border border-strict overflow-hidden">
+<img alt="Bauhaus design elements" class="w-full h-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0 group-hover:opacity-90" data-alt="Minimalist architectural windows geometric pattern" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEQXP3Zw7ZARufWDA-VFModSgllHSUs1ii77rH21KlA_CBLgi0WlZWcHTiLr6d-qDAaxgxVfz02BrWARin4ie0924nOEakXUe0_EESATw8Y8w3JjY1ul7h2LCgb1CvYoshKSfiFZXu4E1djgMEcPQeq4MFJxsWBYBmBZjJMSheVCCJOs6DIa-1y3u6PuAs37laAJi12b81_nIRGsoSr4_BFJyplx_nfVAX94Pqmcpn62cUVQxHUDlJIDd7FBkqmCy60dw-08AvbvYB"/>
+<div class="absolute top-0 left-0 p-4">
+<span class="bg-primary text-white text-[10px] px-2 py-1 font-bold">THEORY</span>
+</div>
+</div>
+<div class="flex items-center gap-2 mb-3">
+<time class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">June 12, 1923</time>
+<span class="w-8 h-[1px] bg-slate-800"></span>
+<span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">12 min read</span>
+</div>
+<h4 class="text-3xl font-serif text-slate-100 group-hover:text-primary transition-colors mb-4 italic">The Bauhaus Legacy: Form Over All</h4>
+<p class="text-slate-500 text-sm leading-relaxed line-clamp-3 font-display">
+                        Revisiting the Dessau workshop and the philosophy that unified craft with industrial mass production.
+                    </p>
+</article>
+<!-- Article 3 -->
+<article class="flex flex-col group">
+<div class="aspect-[4/5] bg-neutral-gray mb-6 relative border border-strict overflow-hidden">
+<img alt="Mies van der Rohe pavilion" class="w-full h-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0 group-hover:opacity-90" data-alt="Minimalist glass and steel building structure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDa7BluLY7EKuoki6Op2wtrzYieePtx8lgsbS2OmPiIrmGVD56bmjw0g3xoGVMxEWbYnicIlnHWXvttFjQq4YbuBLhqgU0Yxe6nWuJKnPPrYOGVBIiVbEIqI8y4ZiKYCDATkWIod0nK2Hk714KTUkbI7DqaqSjDJ2UIZGEJqLhBgo2p7piIpX0tOmeo0SByk2tprfskt3mtgvMRT0NzJOfKFVv1WDVvB71A5sOgAXbrDgz1VAGXrlgGQcQOhEydrtmmMMtMxcHAfofP"/>
+<div class="absolute top-0 left-0 p-4">
+<span class="bg-primary text-white text-[10px] px-2 py-1 font-bold">PROFILE</span>
+</div>
+</div>
+<div class="flex items-center gap-2 mb-3">
+<time class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">August 17, 1969</time>
+<span class="w-8 h-[1px] bg-slate-800"></span>
+<span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">5 min read</span>
+</div>
+<h4 class="text-3xl font-serif text-slate-100 group-hover:text-primary transition-colors mb-4 italic">The Master of Silence: Ludwig Mies van der Rohe</h4>
+<p class="text-slate-500 text-sm leading-relaxed line-clamp-3 font-display">
+                        The God is in the details. Exploring the Barcelona Pavilion and the invention of modern luxury through emptiness.
+                    </p>
+</article>
+</div>
+<!-- More Content Indicator -->
+<div class="mt-24 flex flex-col items-center">
+<button class="group flex flex-col items-center gap-4">
+<span class="text-[10px] font-black tracking-[0.8em] text-slate-500 group-hover:text-primary transition-colors uppercase">View Archive</span>
+<div class="w-[1px] h-24 bg-gradient-to-b from-primary to-transparent"></div>
+</button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="border-t border-strict px-6 lg:px-20 py-20 bg-black">
+<div class="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="md:col-span-2">
+<h2 class="text-4xl font-black text-slate-100 mb-6 font-display italic">THE VOID</h2>
+<p class="text-slate-500 max-w-sm font-display text-sm leading-relaxed uppercase tracking-wider">
+                        A tribute to the architectural giants who found beauty in the blank space. Published quarterly from the heart of the grid.
+                    </p>
+</div>
+<div>
+<h5 class="text-primary text-[10px] font-black tracking-[0.3em] mb-6 uppercase">Navigation</h5>
+<ul class="flex flex-col gap-4 text-xs font-bold text-slate-400 tracking-widest">
+<li><a class="hover:text-white transition-colors uppercase" href="#">Index</a></li>
+<li><a class="hover:text-white transition-colors uppercase" href="#">Photography</a></li>
+<li><a class="hover:text-white transition-colors uppercase" href="#">Interviews</a></li>
+<li><a class="hover:text-white transition-colors uppercase" href="#">Submissions</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-primary text-[10px] font-black tracking-[0.3em] mb-6 uppercase">Connect</h5>
+<ul class="flex flex-col gap-4 text-xs font-bold text-slate-400 tracking-widest">
+<li><a class="hover:text-white transition-colors uppercase" href="#">Instagram</a></li>
+<li><a class="hover:text-white transition-colors uppercase" href="#">Newsletter</a></li>
+<li><a class="hover:text-white transition-colors uppercase" href="#">RSS Feed</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-[1400px] mx-auto mt-20 pt-8 border-t border-strict flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-[10px] text-slate-600 font-bold tracking-[0.2em] uppercase">© 1929—2024 THE VOID ARCHIVE. ALL RIGHTS RESERVED.</p>
+<div class="flex gap-8">
+<span class="text-[10px] text-slate-600 font-bold uppercase">Privacy</span>
+<span class="text-[10px] text-slate-600 font-bold uppercase">Imprint</span>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

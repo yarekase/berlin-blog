@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#ec1313",
+                "background-light": "#f8f6f6",
+                "background-dark": "#0a0a0a",
+              },
+              fontFamily: {
+                "display": ["Inter", "sans-serif"],
+                "serif": ["Playfair Display", "serif"]
+              },
+              borderRadius: {"DEFAULT": "0rem", "lg": "0rem", "xl": "0rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0a0a0a;
+            /* Subtle concrete/grain texture simulation using SVG filter */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            background-blend-mode: overlay;
+            opacity: 0.98;
+        }
+        .kerning-tight { letter-spacing: -0.05em; }
+        .vertical-text { writing-mode: vertical-rl; }
+    </style>
+</head>
+<body class="font-display text-slate-100 selection:bg-primary selection:text-white">
+<div class="relative flex min-h-screen w-full flex-col bg-background-dark overflow-x-hidden">
+<header class="fixed top-0 left-0 w-full z-50 mix-blend-difference px-6 py-8 flex justify-between items-start border-b border-slate-100/10 backdrop-blur-sm">
+<div class="flex flex-col gap-1">
+<div class="size-8 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<span class="text-[10px] uppercase tracking-[0.4em] font-bold">Void</span>
+</div>
+<nav class="flex gap-12 text-[10px] uppercase tracking-[0.3em] items-center">
+<a class="hover:text-primary transition-colors" href="#">Archive</a>
+<a class="hover:text-primary transition-colors" href="#">Manifesto</a>
+<button class="material-symbols-outlined text-slate-100 hover:text-primary !text-2xl">menu</button>
+</nav>
+</header>
+<main class="flex-1 flex flex-col pt-32">
+<section class="px-6 md:px-24 lg:px-48 mb-32">
+<div class="flex flex-col md:flex-row justify-between items-baseline border-b border-slate-100/20 pb-4 mb-12">
+<span class="text-[11px] uppercase tracking-widest text-slate-500 font-medium">Issue No. 04 — Architectural Metaphysics</span>
+<span class="text-[11px] uppercase tracking-widest text-slate-500 font-medium">12.04.24 / 52.5200° N, 13.4050° E</span>
+</div>
+<div class="grid grid-cols-12 gap-4">
+<div class="col-span-12 lg:col-span-10">
+<h1 class="font-serif text-6xl md:text-8xl lg:text-9xl leading-[0.9] kerning-tight font-bold mb-12">
+                            THE <span class="text-primary italic font-light">ARCHITECTURE</span> OF SILENCE
+                        </h1>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-8 items-start">
+<div class="col-span-12 md:col-span-4 lg:col-span-3">
+<div class="border-t-2 border-primary pt-4">
+<p class="text-[11px] uppercase tracking-[0.2em] leading-relaxed text-slate-400">
+                                Essay by <br/>
+<span class="text-slate-100 font-bold">Ludwig V. Mies</span>
+</p>
+</div>
+</div>
+<div class="col-span-12 md:col-span-8 lg:col-span-6">
+<p class="text-xl md:text-2xl font-light leading-relaxed text-slate-300">
+                            Less is more. The structural skin becomes the message. In the realm of pure blackspace, the grid is the only truth. This exploration of Bauhaus principles in the digital age seeks to redefine how we perceive the 'empty' screen.
+                        </p>
+</div>
+</div>
+</section>
+<section class="w-full h-[80vh] relative overflow-hidden bg-slate-900 group">
+<div class="absolute inset-0 bg-black/40 z-10"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 text-center w-full px-4">
+<span class="text-[10vw] font-serif italic text-white/10 select-none">Mies van der Rohe</span>
+</div>
+<img class="w-full h-full object-cover grayscale contrast-125 brightness-75 transition-transform duration-1000 group-hover:scale-110" data-alt="Monochrome close-up of Brutalist concrete building texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvsfPHKC7DzIKKWMj40hc7RcFFa-ebA8fjtCsfwgwg8AtPMmDvl3391-ZyTr2H8ITPd7dO1tETt6Ovl5DhQytxY2ZVzUvyxvVkxEyiTA5cCRNipO0SNBKCrpZq1cT8Q7JJo8l6VWaXbInxHyq0l7aqdf_FTyCz3EtPRvl3u4ZX8raQ2ulHUWHbhRW228na67Znci7KrkAT8tKwU4TZUqk1vkvFzVr0-DRTzZ26Sv1EKaTuyG3KzKXvArj1y14w9bfjkiS6hiyVZZZy"/>
+</section>
+<section class="grid grid-cols-12 gap-0 px-6 md:px-24 lg:px-48 py-32 relative">
+<div class="hidden lg:block absolute left-12 top-32 vertical-text text-slate-800 text-[10px] uppercase tracking-[1em] font-bold h-full">
+                    STRUCTURAL GRID SYSTEMS — 1929
+                </div>
+<div class="col-span-12 lg:col-span-8 lg:col-start-4 space-y-16">
+<div class="prose prose-invert max-w-none">
+<p class="text-lg leading-[1.8] text-slate-400">
+                            The void is not an absence, but a presence of potential. In the Barcelona Pavilion, Mies van der Rohe didn't just place walls; he curated the flow of space itself. In the digital realm, we often fear the "white space" or the "blackspace," rushing to fill every pixel with data, notifications, and stimuli. 
+                        </p>
+<div class="grid grid-cols-2 gap-4 my-16">
+<div class="h-64 border border-slate-100/10 flex items-center justify-center group relative overflow-hidden">
+<div class="absolute inset-0 bg-primary translate-y-full transition-transform group-hover:translate-y-0 duration-500 opacity-20"></div>
+<span class="text-[10px] uppercase tracking-[0.5em] text-slate-600">Form</span>
+</div>
+<div class="h-64 border border-slate-100/10 flex items-center justify-center group relative overflow-hidden">
+<div class="absolute inset-0 bg-primary translate-y-full transition-transform group-hover:translate-y-0 duration-500 opacity-20"></div>
+<span class="text-[10px] uppercase tracking-[0.5em] text-slate-600">Function</span>
+</div>
+</div>
+<p class="text-lg leading-[1.8] text-slate-400">
+                            The true Bauhaus approach to the interface is one of radical reduction. It asks: what is the minimum required to convey the essence? The grid provides the skeleton; the typography provides the voice; the void provides the breath. We must embrace the silence between the glyphs.
+                        </p>
+</div>
+<blockquote class="border-l-4 border-primary pl-8 py-4 my-24">
+<span class="font-serif text-4xl md:text-5xl italic leading-tight text-slate-100 block mb-4">
+                            "God is in the details."
+                        </span>
+<cite class="text-[11px] uppercase tracking-widest text-slate-500 not-italic">— Ludwig Mies van der Rohe</cite>
+</blockquote>
+<div class="prose prose-invert max-w-none pb-24 border-b border-slate-100/10">
+<p class="text-lg leading-[1.8] text-slate-400">
+                            As we navigate an era of sensory overload, the "Architecture of Silence" becomes a sanctuary. Design is no longer about decoration; it is about the careful management of cognitive load. By honoring the void, we honor the user's attention.
+                        </p>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-black py-24 px-6 md:px-24 lg:px-48 border-t border-slate-100/5">
+<div class="grid grid-cols-12 gap-12">
+<div class="col-span-12 md:col-span-6">
+<div class="flex items-center gap-4 mb-8">
+<div class="size-6 text-primary">
+<svg fill="currentColor" viewbox="0 0 48 48">
+<path d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z"></path>
+</svg>
+</div>
+<h2 class="text-xl font-bold tracking-tighter">VOID JOURNAL</h2>
+</div>
+<p class="text-slate-500 text-sm max-w-xs leading-relaxed">
+                        An experimental laboratory for minimal aesthetics and brutalist digital theory.
+                    </p>
+</div>
+<div class="col-span-6 md:col-span-3">
+<h4 class="text-[10px] uppercase tracking-[0.3em] font-bold mb-6 text-slate-400">Navigation</h4>
+<ul class="space-y-4 text-xs">
+<li><a class="hover:text-primary transition-colors" href="#">Manifesto</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Archives</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Submit</a></li>
+</ul>
+</div>
+<div class="col-span-6 md:col-span-3">
+<h4 class="text-[10px] uppercase tracking-[0.3em] font-bold mb-6 text-slate-400">Connect</h4>
+<ul class="space-y-4 text-xs">
+<li><a class="hover:text-primary transition-colors" href="#">Instagram</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Twitter</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Are.na</a></li>
+</ul>
+</div>
+</div>
+<div class="mt-24 pt-8 border-t border-slate-100/5 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-[9px] uppercase tracking-widest text-slate-600">© 2024 VOID EXPERIMENTAL LAB. ALL RIGHTS RESERVED.</p>
+<div class="flex gap-4">
+<div class="size-2 bg-primary"></div>
+<div class="size-2 bg-slate-800"></div>
+<div class="size-2 bg-slate-800"></div>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

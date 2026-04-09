@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec1313",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#0a0a0a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0rem", "lg": "0rem", "xl": "0rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .grain-texture {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.04;
+            pointer-events: none;
+        }
+        .concrete-texture {
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-slate-100 selection:bg-primary selection:text-white">
+<div class="fixed inset-0 grain-texture z-50"></div>
+<div class="fixed inset-0 concrete-texture z-0"></div>
+<div class="relative z-10 min-h-screen flex flex-col">
+<header class="border-b border-white/10 px-6 py-6 flex justify-between items-center bg-background-dark/80 backdrop-blur-md sticky top-0">
+<div class="flex items-center gap-12">
+<div class="flex items-center gap-3">
+<div class="bg-primary size-6 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xs">square</span>
+</div>
+<h2 class="text-xl font-bold tracking-tighter uppercase italic font-serif">The Archive</h2>
+</div>
+<nav class="hidden md:flex gap-8 text-xs uppercase tracking-widest font-medium">
+<a class="hover:text-primary transition-colors" href="#">Manifestos</a>
+<a class="hover:text-primary transition-colors" href="#">Structures</a>
+<a class="hover:text-primary transition-colors" href="#">Void</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden sm:block">
+<input class="bg-transparent border border-white/20 px-4 py-2 text-xs focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-white/30 w-48 transition-all" placeholder="SEARCH" type="text"/>
+</div>
+<button class="material-symbols-outlined hover:text-primary">menu</button>
+</div>
+</header>
+<main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-0 border-r border-white/10">
+<aside class="lg:col-span-3 border-r border-white/10 p-8 flex flex-col justify-between h-auto lg:h-[calc(100vh-85px)] sticky top-[85px]">
+<div class="space-y-12">
+<div class="space-y-4">
+<span class="text-[10px] uppercase tracking-[0.3em] text-primary font-bold">Structural Data</span>
+<div class="border border-white/10 p-6 bg-white/5 space-y-6">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-white/40 uppercase">Author</span>
+<span class="font-serif italic text-lg">Mies van der Rohe</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-white/40 uppercase">Publication</span>
+<span class="text-sm font-medium">OCTOBER 1929</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-white/40 uppercase">Subject</span>
+<span class="text-sm font-medium tracking-wide">MINIMALISM / BAUHAUS</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-white/40 uppercase">Reading Time</span>
+<span class="text-sm font-medium italic">14 MINUTES</span>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<span class="text-[10px] uppercase tracking-[0.3em] text-white/60">Reference Materials</span>
+<ul class="text-xs space-y-3 font-medium">
+<li><a class="border-b border-white/10 pb-1 block hover:border-primary transition-all" href="#">01. Barcelona Pavilion Analysis</a></li>
+<li><a class="border-b border-white/10 pb-1 block hover:border-primary transition-all" href="#">02. The Logic of Steel</a></li>
+<li><a class="border-b border-white/10 pb-1 block hover:border-primary transition-all" href="#">03. Glass as Transparency</a></li>
+</ul>
+</div>
+</div>
+<div class="pt-12 text-[10px] text-white/20 uppercase tracking-widest leading-relaxed">
+                    © MCMXXIX — THE ARCHIVE <br/>
+                    BERLIN • WEIMAR • DESSAU
+                </div>
+</aside>
+<article class="lg:col-span-9">
+<div class="relative w-full h-[60vh] overflow-hidden border-b border-white/10">
+<div class="absolute inset-0 bg-neutral-900 flex items-center justify-center grayscale contrast-125">
+<div class="w-full h-full bg-cover bg-center" data-alt="High contrast black and white photo of a brutalist skyscraper corner" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA3J4v_nihMPdHCGSDqwr2jRoqBxsvE0Va5Mf_oJZXdywZI3IJ93BGhJiTYdfBfK4nwp19drVlKty7vvyvUMTi_UyA7zUS49YLFSv5guCqghEGkg2w_i5S5gWybbDKY0M4aL1Er4onB3VM0eg6XWelMqi9mIQ59rEpx7I7N1gOaXjgNL_qXtzkjnDfEBVqvRlDCtwRlOO3d4QPz5zuEIvTovdeVl3AAQ8_XztqHlZ0ZnpDXFjM7IyacAlbsekkeTeSRQ8XUSh3Ux5S6');"></div>
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-12 max-w-4xl">
+<h1 class="text-5xl md:text-7xl lg:text-8xl font-serif italic leading-[1.1] text-white">
+                            The <span class="text-primary not-italic font-display font-black tracking-tighter">Form</span> of <br/> Silence
+                        </h1>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-0">
+<div class="md:col-span-8 p-12 lg:p-20 space-y-12 border-r border-white/10">
+<div class="space-y-6 text-xl md:text-2xl leading-relaxed font-serif text-slate-300 italic">
+<p class="first-letter:text-7xl first-letter:font-black first-letter:text-primary first-letter:mr-3 first-letter:float-left first-letter:leading-none first-letter:font-display not-italic">
+                                Architecture starts when you carefully put two bricks together. There it begins. It is the language of structure, the poetry of the necessary. In our pursuit of the essence, we find that the "less" is not a reduction, but an intensification.
+                            </p>
+</div>
+<div class="space-y-8 text-base md:text-lg text-slate-400 leading-relaxed max-w-2xl">
+<p>
+                                Modern architecture does not mean the use of new materials. It means the use of materials in a new way. The steel frame and the glass wall are not merely technical achievements; they are the vocabulary of a new clarity. 
+                            </p>
+<div class="border-l-4 border-primary pl-8 py-4 my-12">
+<h3 class="text-white text-3xl font-display font-black uppercase tracking-tighter mb-4">God is in the details.</h3>
+<p class="text-sm italic font-serif">— Mies van der Rohe, on the precision of craft.</p>
+</div>
+<p>
+                                The skyscraper must be a structural symbol. It should not be a box with windows, but a volume of light. When we look at the pure geometry of the Seagram Building or the Barcelona Pavilion, we see the rejection of the ornamental. We see the soul of the machine age translated into stone and metal.
+                            </p>
+<div class="grid grid-cols-2 gap-4 py-8">
+<div class="aspect-[4/5] bg-neutral-800 grayscale" data-alt="Minimalist architectural detail of concrete stairs and shadows" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBMXNmI2NF8PIgv7JGLeYT1xcvX1lrdC2OCvHPfCu8-bZICX0mwwTkZCZA2k-_LQq0Qu0Ak6sPA1AQfbA6FUnmfFU0_3AlfXbZbIOcPnSMcByvqneBcNxpSR_6yAKrHwMd8co1iYah1lq8A2_76gXdOtjE6uezuwpl8tgcO9ROMXvGU85zDF9Ber0JCwrT3oBB-g9DhU9uoH-4IOQ7798tKaugZf7g9VsiH06qGRyYkZNB_LNcNREonhXtxiWHS0Cvintvcrk-PnkDz'); background-size: cover;"></div>
+<div class="aspect-[4/5] bg-neutral-800 grayscale contrast-150" data-alt="Abstract shadow pattern on a white modernist wall" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCFgdQlwBxF2YnS-YmlKdzQWF0rwJK5xh_psr4c_5lafF7p02jje5NbYuJwuwGWynndysbai3ozklglXrweJUx89-cqfoPbl2h3nu1q0rHOfc0Kg3mpjCzh0WbLgQYBlHpjAUwN-Ovl80LgZy8XZ6ZpwCL1HLepkFWWtGSuJpTetsIx9lVZd1uVdLzC-q5aj4drDCGOy_94cMv452RW7nUBdwa9nVkgcq2w9q23B-IlKPyHsP818amIpi-zbjvYxUvFp05CFGtmqv-9'); background-size: cover;"></div>
+</div>
+<p>
+                                We must understand that the aesthetic of structure is not coldness, but honesty. To strip away the unnecessary is to reveal the truth of the space. In the silence of the minimalist room, every line carries weight. Every shadow becomes a deliberate act of composition.
+                            </p>
+</div>
+</div>
+<div class="md:col-span-4 p-12 space-y-16 bg-white/5">
+<div class="space-y-4">
+<h4 class="text-[10px] uppercase tracking-[0.4em] font-bold text-primary">Technical Specs</h4>
+<div class="space-y-4 text-xs">
+<div class="flex justify-between border-b border-white/10 pb-2">
+<span class="text-white/40">Steel Grade</span>
+<span>ASTM A36</span>
+</div>
+<div class="flex justify-between border-b border-white/10 pb-2">
+<span class="text-white/40">Glass Clarity</span>
+<span>Low-Iron Optiwhite</span>
+</div>
+<div class="flex justify-between border-b border-white/10 pb-2">
+<span class="text-white/40">Module Grid</span>
+<span>1.2m x 1.2m</span>
+</div>
+</div>
+</div>
+<div class="aspect-square bg-white flex items-center justify-center p-8 group overflow-hidden cursor-crosshair">
+<div class="w-full h-full border-2 border-black relative transition-transform duration-700 group-hover:scale-110">
+<div class="absolute top-1/2 left-0 w-full h-[1px] bg-black/20"></div>
+<div class="absolute top-0 left-1/2 h-full w-[1px] bg-black/20"></div>
+<div class="absolute inset-4 border border-primary/40"></div>
+<div class="absolute inset-0 flex items-center justify-center text-black font-serif italic text-4xl">Void</div>
+</div>
+</div>
+<div class="space-y-6">
+<h4 class="text-[10px] uppercase tracking-[0.4em] font-bold text-white/60">Share Insights</h4>
+<div class="flex flex-col gap-4">
+<button class="border border-white/10 py-3 px-6 text-[10px] uppercase tracking-widest hover:bg-primary hover:border-primary transition-all flex items-center justify-between">
+                                    Archive to PDF
+                                    <span class="material-symbols-outlined text-sm">download</span>
+</button>
+<button class="border border-white/10 py-3 px-6 text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition-all flex items-center justify-between">
+                                    Digital Print
+                                    <span class="material-symbols-outlined text-sm">print</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</article>
+</main>
+<footer class="border-t border-white/10 p-12 grid grid-cols-1 md:grid-cols-4 gap-12 bg-background-dark">
+<div class="space-y-4">
+<div class="bg-primary size-8 mb-6"></div>
+<p class="text-xs text-white/40 leading-relaxed uppercase tracking-tighter">
+                    Exploring the intersection of architectural heritage and digital brutalism through the lens of pure logic.
+                </p>
+</div>
+<div class="space-y-4">
+<h5 class="text-[10px] uppercase tracking-widest text-primary">Location</h5>
+<p class="text-sm font-serif italic">Dessau, Germany</p>
+<div class="w-full h-32 bg-neutral-900 grayscale opacity-50 border border-white/10" data-location="Dessau, Germany" style=""></div>
+</div>
+<div class="space-y-4">
+<h5 class="text-[10px] uppercase tracking-widest text-primary">Curators</h5>
+<ul class="text-xs space-y-2 uppercase font-medium">
+<li>Bauhaus Foundation</li>
+<li>The International Style</li>
+<li>Minimalist Collective</li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="text-[10px] uppercase tracking-widest text-primary">Newsletter</h5>
+<div class="flex gap-0">
+<input class="bg-transparent border border-white/20 border-r-0 px-4 py-2 text-xs w-full focus:ring-0 focus:border-white transition-all" placeholder="EMAIL" type="email"/>
+<button class="bg-primary text-white px-4 py-2 text-xs font-bold uppercase hover:bg-white hover:text-black transition-all">JOIN</button>
+</div>
+</div>
+</footer>
+</div>
+</body></html>
