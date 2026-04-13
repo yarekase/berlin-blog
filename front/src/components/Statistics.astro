@@ -1,0 +1,21 @@
+---
+/**
+ * 統計卡片區域組件
+ * 顯示發佈文章、草稿、總文章數統計
+ */
+---
+
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+  <div class="border border-white/10 rounded-lg p-6 bg-void-black/50">
+    <div class="text-slate-400 text-sm font-medium mb-2">發佈文章</div>
+    <div class="text-4xl font-bold text-white" id="publishedCount">0</div>
+  </div>
+  <div class="border border-white/10 rounded-lg p-6 bg-void-black/50">
+    <div class="text-slate-400 text-sm font-medium mb-2">草稿</div>
+    <div class="text-4xl font-bold text-white" id="draftCount">0</div>
+  </div>
+  <div class="border border-white/10 rounded-lg p-6 bg-void-black/50">
+    <div class="text-slate-400 text-sm font-medium mb-2">總文章數</div>
+    <div class="text-4xl font-bold text-white" id="totalCount">0</div>
+  </div>
+</section>

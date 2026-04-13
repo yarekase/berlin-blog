@@ -1,0 +1,169 @@
+---
+/**
+ * 編輯/新增文章模態框組件
+ * 包含表單表格和 Editor.js 編輯器
+ */
+---
+
+<div
+  id="editModal"
+  class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+>
+  <div
+    class="bg-void-black border border-white/10 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+  >
+    <div
+      class="sticky top-0 bg-void-black border-b border-white/10 px-6 py-4 flex items-center justify-between"
+    >
+      <h3 class="text-xl font-bold" id="modalTitle">新增文章</h3>
+      <button
+        id="closeModalBtn"
+        class="text-slate-400 hover:text-white transition-colors"
+      >
+        ✕
+      </button>
+    </div>
+
+    <form id="postForm" class="p-6 space-y-6">
+      <div>
+        <label for="title" class="block text-sm font-medium text-slate-400 mb-2"
+          >文章標題</label
+        >
+        <input
+          type="text"
+          id="title"
+          name="title"
+          class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+          required
+        />
+      </div>
+
+      <div>
+        <label
+          for="author_name"
+          class="block text-sm font-medium text-slate-400 mb-2">作者名稱</label
+        >
+        <input
+          type="text"
+          id="author_name"
+          name="author_name"
+          class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="slug" class="block text-sm font-medium text-slate-400 mb-2"
+          >網址路徑 (Slug)</label
+        >
+        <input
+          type="text"
+          id="slug"
+          name="slug"
+          class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+          required
+        />
+      </div>
+
+      <div>
+        <label
+          for="categories"
+          class="block text-sm font-medium text-slate-400 mb-2"
+          >分類 (可多選)</label
+        >
+        <div id="categoriesContainer" class="space-y-2">
+          <!-- 動態生成分類選項 -->
+        </div>
+      </div>
+
+      <div>
+        <label
+          for="summary"
+          class="block text-sm font-medium text-slate-400 mb-2"
+          >摘要 (SEO 用)</label
+        >
+        <textarea
+          id="summary"
+          name="summary"
+          rows="3"
+          class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+          placeholder="可留空，系統會自動從內容生成"></textarea>
+      </div>
+
+      <div>
+        <label
+          for="cover_image"
+          class="block text-sm font-medium text-slate-400 mb-2"
+          >封面圖 URL</label
+        >
+        <input
+          type="url"
+          id="cover_image"
+          name="cover_image"
+          class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+          placeholder="R2 URL"
+        />
+      </div>
+
+      <div>
+        <label
+          for="content"
+          class="block text-sm font-medium text-slate-400 mb-2">內容</label
+        >
+        <div
+          id="editorjs"
+          class="min-h-[400px] border border-white/20 rounded p-4 bg-void-black text-white"
+        >
+        </div>
+        <textarea id="content" name="content" class="hidden"></textarea>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label
+            for="status"
+            class="block text-sm font-medium text-slate-400 mb-2">狀態</label
+          >
+          <select
+            id="status"
+            name="status"
+            class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+          >
+            <option value="draft">草稿</option>
+            <option value="published">發佈</option>
+          </select>
+        </div>
+        <div>
+          <label
+            for="publishedAt"
+            class="block text-sm font-medium text-slate-400 mb-2"
+            >發佈日期</label
+          >
+          <input
+            type="datetime-local"
+            id="publishedAt"
+            name="publishedAt"
+            class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+          />
+        </div>
+      </div>
+
+      <div class="flex gap-4 pt-4">
+        <button
+          type="submit"
+          id="submitBtn"
+          class="flex-1 bg-primary text-white px-6 py-2 rounded font-bold hover:bg-primary/80 transition-all"
+        >
+          保存
+        </button>
+        <button
+          type="button"
+          class="flex-1 bg-void-black border border-white/20 text-white px-6 py-2 rounded font-bold hover:border-white/40 transition-all"
+          onclick="document.getElementById('editModal').classList.add('hidden')"
+        >
+          取消
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

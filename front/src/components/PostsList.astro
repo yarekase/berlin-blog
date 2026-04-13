@@ -1,0 +1,55 @@
+---
+/**
+ * 文章列表表格組件
+ * 顯示所有文章的表格和操作按鈕
+ */
+---
+
+<section>
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold">文章管理</h2>
+    <button
+      id="newPostBtn"
+      class="bg-primary text-white px-6 py-2 rounded font-bold hover:bg-primary/80 transition-all"
+    >
+      新增文章
+    </button>
+  </div>
+
+  <!-- 文章列表表格 -->
+  <div class="border border-white/10 rounded-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-void-black/50 border-b border-white/10">
+          <tr>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-400"
+              >標題</th
+            >
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-400"
+              >作者</th
+            >
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-400"
+              >分類</th
+            >
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-400"
+              >狀態</th
+            >
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-400"
+              >建立日期</th
+            >
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-400"
+              >操作</th
+            >
+          </tr>
+        </thead>
+        <tbody id="postsList">
+          <tr>
+            <td colspan="5" class="px-6 py-8 text-center text-slate-500">
+              暫無文章
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

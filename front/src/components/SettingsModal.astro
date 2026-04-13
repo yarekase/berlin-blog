@@ -1,0 +1,56 @@
+---
+/**
+ * 設定模態框組件
+ * 管理用戶暱稱等設定
+ */
+---
+
+<div
+  id="settingsModal"
+  class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+>
+  <div class="bg-void-black border border-white/10 rounded-lg max-w-md w-full">
+    <div
+      class="px-6 py-4 border-b border-white/10 flex items-center justify-between"
+    >
+      <h3 class="text-xl font-bold">設定</h3>
+      <button
+        id="closeSettingsBtn"
+        class="text-slate-400 hover:text-white transition-colors"
+      >
+        ✕
+      </button>
+    </div>
+
+    <form id="settingsForm" class="p-6 space-y-6">
+      <div>
+        <label for="nickname" class="block text-sm font-medium text-slate-400 mb-2"
+          >暱稱</label
+        >
+        <input
+          type="text"
+          id="nickname"
+          name="nickname"
+          class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+          placeholder="輸入您的暱稱"
+        />
+      </div>
+
+      <div class="flex gap-4 pt-4">
+        <button
+          type="submit"
+          class="flex-1 bg-primary text-white px-6 py-2 rounded font-bold hover:bg-primary/80 transition-all"
+        >
+          保存
+        </button>
+        <button
+          type="button"
+          class="flex-1 bg-void-black border border-white/20 text-white px-6 py-2 rounded font-bold hover:border-white/40 transition-all"
+          onclick="document.getElementById('settingsModal').classList.add('hidden')"
+        >
+          取消
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

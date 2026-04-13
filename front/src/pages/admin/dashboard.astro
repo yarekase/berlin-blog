@@ -1,378 +1,454 @@
 ---
+/**
+ * 後台儀表板主頁面
+ * 這是經過重構的主頁面，使用了模塊化組件
+ */
 import Layout from "../../layouts/Layout.astro";
+import Navigation from "../../components/Navigation.astro";
+import Statistics from "../../components/Statistics.astro";
+import PostsList from "../../components/PostsList.astro";
+import EditModal from "../../components/EditModal.astro";
+import SettingsModal from "../../components/SettingsModal.astro";
+import "../../styles/editor.css";
 ---
 
 <Layout title="後台儀表板 - 子迂的蠹酸齋">
   <main class="min-h-screen bg-void-black text-stucco-white font-display pb-24">
-    <!-- 頂部導航 -->
-    <nav class="border-b border-white/10 bg-void-black sticky top-0 z-50">
-      <div
-        class="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between"
-      >
-        <h1 class="text-xl font-bold">後台管理</h1>
-        <div class="flex items-center gap-4">
-          <button
-            id="settingsBtn"
-            class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-primary transition-colors"
-            >設定</button
-          >
-          <button
-            id="logoutBtn"
-            class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-primary transition-colors"
-            >登出</button
-          >
-        </div>
-      </div>
-    </nav>
+    <!-- 導航欄 -->
+    <Navigation />
 
     <!-- 主要內容 -->
     <div class="max-w-[1400px] mx-auto px-6 py-8">
       <!-- 儀表板統計 -->
-      <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div class="border border-white/10 rounded-lg p-6 bg-void-black/50">
-          <div class="text-slate-400 text-sm font-medium mb-2">發佈文章</div>
-          <div class="text-4xl font-bold text-white" id="publishedCount">0</div>
-        </div>
-        <div class="border border-white/10 rounded-lg p-6 bg-void-black/50">
-          <div class="text-slate-400 text-sm font-medium mb-2">草稿</div>
-          <div class="text-4xl font-bold text-white" id="draftCount">0</div>
-        </div>
-        <div class="border border-white/10 rounded-lg p-6 bg-void-black/50">
-          <div class="text-slate-400 text-sm font-medium mb-2">總文章數</div>
-          <div class="text-4xl font-bold text-white" id="totalCount">0</div>
-        </div>
-      </section>
+      <Statistics />
 
       <!-- 文章管理區 -->
-      <section>
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold">文章管理</h2>
-          <button
-            id="newPostBtn"
-            class="bg-primary text-white px-6 py-2 rounded font-bold hover:bg-primary/80 transition-all"
-          >
-            新增文章
-          </button>
-        </div>
-
-        <!-- 文章列表 -->
-        <div class="border border-white/10 rounded-lg overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead class="bg-void-black/50 border-b border-white/10">
-                <tr>
-                  <th
-                    class="px-6 py-4 text-left text-sm font-semibold text-slate-400"
-                    >標題</th
-                  >
-                  <th
-                    class="px-6 py-4 text-left text-sm font-semibold text-slate-400"
-                    >分類</th
-                  >
-                  <th
-                    class="px-6 py-4 text-left text-sm font-semibold text-slate-400"
-                    >狀態</th
-                  >
-                  <th
-                    class="px-6 py-4 text-left text-sm font-semibold text-slate-400"
-                    >建立日期</th
-                  >
-                  <th
-                    class="px-6 py-4 text-left text-sm font-semibold text-slate-400"
-                    >操作</th
-                  >
-                </tr>
-              </thead>
-              <tbody id="postsList">
-                <tr>
-                  <td colspan="5" class="px-6 py-8 text-center text-slate-500">
-                    暫無文章
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+      <PostsList />
     </div>
   </main>
 
   <!-- 編輯模態框 -->
-  <div
-    id="editModal"
-    class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-  >
-    <div
-      class="bg-void-black border border-white/10 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-    >
-      <div
-        class="sticky top-0 bg-void-black border-b border-white/10 px-6 py-4 flex items-center justify-between"
-      >
-        <h3 class="text-xl font-bold" id="modalTitle">新增文章</h3>
-        <button
-          id="closeModalBtn"
-          class="text-slate-400 hover:text-white transition-colors"
-        >
-          ✕
-        </button>
-      </div>
-
-      <form id="postForm" class="p-6 space-y-6">
-        <div>
-          <label
-            for="title"
-            class="block text-sm font-medium text-slate-400 mb-2"
-            >文章標題</label
-          >
-          <input
-            type="text"
-            id="title"
-            name="title"
-            class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
-            required
-          />
-        </div>
-
-        <div>
-          <label
-            for="category"
-            class="block text-sm font-medium text-slate-400 mb-2">分類</label
-          >
-          <select
-            id="category"
-            name="category"
-            class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
-            required
-          >
-            <option value="">選擇分類</option>
-            <option value="coding">Coding</option>
-            <option value="finance">Finance</option>
-            <option value="design">Design</option>
-            <option value="kaohsiung">Kaohsiung</option>
-            <option value="life">Life</option>
-          </select>
-        </div>
-
-        <div>
-          <label
-            for="excerpt"
-            class="block text-sm font-medium text-slate-400 mb-2">摘要</label
-          >
-          <textarea
-            id="excerpt"
-            name="excerpt"
-            rows="3"
-            class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
-          ></textarea>
-        </div>
-
-        <div>
-          <label
-            for="content"
-            class="block text-sm font-medium text-slate-400 mb-2">內容</label
-          >
-          <div
-            id="editorjs"
-            class="min-h-[400px] border border-white/20 rounded p-4 bg-void-black text-white"
-          >
-          </div>
-          <textarea id="content" name="content" class="hidden"></textarea>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label
-              for="status"
-              class="block text-sm font-medium text-slate-400 mb-2">狀態</label
-            >
-            <select
-              id="status"
-              name="status"
-              class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
-            >
-              <option value="draft">草稿</option>
-              <option value="published">發佈</option>
-            </select>
-          </div>
-          <div>
-            <label
-              for="publishedAt"
-              class="block text-sm font-medium text-slate-400 mb-2"
-              >發佈日期</label
-            >
-            <input
-              type="datetime-local"
-              id="publishedAt"
-              name="publishedAt"
-              class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
-            />
-          </div>
-        </div>
-
-        <div class="flex gap-4 pt-4">
-          <button
-            type="submit"
-            id="submitBtn"
-            class="flex-1 bg-primary text-white px-6 py-2 rounded font-bold hover:bg-primary/80 transition-all"
-          >
-            保存
-          </button>
-          <button
-            type="button"
-            class="flex-1 bg-void-black border border-white/20 text-white px-6 py-2 rounded font-bold hover:border-white/40 transition-all"
-            onclick="document.getElementById('editModal').classList.add('hidden')"
-          >
-            取消
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
+  <EditModal />
 
   <!-- 設定模態框 -->
-  <div
-    id="settingsModal"
-    class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-  >
-    <div
-      class="bg-void-black border border-white/10 rounded-lg max-w-md w-full"
-    >
-      <div
-        class="px-6 py-4 border-b border-white/10 flex items-center justify-between"
-      >
-        <h3 class="text-xl font-bold">設定</h3>
-        <button
-          id="closeSettingsBtn"
-          class="text-slate-400 hover:text-white transition-colors"
-        >
-          ✕
-        </button>
-      </div>
-
-      <form id="settingsForm" class="p-6 space-y-6">
-        <div>
-          <label
-            for="nickname"
-            class="block text-sm font-medium text-slate-400 mb-2">暱稱</label
-          >
-          <input
-            type="text"
-            id="nickname"
-            name="nickname"
-            class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
-            placeholder="輸入您的暱稱"
-          />
-        </div>
-
-        <div class="flex gap-4 pt-4">
-          <button
-            type="submit"
-            class="flex-1 bg-primary text-white px-6 py-2 rounded font-bold hover:bg-primary/80 transition-all"
-          >
-            保存
-          </button>
-          <button
-            type="button"
-            class="flex-1 bg-void-black border border-white/20 text-white px-6 py-2 rounded font-bold hover:border-white/40 transition-all"
-            onclick="document.getElementById('settingsModal').classList.add('hidden')"
-          >
-            取消
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
+  <SettingsModal />
 </Layout>
 
 <script>
-  // 1. 使用 D1 資料庫完全同步的介面
-  import type { Category, Post } from "../../types/interfaces";
+  import {
+    checkAuth,
+    logout,
+    setNickname,
+    getNickname,
+  } from "../../utils/auth";
+  import { postManager, type Post } from "../../utils/postManager";
+  import {
+    initEditor,
+    saveEditorContent,
+    destroyEditor,
+  } from "../../utils/editorManager";
 
-  // 2. 全域變數與狀態
-  let editor: any = null; // Editor.js 編輯器物件
-  let posts: Post[] = [];
-  // 模擬從 D1 抓取的分類清單
-  const allCategories: Category[] = [
-    { id: 1, name: "軟體工程", slug: "coding", sort_order: 1 },
-    { id: 2, name: "生活隨筆", slug: "life", sort_order: 2 },
-    { id: 3, name: "金融投資", slug: "finance", sort_order: 3 },
-    { id: 4, name: "高雄在地", slug: "kaohsiung", sort_order: 4 },
-  ];
+  // ===== 全局變數 - 外層作用域 =====
+  let editModal: HTMLDivElement | null = null;
+  let settingsModal: HTMLDivElement | null = null;
 
-  // 3. 輔助函式
+  // ===== 渲染函數 =====
+  function renderPosts() {
+    const postsList = document.getElementById(
+      "postsList",
+    ) as HTMLTableSectionElement | null;
+    const publishedCount = document.getElementById(
+      "publishedCount",
+    ) as HTMLDivElement | null;
+    const draftCount = document.getElementById(
+      "draftCount",
+    ) as HTMLDivElement | null;
+    const totalCount = document.getElementById(
+      "totalCount",
+    ) as HTMLDivElement | null;
 
-  // declare global 讓 TypeScript 知道我要修改全域的物件
-  declare global {
-    // 針對window物件新增兩個方法，分別是editPost和deletePost，這樣在其他地方就可以直接呼叫
-    interface Window {
-      editPost: (index: number) => void;
-      deletePost: (index: number) => void;
+    if (!postsList) return;
+
+    const posts = postManager.getPosts();
+
+    if (posts.length === 0) {
+      postsList.innerHTML =
+        '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500">暫無文章</td></tr>';
+    } else {
+      postsList.innerHTML = posts
+        .map(
+          (post) => `
+        <tr class="border-t border-white/10 hover:bg-void-black/50 transition-colors">
+          <td class="px-6 py-4 text-white">${post.title}</td>
+          <td class="px-6 py-4 text-slate-400 text-sm">${post.author_name}</td>
+          <td class="px-6 py-4 text-slate-400 text-sm">${post.categories.map((c) => c.name).join(", ")}</td>
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 text-xs font-medium rounded ${
+              post.status === "published"
+                ? "bg-green-500/20 text-green-400"
+                : "bg-yellow-500/20 text-yellow-400"
+            }">
+              ${post.status === "published" ? "發佈" : "草稿"}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-slate-400 text-sm">${new Date(post.created_at).toLocaleDateString()}</td>
+          <td class="px-6 py-4 text-sm">
+            <button class="text-primary hover:text-primary/80 transition-colors mr-4" onclick="editPost('${post.id}')">編輯</button>
+            <button class="text-red-500 hover:text-red-400 transition-colors" onclick="deletePost('${post.id}')">刪除</button>
+          </td>
+        </tr>
+      `,
+        )
+        .join("");
+    }
+
+    // 更新統計
+    if (publishedCount)
+      publishedCount.textContent = postManager.getPublishedCount().toString();
+    if (draftCount)
+      draftCount.textContent = postManager.getDraftCount().toString();
+    if (totalCount)
+      totalCount.textContent = postManager.getTotalCount().toString();
+  }
+
+  // ===== 全局函數 - 供 onclick 事件調用 =====
+  function deletePost(id: string) {
+    if (confirm("確定要刪除嗎？")) {
+      if (postManager.deletePost(id)) {
+        renderPosts();
+      }
     }
   }
+
+  async function editPost(id: string) {
+    const post = postManager.getPost(id);
+    if (!post) return;
+
+    const titleInput = document.getElementById(
+      "title",
+    ) as HTMLInputElement | null;
+    const authorNameInput = document.getElementById(
+      "author_name",
+    ) as HTMLInputElement | null;
+    const slugInput = document.getElementById(
+      "slug",
+    ) as HTMLInputElement | null;
+    const summaryTextarea = document.getElementById(
+      "summary",
+    ) as HTMLTextAreaElement | null;
+    const coverImageInput = document.getElementById(
+      "cover_image",
+    ) as HTMLInputElement | null;
+    const statusSelect = document.getElementById(
+      "status",
+    ) as HTMLSelectElement | null;
+    const modalTitle = document.getElementById(
+      "modalTitle",
+    ) as HTMLHeadingElement | null;
+    const submitBtn = document.getElementById(
+      "submitBtn",
+    ) as HTMLButtonElement | null;
+    const postForm = document.getElementById(
+      "postForm",
+    ) as HTMLFormElement | null;
+    const categoriesContainer = document.getElementById(
+      "categoriesContainer",
+    ) as HTMLDivElement | null;
+
+    if (
+      !titleInput ||
+      !authorNameInput ||
+      !slugInput ||
+      !summaryTextarea ||
+      !coverImageInput ||
+      !statusSelect ||
+      !modalTitle ||
+      !submitBtn ||
+      !postForm ||
+      !editModal ||
+      !categoriesContainer
+    )
+      return;
+
+    // 填充表單
+    titleInput.value = post.title;
+    authorNameInput.value = post.author_name;
+    slugInput.value = post.slug;
+    summaryTextarea.value = post.summary || "";
+    coverImageInput.value = post.cover_image;
+    statusSelect.value = post.status;
+
+    // 生成分類選項
+    const categories = postManager.getCategories();
+    categoriesContainer.innerHTML = categories
+      .map(
+        (category) => `
+        <label class="flex items-center">
+          <input
+            type="checkbox"
+            value="${category.id}"
+            class="mr-2"
+            ${post.categories.some((c) => c.id === category.id) ? "checked" : ""}
+          />
+          ${category.name}
+        </label>
+      `,
+      )
+      .join("");
+
+    // 初始化 Editor.js 並載入內容
+    const editorData = post.content ? JSON.parse(post.content) : null;
+    await initEditor(editorData);
+
+    modalTitle.textContent = "編輯文章";
+    submitBtn.textContent = "更新";
+
+    postForm.onsubmit = async (e: Event) => {
+      e.preventDefault();
+      const contentData = await saveEditorContent();
+
+      // 獲取選中的分類
+      const selectedCategoryIds = Array.from(
+        categoriesContainer.querySelectorAll('input[type="checkbox"]:checked'),
+      ).map((checkbox) => parseInt((checkbox as HTMLInputElement).value));
+      const selectedCategories = categories.filter((c) =>
+        selectedCategoryIds.includes(c.id),
+      );
+
+      postManager.updatePost(id, {
+        title: titleInput.value,
+        author_name: authorNameInput.value,
+        content: JSON.stringify(contentData),
+        summary: summaryTextarea.value || undefined,
+        cover_image: coverImageInput.value,
+        status: statusSelect.value as "draft" | "published",
+        categories: selectedCategories,
+      });
+
+      renderPosts();
+      await destroyEditor();
+      editModal.classList.add("hidden");
+    };
+
+    editModal.classList.remove("hidden");
+  }
+
+  // ===== 頁面初始化 - DOMContentLoaded =====
+  document.addEventListener("DOMContentLoaded", () => {
+    // 認證檢查
+    checkAuth();
+
+    // 取得模態框和按鈕元素
+    editModal = document.getElementById("editModal") as HTMLDivElement | null;
+    settingsModal = document.getElementById(
+      "settingsModal",
+    ) as HTMLDivElement | null;
+    const newPostBtn = document.getElementById(
+      "newPostBtn",
+    ) as HTMLButtonElement | null;
+    const settingsBtn = document.getElementById(
+      "settingsBtn",
+    ) as HTMLButtonElement | null;
+    const closeModalBtn = document.getElementById(
+      "closeModalBtn",
+    ) as HTMLButtonElement | null;
+    const closeSettingsBtn = document.getElementById(
+      "closeSettingsBtn",
+    ) as HTMLButtonElement | null;
+    const logoutBtn = document.getElementById(
+      "logoutBtn",
+    ) as HTMLButtonElement | null;
+    const settingsForm = document.getElementById(
+      "settingsForm",
+    ) as HTMLFormElement | null;
+    const postForm = document.getElementById(
+      "postForm",
+    ) as HTMLFormElement | null;
+
+    if (
+      !editModal ||
+      !settingsModal ||
+      !newPostBtn ||
+      !settingsBtn ||
+      !closeModalBtn ||
+      !closeSettingsBtn
+    ) {
+      console.error("必要的 DOM 元素未找到");
+      return;
+    }
+
+    // ===== 新增文章 =====
+    newPostBtn.addEventListener("click", () => {
+      const modalTitle = document.getElementById(
+        "modalTitle",
+      ) as HTMLHeadingElement | null;
+      const submitBtn = document.getElementById(
+        "submitBtn",
+      ) as HTMLButtonElement | null;
+      const categoriesContainer = document.getElementById(
+        "categoriesContainer",
+      ) as HTMLDivElement | null;
+      if (postForm && modalTitle && submitBtn && categoriesContainer) {
+        postForm.reset();
+        modalTitle.textContent = "新增文章";
+        submitBtn.textContent = "新增";
+
+        // 生成分類選項
+        const categories = postManager.getCategories();
+        categoriesContainer.innerHTML = categories
+          .map(
+            (category) => `
+            <label class="flex items-center">
+              <input type="checkbox" value="${category.id}" class="mr-2" />
+              ${category.name}
+            </label>
+          `,
+          )
+          .join("");
+
+        initEditor();
+        editModal.classList.remove("hidden");
+
+        // 重新綁定 submit 事件用於新增
+        postForm.onsubmit = async (e: Event) => {
+          e.preventDefault();
+          const contentData = await saveEditorContent();
+
+          const titleInput = document.getElementById(
+            "title",
+          ) as HTMLInputElement | null;
+          const authorNameInput = document.getElementById(
+            "author_name",
+          ) as HTMLInputElement | null;
+          const slugInput = document.getElementById(
+            "slug",
+          ) as HTMLInputElement | null;
+          const summaryTextarea = document.getElementById(
+            "summary",
+          ) as HTMLTextAreaElement | null;
+          const coverImageInput = document.getElementById(
+            "cover_image",
+          ) as HTMLInputElement | null;
+          const statusSelect = document.getElementById(
+            "status",
+          ) as HTMLSelectElement | null;
+          const categoriesContainer = document.getElementById(
+            "categoriesContainer",
+          ) as HTMLDivElement | null;
+
+          if (
+            !titleInput ||
+            !authorNameInput ||
+            !slugInput ||
+            !summaryTextarea ||
+            !coverImageInput ||
+            !statusSelect ||
+            !categoriesContainer
+          )
+            return;
+
+          // 獲取選中的分類
+          const selectedCategoryIds = Array.from(
+            categoriesContainer.querySelectorAll(
+              'input[type="checkbox"]:checked',
+            ),
+          ).map((checkbox) => parseInt((checkbox as HTMLInputElement).value));
+          const selectedCategories = postManager
+            .getCategories()
+            .filter((c) => selectedCategoryIds.includes(c.id));
+
+          postManager.addPost({
+            title: titleInput.value,
+            author_name: authorNameInput.value,
+            content: JSON.stringify(contentData),
+            cover_image: coverImageInput.value,
+            status: statusSelect.value as "draft" | "published",
+            categories: selectedCategories,
+          });
+
+          renderPosts();
+          await destroyEditor();
+          editModal.classList.add("hidden");
+        };
+      }
+    });
+
+    // ===== 設定按鈕 =====
+    settingsBtn.addEventListener("click", () => {
+      const nicknameInput = document.getElementById(
+        "nickname",
+      ) as HTMLInputElement | null;
+      if (nicknameInput) {
+        nicknameInput.value = getNickname();
+        settingsModal.classList.remove("hidden");
+      }
+    });
+
+    // ===== 關閉模態框 =====
+    closeModalBtn.addEventListener("click", () => {
+      editModal.classList.add("hidden");
+      destroyEditor();
+    });
+
+    closeSettingsBtn.addEventListener("click", () => {
+      settingsModal.classList.add("hidden");
+    });
+
+    // 點擊背景關閉模態框
+    editModal.addEventListener("click", (e: Event) => {
+      if (e.target === editModal) {
+        editModal.classList.add("hidden");
+        destroyEditor();
+      }
+    });
+
+    settingsModal.addEventListener("click", (e: Event) => {
+      if (e.target === settingsModal) {
+        settingsModal.classList.add("hidden");
+      }
+    });
+
+    // ===== Slug 自動生成 =====
+    const titleInput = document.getElementById(
+      "title",
+    ) as HTMLInputElement | null;
+    const slugInput = document.getElementById(
+      "slug",
+    ) as HTMLInputElement | null;
+    if (titleInput && slugInput) {
+      titleInput.addEventListener("input", () => {
+        const slug = titleInput.value
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, "")
+          .replace(/[\s_-]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+        slugInput.value = slug;
+      });
+    }
+
+    // ===== 設定表單提交 =====
+    if (settingsForm) {
+      settingsForm.addEventListener("submit", (e: Event) => {
+        e.preventDefault();
+        const nicknameInput = document.getElementById(
+          "nickname",
+        ) as HTMLInputElement | null;
+        if (nicknameInput) {
+          setNickname(nicknameInput.value);
+          settingsModal.classList.add("hidden");
+          alert("設定已保存");
+        }
+      });
+    }
+
+    // ===== 登出 =====
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        logout();
+      });
+    }
+
+    // 初始化頁面
+    renderPosts();
+  });
 </script>
-
-<style>
-  input:focus,
-  select:focus,
-  textarea:focus {
-    border-color: var(--color-primary);
-  }
-
-  /* Editor.js 暗色主題 */
-  .codex-editor {
-    color: white;
-  }
-
-  .codex-editor__redactor {
-    padding-bottom: 100px !important;
-  }
-
-  .ce-block__content,
-  .ce-toolbar__content {
-    max-width: none;
-  }
-
-  .ce-paragraph[data-placeholder]:empty::before {
-    color: #9ca3af;
-  }
-
-  .ce-header {
-    color: white;
-  }
-
-  .ce-toolbar__plus,
-  .ce-toolbar__settings-btn {
-    color: white;
-  }
-
-  .ce-toolbox {
-    background: #1f2937;
-    border: 1px solid #374151;
-  }
-
-  .ce-toolbox__toggler {
-    color: white;
-  }
-
-  .ce-block--selected .ce-block__content {
-    background-color: rgba(59, 130, 246, 0.1);
-  }
-
-  .ce-inline-toolbar {
-    background: #1f2937;
-    border: 1px solid #374151;
-  }
-
-  .ce-inline-toolbar__buttons {
-    color: white;
-  }
-
-  .ce-conversion-toolbar {
-    background: #1f2937;
-    border: 1px solid #374151;
-  }
-
-  .ce-conversion-toolbar__buttons {
-    color: white;
-  }
-</style>
