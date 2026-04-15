@@ -3,6 +3,8 @@
  * 負責 Editor.js 的初始化和生命週期管理
  */
 
+import { config } from "astro:schema";
+
 export let editor: any = null;
 
 /**
@@ -12,9 +14,7 @@ export let editor: any = null;
 export async function initEditor(data: any = null): Promise<void> {
   try {
     // 如果已有編輯器，先銷毀
-    if (editor) {
-      await editor.destroy();
-    }
+    await destroyEditor();
 
     // 動態導入 Editor.js 和工具
     const { default: EditorJS } = await import("@editorjs/editorjs");
@@ -23,6 +23,8 @@ export async function initEditor(data: any = null): Promise<void> {
     const { default: Quote } = await import("@editorjs/quote");
     const { default: Delimiter } = await import("@editorjs/delimiter");
     const { default: Embed } = await import("@editorjs/embed");
+    const { default: Image } = await import("@editorjs/image");
+    const { default: Marker } = await import("@editorjs/marker");
 
     editor = new EditorJS({
       holder: "editorjs",
@@ -36,6 +38,9 @@ export async function initEditor(data: any = null): Promise<void> {
         list: {
           class: List as any,
           inlineToolbar: true,
+          config: {
+            defaultStyle: "unordered",
+          },
         },
         quote: {
           class: Quote as any,
@@ -45,6 +50,18 @@ export async function initEditor(data: any = null): Promise<void> {
         embed: {
           class: Embed as any,
           inlineToolbar: true,
+        },
+        image: {
+          class: Image,
+          config: {
+            endpoints: {
+              byFile: "/api/upload", // 指向你的後端路徑
+            },
+          },
+        },
+        marker: {
+          class: Marker,
+          shortcut: "CMD+SHIFT+M", // 也可以設定快速鍵
         },
       },
     } as any);

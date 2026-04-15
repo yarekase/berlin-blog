@@ -1,96 +1,121 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="子迂的蠹酸齋">
   <!-- 最小高度螢幕高 自定義黑色背景 自定義白色文字 字體使用無襯線體 內邊間距24(最最下面，墊高內容) -->
-    <main class="min-h-screen bg-void-black text-stucco-white font-display pb-24">
-        
-        <!-- 首頁圖區，寬滿版，高32(128px) relative子元素的基準點 border邊界線有底線 邊界線顏色白色透明 -->
-        <div class="w-full h-32 relative border-b border-white/10" >
-            <!-- 預計要放圖 -->
-            <div class="absolute inset-0 flex items-center justify-center bg-linear-to-t from-void-black/80 to-transparent">
-              <span>首頁圖</span>
-            </div>
+  <main class="min-h-screen bg-void-black text-stucco-white font-display pb-24">
+    <!-- 首頁圖區，寬滿版，高32(128px) relative子元素的基準點 border邊界線有底線 邊界線顏色白色透明 -->
+    <div class="w-full h-32 relative border-b border-white/10">
+      <!-- 預計要放圖 -->
+      <div
+        class="absolute inset-0 flex items-center justify-center bg-linear-to-t from-void-black/80 to-transparent"
+      >
+        <span>首頁圖</span>
+      </div>
+    </div>
+
+    <!-- 內容區 最大寬度1200px 外邊界自動 x軸兩側預留6(24px) -->
+    <div class="max-w-300 mx-auto px-6">
+      <div
+        class="relative -mt-4 mb-12 flex flex-col md:flex-row items-start gap-6"
+      >
+        <div
+          class="w-32 h-32 bg-primary border-[6px] border-void-black shadow-xl shrink-0 flex items-center justify-center"
+        >
+          <span class="text-white font-black text-xs uppercase">Profile</span>
         </div>
 
-        <!-- 內容區 最大寬度1200px 外邊界自動 x軸兩側預留6(24px) -->
-        <div class="max-w-[1200px] mx-auto px-6">
-          
+        <div class="flex-1">
+          <h1 class="text-3xl font-bold tracking-tight text-white mb-1">
+            子迂的蠢酸齋
+          </h1>
 
-          <div class="relative -mt-4 mb-12 flex flex-col md:flex-row items-start gap-6">
-              <div class="w-32 h-32 bg-primary border-[6px] border-void-black shadow-xl shrink-0 flex items-center justify-center">
-              <span class="text-white font-black text-xs uppercase">Profile</span>
-            </div>
-          
-            <div class="flex-1">
-              
-              <h1 class="text-3xl font-bold tracking-tight text-white mb-1">子迂的蠢酸齋</h1>
-              
-              <div class="flex items-center gap-3 text-slate-400 text-sm">
-                <span class="font-medium">424 followers</span>
-                <span class="w-1 h-1 bg-slate-600 rounded-full"></span>
-                <span class="font-medium text-primary">1 software engineer</span>
-              </div>
-            
-            </div>
-            
-            <button class="bg-[#222] text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-primary transition-all self-center md:self-end">
-              Follow
-            </button>
-          
+          <div class="flex items-center gap-3 text-slate-400 text-sm">
+            <span class="font-medium">424 followers</span>
+            <span class="w-1 h-1 bg-slate-600 rounded-full"></span>
+            <span class="font-medium text-primary">1 software engineer</span>
           </div>
+        </div>
 
-          <nav class="flex flex-nowrap gap-10 border-y border-white/5 py-4 mb-16 overflow-x-auto no-scrollbar w-full relative">
-            
-            {['Coding', 'Finance', 'Design', 'Kaohsiung', 'Life'].map(item => (
-              <a href="#" class="text-sm font-medium text-slate-400 hover:text-primary tracking-wide transition-colors uppercase">{item}</a>
-            ))}
-    
-          </nav>
-
-          <section class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24 items-center group cursor-pointer">
-            
-            <div class="aspect-[16/10] bg-[#151515] border border-white/10 overflow-hidden relative">
-              
-              <div class="absolute inset-0 flex items-center justify-center text-slate-800 font-black text-4xl uppercase tracking-tighter opacity-20">Featured</div>
-            
-            </div>
-      
-            <div class="flex flex-col gap-4">
-              <h2 class="text-4xl font-bold leading-[1.2] text-white group-hover:text-primary transition-colors">
-                房價、藝術品、單價、坪數：<br/>軟體視角下的數據觀察
-              </h2>
-        
-              <p class="text-slate-400 text-lg leading-relaxed">        
-                活到一把歲數，我們習慣把牆當成理所當然的東西，直到你開始用 SQL 結構化這些數據，你會發現每一塊磚頭都有它的邏輯位址...
-              </p>
-        
-              <div class="flex items-center gap-2 text-xs text-slate-500 uppercase tracking-widest font-bold">   
-                <span>Yoshua</span> <span class="text-primary">·</span> <span>1d ago</span> <span class="text-primary">·</span> <span>5 min read</span>
-              </div>     
-            </div> 
-          
-          </section>
-
-    
-          <section class="grid grid-cols-1 md:grid-cols-3 gap-10"> 
-            {[1, 2, 3].map(i => (
-              <div class="group cursor-pointer">
-                
-                <div class="aspect-video bg-[#111] border border-white/10 mb-6 relative">
-                  
-                  <div class="absolute inset-0 flex items-center justify-center text-slate-800 font-bold text-xs uppercase tracking-widest opacity-30">Image {i}</div>
-                </div>
-          
-                <h4 class="text-xl font-bold text-white leading-snug group-hover:text-primary transition-colors">
-                  《建築詩篇與程式碼的交響》：<br/>柯比意教我的模矩化設計
-                </h4>
-              
-              </div>
-            ))}
-          </section>
-
+        <button
+          class="bg-[#222] text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-primary transition-all self-center md:self-end"
+        >
+          Follow
+        </button>
       </div>
-    </main>
+
+      <nav
+        class="flex flex-nowrap gap-10 border-y border-white/5 py-4 mb-16 overflow-x-auto no-scrollbar w-full relative"
+      >
+        {
+          ["Coding", "Finance", "Design", "Kaohsiung", "Life"].map((item) => (
+            <a
+              href="#"
+              class="text-sm font-medium text-slate-400 hover:text-primary tracking-wide transition-colors uppercase"
+            >
+              {item}
+            </a>
+          ))
+        }
+      </nav>
+
+      <section
+        class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24 items-center group cursor-pointer"
+      >
+        <div
+          class="aspect-16/10 bg-[#151515] border border-white/10 overflow-hidden relative"
+        >
+          <div
+            class="absolute inset-0 flex items-center justify-center text-slate-800 font-black text-4xl uppercase tracking-tighter opacity-20"
+          >
+            Featured
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <h2
+            class="text-4xl font-bold leading-[1.2] text-white group-hover:text-primary transition-colors"
+          >
+            房價、藝術品、單價、坪數：<br />軟體視角下的數據觀察
+          </h2>
+
+          <p class="text-slate-400 text-lg leading-relaxed">
+            活到一把歲數，我們習慣把牆當成理所當然的東西，直到你開始用 SQL
+            結構化這些數據，你會發現每一塊磚頭都有它的邏輯位址...
+          </p>
+
+          <div
+            class="flex items-center gap-2 text-xs text-slate-500 uppercase tracking-widest font-bold"
+          >
+            <span>Yoshua</span>
+            <span class="text-primary">·</span>
+            <span>1d ago</span>
+            <span class="text-primary">·</span>
+            <span>5 min read</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-10">
+        {
+          [1, 2, 3].map((i) => (
+            <div class="group cursor-pointer">
+              <div class="aspect-video bg-[#111] border border-white/10 mb-6 relative">
+                <div class="absolute inset-0 flex items-center justify-center text-slate-800 font-bold text-xs uppercase tracking-widest opacity-30">
+                  Image {i}
+                </div>
+              </div>
+
+              <h4 class="text-xl font-bold text-white leading-snug group-hover:text-primary transition-colors">
+                《建築詩篇與程式碼的交響》：
+                <br />
+                柯比意教我的模矩化設計
+              </h4>
+            </div>
+          ))
+        }
+      </section>
+    </div>
+  </main>
 </Layout>

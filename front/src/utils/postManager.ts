@@ -56,11 +56,12 @@ class PostManager {
    */
   private getDefaultCategories(): Category[] {
     return [
-      { id: 1, name: "Coding", slug: "coding", sort_order: 1 },
-      { id: 2, name: "Finance", slug: "finance", sort_order: 2 },
-      { id: 3, name: "Design", slug: "design", sort_order: 3 },
-      { id: 4, name: "Kaohsiung", slug: "kaohsiung", sort_order: 4 },
-      { id: 5, name: "Life", slug: "life", sort_order: 5 },
+      { id: 1, name: "有品有閒", slug: "class", sort_order: 1 },
+      { id: 2, name: "藝術", slug: "arts", sort_order: 2 },
+      { id: 3, name: "歷史", slug: "history", sort_order: 3 },
+      { id: 4, name: "政治", slug: "politics", sort_order: 4 },
+      { id: 5, name: "電影", slug: "movies", sort_order: 5 },
+      { id: 6, name: "閱讀", slug: "reading", sort_order: 6 },
     ];
   }
 

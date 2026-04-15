@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@editorjs/image": "^2.10.3",
+    "@editorjs/marker": "^1.4.0"
+  }
+}
