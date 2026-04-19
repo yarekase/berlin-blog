@@ -3,6 +3,8 @@
  * 處理文章的增刪改查和存儲
  */
 
+import { any } from "astro:schema";
+
 export interface Category {
   id: number;
   name: string;
@@ -19,32 +21,126 @@ export interface Post {
   summary?: string; // nullable
   cover_image: string;
   status: "draft" | "published";
-  preview_token: string;
+  draft_token: string;
   created_at: string;
   published_at?: string; // nullable
   updated_at: string;
   categories: Category[]; // 多對多關係
 }
 
-class PostManager {
+export class PostManager {
   private posts: Post[] = [];
   private categories: Category[] = [];
-
-  constructor() {
-    this.loadPosts();
-    this.loadCategories();
-  }
-
   /**
-   * 從 localStorage 加載文章
+   * 生成 URL slug
+   * @param title
+   * @returns
    */
-  private loadPosts(): void {
-    const saved = localStorage.getItem("adminPosts");
-    this.posts = saved ? JSON.parse(saved) : [];
+  private generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
   }
 
   /**
-   * 從 localStorage 加載分類
+   * 從 D1atabase 加載文章
+   */
+  async getPosts(db: D1Database): Promise<Post[]> {
+    const { results } = await db
+      .prepare(
+        `
+      SELECT p.*, 
+      (SELECT json_group_array(json_object('id', c.id, 'name', c.name, 'slug', c.slug, 'sort_order', c.sort_order))
+       FROM categories c
+       JOIN post_categories pc ON c.id = pc.category_id
+       WHERE pc.post_id = p.id) as categories
+       
+      FROM posts p
+      ORDER BY created_at DESC
+    `,
+      )
+      .all();
+
+    return results.map((row: any) => {
+      let parsedCategories: any[] = [];
+
+      try {
+        // 檢查 row.categories 是否存在，若不存在或不是字串則給予空陣列
+        parsedCategories = row.categories
+          ? JSON.parse(row.categories as string)
+          : [];
+      } catch (e) {
+        console.error("解析分類失敗:", e);
+        parsedCategories = [];
+      }
+
+      return {
+        ...row,
+        categories: parsedCategories,
+      };
+    }) as Post[];
+  }
+
+  /**
+   * 新增文章 (使用 Batch 確保事務完整)
+   */
+  async addPost(
+    db: D1Database,
+    postData: {
+      title: string;
+      author_name: string;
+      content: string;
+      cover_image: string;
+      status: "draft" | "published";
+      categories: Category[];
+    },
+  ): Promise<void> {
+    const id = crypto.randomUUID().substring(0, 8); // 使用隨機 UUID 防止爬蟲猜測順序
+    const now = new Date().toISOString();
+    const slug = this.generateSlug(postData.title);
+    const summary = this.generateSummary(postData.content);
+    const draft_token = crypto.randomUUID();
+
+    const insertPost = db
+      .prepare(
+        `
+      INSERT INTO posts (id, title, author_name, slug, content, summary, cover_image, status, draft_token, created_at, updated_at, published_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+      )
+      .bind(
+        id,
+        postData.title,
+        postData.author_name,
+        slug,
+        postData.content,
+        summary,
+        postData.cover_image,
+        postData.status,
+        draft_token,
+        now,
+        now,
+        postData.status === "published" ? now : null,
+      );
+
+    // 建立多對多關聯 SQL
+    const insertRelations = postData.categories.map((cat) =>
+      db
+        .prepare(
+          `INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)`,
+        )
+        .bind(id, cat.id),
+    );
+
+    await db.batch([insertPost, ...insertRelations]);
+  }
+
+  // 以下都還沒修改資料，先放在這裡，等後端做好再來改這裡的資料來源
+
+  /**
+   * 從 localStorage 加載分類(以上都還沒有改資料)
    */
   private loadCategories(): void {
     const saved = localStorage.getItem("adminCategories");
@@ -80,17 +176,6 @@ class PostManager {
   }
 
   /**
-   * 生成 slug
-   */
-  private generateSlug(title: string): string {
-    return title
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/[\s_-]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-  }
-
-  /**
    * 生成預覽 token
    */
   private generatePreviewToken(): string {
@@ -119,13 +204,6 @@ class PostManager {
     } catch {
       return "";
     }
-  }
-
-  /**
-   * 獲取所有文章
-   */
-  getPosts(): Post[] {
-    return this.posts;
   }
 
   /**
@@ -161,38 +239,6 @@ class PostManager {
    */
   getTotalCount(): number {
     return this.posts.length;
-  }
-
-  /**
-   * 新增文章
-   */
-  addPost(postData: {
-    title: string;
-    author_name: string;
-    content: string;
-    cover_image: string;
-    status: "draft" | "published";
-    categories: Category[];
-  }): Post {
-    const now = new Date().toISOString();
-    const newPost: Post = {
-      id: Date.now().toString(),
-      title: postData.title,
-      author_name: postData.author_name,
-      slug: this.generateSlug(postData.title),
-      content: postData.content,
-      summary: this.generateSummary(postData.content),
-      cover_image: postData.cover_image,
-      status: postData.status,
-      preview_token: this.generatePreviewToken(),
-      created_at: now,
-      published_at: postData.status === "published" ? now : undefined,
-      updated_at: now,
-      categories: postData.categories,
-    };
-    this.posts.push(newPost);
-    this.savePosts();
-    return newPost;
   }
 
   /**

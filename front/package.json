@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.8",
+    "@astrojs/cloudflare": "^13.1.10",
     "@astrojs/ts-plugin": "^1.10.7",
     "@editorjs/delimiter": "^1.4.2",
     "@editorjs/editorjs": "^2.31.6",
@@ -22,7 +23,8 @@
     "@editorjs/quote": "^2.7.6",
     "@tailwindcss/vite": "^4.2.2",
     "astro": "^6.1.1",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.2.2",
+    "wrangler": "^4.83.0"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

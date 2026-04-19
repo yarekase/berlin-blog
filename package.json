@@ -1,6 +1,17 @@
 {
   "dependencies": {
+    "@astrojs/cloudflare": "^13.1.10",
     "@editorjs/image": "^2.10.3",
-    "@editorjs/marker": "^1.4.0"
+    "@editorjs/marker": "^1.4.0",
+    "wrangler": "^4.83.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260415.1"
+  },
+  "scripts": {
+    "generate-types": "wrangler types"
+  },
+  "overrides": {
+    "vite": "^7"
   }
 }
