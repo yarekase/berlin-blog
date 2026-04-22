@@ -10,6 +10,15 @@ import PostsList from "../../components/PostsList.astro";
 import EditModal from "../../components/EditModal.astro";
 import SettingsModal from "../../components/SettingsModal.astro";
 import "../../styles/editor.css";
+import { postManager, type Post } from "../../utils/postManager";
+
+// 伺服器端抓取資料
+const { DB } = Astro.locals.env || {};
+let posts: Post[] = [];
+
+if (DB) {
+  posts = await postManager.getPosts(DB);
+}
 ---
 
 <Layout title="後台儀表板 - 子迂的蠹酸齋">
@@ -23,7 +32,7 @@ import "../../styles/editor.css";
       <Statistics />
 
       <!-- 文章管理區 -->
-      <PostsList />
+      <PostsList posts={posts} />
     </div>
   </main>
 
@@ -41,134 +50,108 @@ import "../../styles/editor.css";
     setNickname,
     getNickname,
   } from "../../utils/auth";
-  import { postManager, type Post } from "../../utils/postManager";
+  import {
+    postManager,
+    type Post,
+    type Category,
+  } from "../../utils/postManager";
   import {
     initEditor,
     saveEditorContent,
     destroyEditor,
   } from "../../utils/editorManager";
 
+  /**
+   * 斷言輔助函數：取得 DOM 元素並保證其存在
+   * 如果找不到元素，它會直接拋出錯誤。
+   * 這樣後續代碼就不用處理 null 問題。
+   */
+  function $<T>(id: string, required = true): T {
+    const el = document.getElementById(id);
+    if (!el && required) {
+      throw new Error(`必要的 DOM 元素 #${id} 缺失，請檢查組件結構。`);
+    }
+    return el as unknown as T;
+  }
+
   // ===== 全局變數 - 外層作用域 =====
-  let editModal: HTMLDivElement | null = null;
-  let settingsModal: HTMLDivElement | null = null;
+  let editModal: HTMLDivElement;
+  let settingsModal: HTMLDivElement;
 
   // ===== 渲染函數 =====
   function renderPosts() {
-    const postsList = document.getElementById(
-      "postsList",
-    ) as HTMLTableSectionElement | null;
-    const publishedCount = document.getElementById(
-      "publishedCount",
-    ) as HTMLDivElement | null;
-    const draftCount = document.getElementById(
-      "draftCount",
-    ) as HTMLDivElement | null;
-    const totalCount = document.getElementById(
-      "totalCount",
-    ) as HTMLDivElement | null;
+    // const postsList = document.getElementById(
+    //   "postsList",
+    // ) as HTMLTableSectionElement | null;
+    // const publishedCount = document.getElementById(
+    //   "publishedCount",
+    // ) as HTMLDivElement | null;
+    // const draftCount = document.getElementById(
+    //   "draftCount",
+    // ) as HTMLDivElement | null;
+    // const totalCount = document.getElementById(
+    //   "totalCount",
+    // ) as HTMLDivElement | null;
 
-    if (!postsList) return;
+    // if (!postsList) return;
 
-    const posts = postManager.getPosts();
+    // const posts = postManager.getPosts();
 
-    if (posts.length === 0) {
-      postsList.innerHTML =
-        '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500">暫無文章</td></tr>';
-    } else {
-      postsList.innerHTML = posts
-        .map(
-          (post) => `
-        <tr class="border-t border-white/10 hover:bg-void-black/50 transition-colors">
-          <td class="px-6 py-4 text-white">${post.title}</td>
-          <td class="px-6 py-4 text-slate-400 text-sm">${post.author_name}</td>
-          <td class="px-6 py-4 text-slate-400 text-sm">${post.categories.map((c) => c.name).join(", ")}</td>
-          <td class="px-6 py-4">
-            <span class="px-3 py-1 text-xs font-medium rounded ${
-              post.status === "published"
-                ? "bg-green-500/20 text-green-400"
-                : "bg-yellow-500/20 text-yellow-400"
-            }">
-              ${post.status === "published" ? "發佈" : "草稿"}
-            </span>
-          </td>
-          <td class="px-6 py-4 text-slate-400 text-sm">${new Date(post.created_at).toLocaleDateString()}</td>
-          <td class="px-6 py-4 text-sm">
-            <button class="text-primary hover:text-primary/80 transition-colors mr-4" onclick="editPost('${post.id}')">編輯</button>
-            <button class="text-red-500 hover:text-red-400 transition-colors" onclick="deletePost('${post.id}')">刪除</button>
-          </td>
-        </tr>
-      `,
-        )
-        .join("");
-    }
-
-    // 更新統計
-    if (publishedCount)
-      publishedCount.textContent = postManager.getPublishedCount().toString();
-    if (draftCount)
-      draftCount.textContent = postManager.getDraftCount().toString();
-    if (totalCount)
-      totalCount.textContent = postManager.getTotalCount().toString();
-  }
-
-  // ===== 全局函數 - 供 onclick 事件調用 =====
-  function deletePost(id: string) {
-    if (confirm("確定要刪除嗎？")) {
-      if (postManager.deletePost(id)) {
-        renderPosts();
-      }
-    }
+    // if (posts.length === 0) {
+    //   postsList.innerHTML =
+    //     '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500">暫無文章</td></tr>';
+    // } else {
+    //   postsList.innerHTML = posts
+    //     .map(
+    //       (post) => `
+    //     <tr class="border-t border-white/10 hover:bg-void-black/50 transition-colors">
+    //       <td class="px-6 py-4 text-white">${post.title}</td>
+    //       <td class="px-6 py-4 text-slate-400 text-sm">${post.author_name}</td>
+    //       <td class="px-6 py-4 text-slate-400 text-sm">${post.categories.map((c) => c.name).join(", ")}</td>
+    //       <td class="px-6 py-4">
+    //         <span class="px-3 py-1 text-xs font-medium rounded ${
+    //           post.status === "published"
+    //             ? "bg-green-500/20 text-green-400"
+    //             : "bg-yellow-500/20 text-yellow-400"
+    //         }">
+    //           ${post.status === "published" ? "發佈" : "草稿"}
+    //         </span>
+    //       </td>
+    //       <td class="px-6 py-4 text-slate-400 text-sm">${new Date(post.created_at).toLocaleDateString()}</td>
+    //       <td class="px-6 py-4 text-sm">
+    //         <button class="text-primary hover:text-primary/80 transition-colors mr-4" onclick="editPost('${post.id}')">編輯</button>
+    //         <button class="text-red-500 hover:text-red-400 transition-colors" onclick="deletePost('${post.id}')">刪除</button>
+    //       </td>
+    //     </tr>
+    //   `,
+    //     )
+    //     .join("");
+    window.location.reload(); // 簡化處理，直接刷新頁面重新渲染
   }
 
   async function editPost(id: string) {
-    const post = postManager.getPost(id);
-    if (!post) return;
+    const token = localStorage.getItem("adminToken");
 
-    const titleInput = document.getElementById(
-      "title",
-    ) as HTMLInputElement | null;
-    const authorNameInput = document.getElementById(
-      "author_name",
-    ) as HTMLInputElement | null;
-    const slugInput = document.getElementById(
-      "slug",
-    ) as HTMLInputElement | null;
-    const summaryTextarea = document.getElementById(
-      "summary",
-    ) as HTMLTextAreaElement | null;
-    const coverImageInput = document.getElementById(
-      "cover_image",
-    ) as HTMLInputElement | null;
-    const statusSelect = document.getElementById(
-      "status",
-    ) as HTMLSelectElement | null;
-    const modalTitle = document.getElementById(
-      "modalTitle",
-    ) as HTMLHeadingElement | null;
-    const submitBtn = document.getElementById(
-      "submitBtn",
-    ) as HTMLButtonElement | null;
-    const postForm = document.getElementById(
-      "postForm",
-    ) as HTMLFormElement | null;
-    const categoriesContainer = document.getElementById(
-      "categoriesContainer",
-    ) as HTMLDivElement | null;
+    // 1. 從 API 獲取文章資料
+    const postRes = await fetch(`/admin/posts/${id}`);
+    if (!postRes.ok) return alert("獲取文章失敗");
+    const post: Post = await postRes.json();
 
-    if (
-      !titleInput ||
-      !authorNameInput ||
-      !slugInput ||
-      !summaryTextarea ||
-      !coverImageInput ||
-      !statusSelect ||
-      !modalTitle ||
-      !submitBtn ||
-      !postForm ||
-      !editModal ||
-      !categoriesContainer
-    )
-      return;
+    // 2. 從 API 獲取分類清單
+    const catRes = await fetch("/admin/posts/categories");
+    const categories: Category[] = await catRes.json();
+
+    // 【修正】在函式內部宣告並取得必要的 DOM 元素
+    const titleInput = $<HTMLInputElement>("title");
+    const authorNameInput = $<HTMLInputElement>("author_name");
+    const slugInput = $<HTMLInputElement>("slug");
+    const summaryTextarea = $<HTMLTextAreaElement>("summary");
+    const coverImageInput = $<HTMLInputElement>("cover_image");
+    const statusSelect = $<HTMLSelectElement>("status");
+    const modalTitle = $<HTMLHeadingElement>("modalTitle");
+    const submitBtn = $<HTMLButtonElement>("submitBtn");
+    const postForm = $<HTMLFormElement>("postForm");
+    const categoriesContainer = $<HTMLDivElement>("categoriesContainer");
 
     // 填充表單
     titleInput.value = post.title;
@@ -179,7 +162,6 @@ import "../../styles/editor.css";
     statusSelect.value = post.status;
 
     // 生成分類選項
-    const categories = postManager.getCategories();
     categoriesContainer.innerHTML = categories
       .map(
         (category) => `
@@ -215,22 +197,62 @@ import "../../styles/editor.css";
         selectedCategoryIds.includes(c.id),
       );
 
-      postManager.updatePost(id, {
-        title: titleInput.value,
-        author_name: authorNameInput.value,
-        content: JSON.stringify(contentData),
-        summary: summaryTextarea.value || undefined,
-        cover_image: coverImageInput.value,
-        status: statusSelect.value as "draft" | "published",
-        categories: selectedCategories,
+      const response = await fetch("/admin/posts", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          id,
+          updates: {
+            title: titleInput.value,
+            author_name: authorNameInput.value,
+            content: JSON.stringify(contentData),
+            summary: summaryTextarea.value || undefined,
+            cover_image: coverImageInput.value,
+            status: statusSelect.value as "draft" | "published",
+            categories: selectedCategories,
+          },
+        }),
       });
 
-      renderPosts();
-      await destroyEditor();
-      editModal.classList.add("hidden");
+      if (response.ok) {
+        renderPosts();
+        await destroyEditor();
+        editModal.classList.add("hidden");
+      } else {
+        alert("更新失敗");
+      }
     };
 
     editModal.classList.remove("hidden");
+  }
+
+  async function deletePost(id: string) {
+    if (!confirm("確定要刪除這篇文章嗎？此操作無法復原。")) return;
+
+    const token = localStorage.getItem("adminToken");
+    try {
+      // 調用 Hono API 的 DELETE 方法
+      const response = await fetch(`/admin/posts?id=${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        // 刪除成功後，刷新頁面以更新列表與統計數據
+        renderPosts();
+      } else {
+        const error = (await response.json()) as { error?: string };
+        alert(`刪除失敗: ${error.error || "未知錯誤"}`);
+      }
+    } catch (e) {
+      console.error("刪除請求出錯:", e);
+      alert("刪除請求失敗，請檢查網路連線。");
+    }
   }
 
   // ===== 頁面初始化 - DOMContentLoaded =====
@@ -239,62 +261,58 @@ import "../../styles/editor.css";
     checkAuth();
 
     // 取得模態框和按鈕元素
-    editModal = document.getElementById("editModal") as HTMLDivElement | null;
-    settingsModal = document.getElementById(
-      "settingsModal",
-    ) as HTMLDivElement | null;
-    const newPostBtn = document.getElementById(
-      "newPostBtn",
-    ) as HTMLButtonElement | null;
-    const settingsBtn = document.getElementById(
-      "settingsBtn",
-    ) as HTMLButtonElement | null;
-    const closeModalBtn = document.getElementById(
-      "closeModalBtn",
-    ) as HTMLButtonElement | null;
-    const closeSettingsBtn = document.getElementById(
-      "closeSettingsBtn",
-    ) as HTMLButtonElement | null;
-    const logoutBtn = document.getElementById(
-      "logoutBtn",
-    ) as HTMLButtonElement | null;
+    editModal = $<HTMLDivElement>("editModal", true);
+    settingsModal = $<HTMLDivElement>("settingsModal", true);
+
+    // 這些按鈕可能在不同的組件中，建議先檢查是否存在
+    const newPostBtn = document.getElementById("newPostBtn");
+    const settingsBtn = document.getElementById("settingsBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
     const settingsForm = document.getElementById(
       "settingsForm",
-    ) as HTMLFormElement | null;
-    const postForm = document.getElementById(
-      "postForm",
-    ) as HTMLFormElement | null;
+    ) as HTMLFormElement;
+    const postForm = document.getElementById("postForm") as HTMLFormElement;
 
-    if (
-      !editModal ||
-      !settingsModal ||
-      !newPostBtn ||
-      !settingsBtn ||
-      !closeModalBtn ||
-      !closeSettingsBtn
-    ) {
-      console.error("必要的 DOM 元素未找到");
-      return;
+    // ===== 事件委派 - 處理表格按鈕點擊 =====
+    // 透過監聽 tbody 確保動態生成的按鈕也能正常運作
+    const postsListContainer = document.getElementById("postsList");
+    if (postsListContainer) {
+      postsListContainer.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        const id = target.getAttribute("data-id");
+        if (!id) return;
+
+        if (target.classList.contains("edit-btn")) {
+          editPost(id);
+        } else if (target.classList.contains("delete-btn")) {
+          deletePost(id);
+        }
+      });
     }
 
-    // ===== 新增文章 =====
-    newPostBtn.addEventListener("click", () => {
-      const modalTitle = document.getElementById(
-        "modalTitle",
-      ) as HTMLHeadingElement | null;
-      const submitBtn = document.getElementById(
-        "submitBtn",
-      ) as HTMLButtonElement | null;
-      const categoriesContainer = document.getElementById(
-        "categoriesContainer",
-      ) as HTMLDivElement | null;
-      if (postForm && modalTitle && submitBtn && categoriesContainer) {
+    // ===== 新增文章按鈕邏輯 =====
+    newPostBtn?.addEventListener("click", async () => {
+      // 先打開模態框，讓使用者感覺有反應
+      editModal.classList.remove("hidden");
+
+      const modalTitle = $<HTMLHeadingElement>("modalTitle");
+      const submitBtn = $<HTMLButtonElement>("submitBtn");
+      const categoriesContainer = $<HTMLDivElement>("categoriesContainer");
+
+      if (postForm) {
         postForm.reset();
         modalTitle.textContent = "新增文章";
         submitBtn.textContent = "新增";
 
-        // 生成分類選項
-        const categories = postManager.getCategories();
+        // 注入預設作者
+        const authorInput = $<HTMLInputElement>("author_name");
+        authorInput.value = getNickname();
+
+        // 異步加載分類
+        const catRes = await fetch("/admin/posts/categories");
+        const categories: Category[] = await catRes.json();
         categoriesContainer.innerHTML = categories
           .map(
             (category) => `
@@ -307,45 +325,21 @@ import "../../styles/editor.css";
           .join("");
 
         initEditor();
-        editModal.classList.remove("hidden");
 
         // 重新綁定 submit 事件用於新增
         postForm.onsubmit = async (e: Event) => {
           e.preventDefault();
+          const token = localStorage.getItem("adminToken");
           const contentData = await saveEditorContent();
 
-          const titleInput = document.getElementById(
-            "title",
-          ) as HTMLInputElement | null;
-          const authorNameInput = document.getElementById(
-            "author_name",
-          ) as HTMLInputElement | null;
-          const slugInput = document.getElementById(
-            "slug",
-          ) as HTMLInputElement | null;
-          const summaryTextarea = document.getElementById(
-            "summary",
-          ) as HTMLTextAreaElement | null;
-          const coverImageInput = document.getElementById(
-            "cover_image",
-          ) as HTMLInputElement | null;
-          const statusSelect = document.getElementById(
-            "status",
-          ) as HTMLSelectElement | null;
-          const categoriesContainer = document.getElementById(
-            "categoriesContainer",
-          ) as HTMLDivElement | null;
-
-          if (
-            !titleInput ||
-            !authorNameInput ||
-            !slugInput ||
-            !summaryTextarea ||
-            !coverImageInput ||
-            !statusSelect ||
-            !categoriesContainer
-          )
-            return;
+          // 使用 $ 函數，如果元素不存在會直接中斷執行
+          const titleInput = $<HTMLInputElement>("title");
+          const authorNameInput = $<HTMLInputElement>("author_name");
+          const slugInput = $<HTMLInputElement>("slug");
+          const summaryTextarea = $<HTMLTextAreaElement>("summary");
+          const coverImageInput = $<HTMLInputElement>("cover_image");
+          const statusSelect = $<HTMLSelectElement>("status");
+          const categoriesContainer = $<HTMLDivElement>("categoriesContainer");
 
           // 獲取選中的分類
           const selectedCategoryIds = Array.from(
@@ -353,69 +347,67 @@ import "../../styles/editor.css";
               'input[type="checkbox"]:checked',
             ),
           ).map((checkbox) => parseInt((checkbox as HTMLInputElement).value));
-          const selectedCategories = postManager
-            .getCategories()
-            .filter((c) => selectedCategoryIds.includes(c.id));
+          const selectedCategories = categories.filter((c) =>
+            selectedCategoryIds.includes(c.id),
+          );
 
-          postManager.addPost({
-            title: titleInput.value,
-            author_name: authorNameInput.value,
-            content: JSON.stringify(contentData),
-            cover_image: coverImageInput.value,
-            status: statusSelect.value as "draft" | "published",
-            categories: selectedCategories,
+          const response = await fetch("/admin/posts", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              title: titleInput.value,
+              author_name: authorNameInput.value,
+              content: JSON.stringify(contentData),
+              cover_image: coverImageInput.value,
+              status: statusSelect.value as "draft" | "published",
+              categories: selectedCategories,
+            }),
           });
 
-          renderPosts();
-          await destroyEditor();
-          editModal.classList.add("hidden");
+          if (response.ok) {
+            renderPosts();
+            await destroyEditor();
+            editModal.classList.add("hidden"); // editModal 已經保證存在
+          } else {
+            alert("新增失敗");
+          }
         };
-      }
+      } // <--- 補上這個括號，關閉 if 區塊
     });
 
     // ===== 設定按鈕 =====
-    settingsBtn.addEventListener("click", () => {
-      const nicknameInput = document.getElementById(
-        "nickname",
-      ) as HTMLInputElement | null;
-      if (nicknameInput) {
-        nicknameInput.value = getNickname();
-        settingsModal.classList.remove("hidden");
-      }
+    settingsBtn?.addEventListener("click", () => {
+      const nicknameInput = $<HTMLInputElement>("nickname");
+      nicknameInput.value = getNickname();
+      settingsModal.classList.remove("hidden"); // settingsModal 已經保證存在
     });
 
     // ===== 關閉模態框 =====
-    closeModalBtn.addEventListener("click", () => {
+    closeModalBtn?.addEventListener("click", () => {
       editModal.classList.add("hidden");
       destroyEditor();
     });
 
-    closeSettingsBtn.addEventListener("click", () => {
+    closeSettingsBtn?.addEventListener("click", () => {
       settingsModal.classList.add("hidden");
     });
 
-    // 點擊背景關閉模態框
+    // 點擊背景關閉模態框 (editModal 和 settingsModal 已經保證存在)
     editModal.addEventListener("click", (e: Event) => {
-      if (e.target === editModal) {
-        editModal.classList.add("hidden");
-        destroyEditor();
-      }
+      if (e.target === editModal) editModal.classList.add("hidden");
+      destroyEditor(); // 確保編輯器被銷毀
     });
-
     settingsModal.addEventListener("click", (e: Event) => {
-      if (e.target === settingsModal) {
-        settingsModal.classList.add("hidden");
-      }
+      if (e.target === settingsModal) settingsModal.classList.add("hidden");
     });
 
     // ===== Slug 自動生成 =====
-    const titleInput = document.getElementById(
-      "title",
-    ) as HTMLInputElement | null;
-    const slugInput = document.getElementById(
-      "slug",
-    ) as HTMLInputElement | null;
-    if (titleInput && slugInput) {
+    try {
+      const titleInput = $<HTMLInputElement>("title");
+      const slugInput = $<HTMLInputElement>("slug");
       titleInput.addEventListener("input", () => {
         const slug = titleInput.value
           .toLowerCase()
@@ -424,29 +416,19 @@ import "../../styles/editor.css";
           .replace(/^-+|-+$/g, "");
         slugInput.value = slug;
       });
-    }
+    } catch (e) {}
 
-    // ===== 設定表單提交 =====
-    if (settingsForm) {
-      settingsForm.addEventListener("submit", (e: Event) => {
-        e.preventDefault();
-        const nicknameInput = document.getElementById(
-          "nickname",
-        ) as HTMLInputElement | null;
-        if (nicknameInput) {
-          setNickname(nicknameInput.value);
-          settingsModal.classList.add("hidden");
-          alert("設定已保存");
-        }
-      });
-    }
+    // ===== 設定表單提交 (settingsForm 已經保證存在) =====
+    settingsForm?.addEventListener("submit", (e: Event) => {
+      e.preventDefault();
+      const nicknameInput = $<HTMLInputElement>("nickname");
+      setNickname(nicknameInput.value);
+      settingsModal.classList.add("hidden");
+      alert("設定已保存");
+    });
 
     // ===== 登出 =====
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        logout();
-      });
-    }
+    logoutBtn?.addEventListener("click", () => logout());
 
     // 初始化頁面
     renderPosts();

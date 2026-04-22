@@ -1,129 +1,227 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+import { postManager, type Post, type Category } from "../utils/postManager";
+
+// 從 Cloudflare Runtime 環境中取得 D1 資料庫
+const { DB } = Astro.locals.env || {};
+
+let posts: Post[] = [];
+let categories: Category[] = [];
+
+if (DB) {
+  const allPosts = await postManager.getPosts(DB);
+  // 僅顯示已發布的文章
+  posts = allPosts.filter((p) => p.status === "published");
+  categories = await postManager.getCategories(DB);
+}
+
+// 定義資料邏輯：第一篇為特色文章，之後的三篇為一般文章
+const featuredPost = posts[0];
+const recentPosts = posts.slice(1, 4);
 ---
 
 <Layout title="子迂的蠹酸齋">
   <!-- 最小高度螢幕高 自定義黑色背景 自定義白色文字 字體使用無襯線體 內邊間距24(最最下面，墊高內容) -->
-    <main class="min-h-screen bg-void-black text-stucco-white font-display pb-24">
+  <main class="min-h-screen bg-void-black text-stucco-white font-display pb-24">
+    <!-- 搜尋區塊容器 -->
+    <div class="relative w-full max-w-md mb-8 group">
+      <!-- 搜尋圖示 (Lucide Icon 風格) -->
+      <div
+        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 text-slate-500 group-focus-within:text-primary transition-colors"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
 
-		<!-- 搜尋區塊容器 -->
-		<div class="relative w-full max-w-md mb-8 group">
-  		
-			<!-- 搜尋圖示 (Lucide Icon 風格) -->
-  			<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-    			<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500 group-focus-within:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-    			</svg>
-  			</div>
+      <!-- 輸入框 -->
+      <input
+        type="text"
+        placeholder="搜尋文章、分類或關鍵字..."
+        class="w-full bg-white/5 border border-white/10 text-slate-200 text-sm rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-primary/50 focus:bg-white/10 focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-slate-600"
+      />
 
-  			<!-- 輸入框 -->
-  			<input 
-    			type="text" 
-    			placeholder="搜尋文章、分類或關鍵字..." 
-    			class="w-full bg-white/5 border border-white/10 text-slate-200 text-sm rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-primary/50 focus:bg-white/10 focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-slate-600"
-  			/>
+      <!-- 裝飾用快捷鍵提示 (選配) -->
+      <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+        <kbd
+          class="hidden sm:inline-block px-2 py-1 text-xs font-semibold text-slate-500 bg-white/5 border border-white/10 rounded-md"
+        >
+          Search
+        </kbd>
+      </div>
+    </div>
 
-  			<!-- 裝飾用快捷鍵提示 (選配) -->
-  			<div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-    			<kbd class="hidden sm:inline-block px-2 py-1 text-xs font-semibold text-slate-500 bg-white/5 border border-white/10 rounded-md">
-      			Search
-    			</kbd>
-  			</div>
-		</div>
-        
-        <!-- 首頁圖區，寬滿版，高32(128px) relative子元素的基準點 border邊界線有底線 邊界線顏色白色透明 -->
-        <div class="w-full h-32 relative border-b border-white/10" >
-            <!-- 預計要放圖 -->
-            <div class="absolute inset-0 flex items-center justify-center bg-linear-to-t from-void-black/80 to-transparent">
-              <span>首頁圖</span>
-            </div>
+    <!-- 首頁圖區，寬滿版，高32(128px) relative子元素的基準點 border邊界線有底線 邊界線顏色白色透明 -->
+    <div class="w-full h-32 relative border-b border-white/10">
+      <!-- 預計要放圖 -->
+      <div
+        class="absolute inset-0 flex items-center justify-center bg-linear-to-t from-void-black/80 to-transparent"
+      >
+        <span>首頁圖</span>
+      </div>
+    </div>
+
+    <!-- 內容區 最大寬度1200px 外邊界自動 x軸兩側預留6(24px) -->
+    <div class="max-w-300 mx-auto px-6">
+      <!-- 自介區域 -->
+      <div
+        class="relative -mt-4 mb-12 flex flex-row items-end gap-6 md:flex-nowrap"
+      >
+        <!-- 大頭照 -->
+        <img
+          src="/img/self.jpg"
+          alt="柏林的大頭照"
+          class="w-32 h-32 object-cover border-[6px] border-void-black shadow-xl shrink-0"
+        />
+
+        <!-- 部落格名稱 -->
+        <div class="flex-1 self-end overflow-hidden">
+          <h1
+            class="text-3xl overflow-hidden text-ellipsis whitespace-nowrap font-bold tracking-tight text-white mb-1"
+          >
+            子迂的蠢酸齋
+          </h1>
+
+          <div class="flex items-center gap-3 text-primary text-sm">
+            <span class="shrink-0 font-medium">424 followers</span>
+          </div>
         </div>
 
-        <!-- 內容區 最大寬度1200px 外邊界自動 x軸兩側預留6(24px) -->
-        <div class="max-w-[1200px] mx-auto px-6">
-          
-			<!-- 自介區域 -->
-          	<div class="relative -mt-4 mb-12 flex flex-row items-end gap-6 md:flex-nowrap">
+        <!-- Follow 按鈕 -->
+        <button
+          class="bg-[#222] text-primary px-6 py-2 rounded-full text-sm font-bold hover:bg-slate-600 transition-all self-end"
+        >
+          Follow
+        </button>
+      </div>
 
-				<!-- 大頭照 -->
-				<img src="/img/self.jpg" alt="柏林的大頭照" class="w-32 h-32 object-cover border-[6px] border-void-black shadow-xl shrink-0"/>
-				
-				<!-- 部落格名稱 -->
-            	<div class="flex-1 self-end overflow-hidden">
-               		<h1 class="text-3xl overflow-hidden text-ellipsis whitespace-nowrap font-bold tracking-tight text-white mb-1">子迂的蠢酸齋</h1>
-              
-            		<div class="flex items-center gap-3 text-primary text-sm">
-                		<span class="shrink-0 font-medium">424 followers</span>
-              		</div>        
-        		</div>
-				
-				<!-- Follow 按鈕 -->
-            	<button class="bg-[#222] text-primary px-6 py-2 rounded-full text-sm font-bold hover:bg-slate-600 transition-all self-end">
-              		Follow
-            	</button>
-          
-          	</div>
+      <!-- 分類導航 -->
+      <nav
+        class="flex flex-nowrap gap-10 border-y border-white/5 py-4 mb-16 overflow-x-auto no-scrollbar w-full relative"
+      >
+        {
+          categories.length > 0 ? (
+            categories.map((category) => (
+              <a
+                href={`/category/${category.slug}`}
+                class="text-sm font-medium text-slate-400 hover:text-primary tracking-wide transition-colors uppercase whitespace-nowrap"
+              >
+                {category.name}
+              </a>
+            ))
+          ) : (
+            <span class="text-sm text-slate-600 italic">尚未設定分類</span>
+          )
+        }
+      </nav>
 
-			<!-- 分類導航 -->
-          	<nav class="flex flex-nowrap gap-10 border-y border-white/5 py-4 mb-16 overflow-x-auto no-scrollbar w-full relative">
-            
-            	{['有品有閒', '烏合之眾', '藝術', '電影', '隨筆'].map(item => (
-              		<a href="#" class="text-sm font-medium text-slate-400 hover:text-primary tracking-wide transition-colors uppercase">{item}</a>
-            	))}   
-          	</nav>
+      <!-- 特色文章區 -->
+      <section class="mb-24 min-h-100">
+        {
+          featuredPost ? (
+            <a
+              href={`/post/${featuredPost.slug}`}
+              class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center group cursor-pointer"
+            >
+              <div class="aspect-16/10 bg-[#151515] border border-white/10 overflow-hidden relative">
+                {featuredPost.cover_image ? (
+                  <img
+                    src={featuredPost.cover_image}
+                    alt={featuredPost.title}
+                    class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div class="absolute inset-0 flex items-center justify-center text-slate-700">
+                    No Image
+                  </div>
+                )}
+              </div>
 
-		  	<!-- 特色文章區 -->
-          	<section class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24 items-center group cursor-pointer">
-            
-            <div class="aspect-[16/10] bg-[#151515] border border-white/10 overflow-hidden relative">
-              
-              	<img src="/img/pic01.webp" alt="入陣者" class="object-contain border-[6px] border-void-black shadow-xl shrink-0"/>
-            
+              <div class="flex flex-col gap-4">
+                <h2 class="text-4xl font-bold leading-[1.2] text-white group-hover:text-primary transition-colors">
+                  {featuredPost.title}
+                </h2>
+
+                <p class="text-slate-400 text-lg leading-relaxed line-clamp-3">
+                  {featuredPost.summary}
+                </p>
+
+                <div class="flex items-center gap-2 text-xs text-slate-500 uppercase tracking-widest font-bold">
+                  <span>{featuredPost.author_name}</span>
+                  <span class="text-primary">·</span>
+                  <span>
+                    {new Date(featuredPost.created_at).toLocaleDateString(
+                      "zh-TW",
+                    )}
+                  </span>
+                </div>
+              </div>
+            </a>
+          ) : (
+            <div class="w-full h-100 flex items-center justify-center border border-dashed border-white/10 rounded-lg">
+              <p class="text-slate-500 font-display tracking-widest uppercase">
+                尚無特色文章
+              </p>
             </div>
-      
-            <div class="flex flex-col gap-4">
-              	<h2 class="text-4xl font-bold leading-[1.2] text-white group-hover:text-primary transition-colors">
-                	《入陣者》孫友聯的勞運回憶
-              	</h2>
-        
-              	<p class="text-slate-400 text-lg leading-relaxed">        
-                	《入陣者：台灣勞工運動三十年，一場尊嚴與抵抗的對話》除了簡單談及台灣鮮少被談及的勞工運動史之外，更是把整個台灣經濟發展的觀看角度，從那些經濟奇蹟的倖存者偏差敘事中抽離出來，重新排列。
-              	</p>
-        
-              	<div class="flex items-center gap-2 text-xs text-slate-500 uppercase tracking-widest font-bold">   
-                	<span>Berlin</span> <span class="text-primary">·</span> <span>1d ago</span> <span class="text-primary">·</span> <span>5 min read</span>
-              	</div>     
-            </div> 
-          
-    		</section>
+          )
+        }
+      </section>
 
-    
-			<section class="grid grid-cols-1 md:grid-cols-3 gap-10"> 
-				{[1, 2, 3].map(i => (
-					<div class="group cursor-pointer">
-					
-						<div class="aspect-video bg-[#111] border border-white/10 mb-6 relative">
-					
-							<div class="absolute inset-0 flex items-center justify-center text-slate-800 font-bold text-xs uppercase tracking-widest opacity-30">Image {i}</div>
-						</div>
-			
-						<h4 class="text-xl font-bold text-white leading-snug group-hover:text-primary transition-colors">
-							房價、藝術品、單價、坪數
-						</h4>
-				
-					</div>
-				))}
-			</section>
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-10 min-h-75">
+        {
+          recentPosts.length > 0 ? (
+            recentPosts.map((post) => (
+              <a href={`/post/${post.slug}`} class="group cursor-pointer">
+                <div class="aspect-video bg-[#111] border border-white/10 mb-6 relative overflow-hidden">
+                  {post.cover_image ? (
+                    <img
+                      src={post.cover_image}
+                      alt={post.title}
+                      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div class="absolute inset-0 flex items-center justify-center text-slate-800 font-bold text-xs uppercase tracking-widest opacity-30">
+                      No Image
+                    </div>
+                  )}
+                </div>
 
-      	</div>
-    </main>
+                <h4 class="text-xl font-bold text-white leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                  {post.title}
+                </h4>
 
+                <div class="mt-4 text-[10px] text-slate-500 uppercase tracking-widest">
+                  {new Date(post.created_at).toLocaleDateString("zh-TW")}
+                </div>
+              </a>
+            ))
+          ) : (
+            <div class="col-span-full flex items-center justify-center py-20 border border-dashed border-white/10 rounded-lg">
+              <p class="text-slate-500 font-display tracking-widest uppercase">
+                尚無文章
+              </p>
+            </div>
+          )
+        }
+      </section>
+    </div>
+  </main>
 </Layout>
 
 <style>
-	/* 空心字 */
-	.text-outline {
-		-webkit-text-stroke: 1px rgba(241, 245, 249, 0.5);
-		color: transparent;
-	}
+  /* 空心字 */
+  .text-outline {
+    -webkit-text-stroke: 1px rgba(241, 245, 249, 0.5);
+    color: transparent;
+  }
 </style>

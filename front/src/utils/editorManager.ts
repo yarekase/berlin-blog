@@ -3,8 +3,6 @@
  * 負責 Editor.js 的初始化和生命週期管理
  */
 
-import { config } from "astro:schema";
-
 export let editor: any = null;
 
 /**
@@ -55,7 +53,7 @@ export async function initEditor(data: any = null): Promise<void> {
           class: Image,
           config: {
             endpoints: {
-              byFile: "/api/upload", // 指向你的後端路徑
+              byFile: "/api/posts/upload", // 指向你的後端路徑
             },
           },
         },

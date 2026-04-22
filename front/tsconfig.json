@@ -2,6 +2,7 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "module": "ESNext",
+    "lib": ["ESNext", "Dom", "Dom.Iterable"],
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,

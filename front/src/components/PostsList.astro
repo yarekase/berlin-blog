@@ -3,6 +3,13 @@
  * 文章列表表格組件
  * 顯示所有文章的表格和操作按鈕
  */
+import type { Post } from "../utils/postManager";
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
 ---
 
 <section>
@@ -43,11 +50,66 @@
           </tr>
         </thead>
         <tbody id="postsList">
-          <tr>
-            <td colspan="5" class="px-6 py-8 text-center text-slate-500">
-              暫無文章
-            </td>
-          </tr>
+          {
+            posts.length === 0 ? (
+              <tr>
+                <td colspan="6" class="px-6 py-8 text-center text-slate-500">
+                  暫無文章
+                </td>
+              </tr>
+            ) : (
+              posts.map((post) => (
+                <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                  <td class="px-6 py-4">
+                    <div class="font-medium text-white">{post.title}</div>
+                    <div class="text-xs text-slate-500">{post.id}</div>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-slate-300">
+                    {post.author_name}
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      {post.categories.map((cat) => (
+                        <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-slate-300">
+                          {cat.name}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class={`text-xs px-2 py-1 rounded-full ${
+                        post.status === "published"
+                          ? "bg-green-500/10 text-green-400"
+                          : "bg-yellow-500/10 text-yellow-400"
+                      }`}
+                    >
+                      {post.status === "published" ? "已發布" : "草稿"}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-slate-400">
+                    {new Date(post.created_at).toLocaleDateString()}
+                  </td>
+                  <td class="px-6 py-4 text-sm">
+                    <div class="flex gap-3">
+                      <button
+                        class="text-primary hover:text-primary/80 transition-colors edit-btn"
+                        data-id={post.id}
+                      >
+                        編輯
+                      </button>
+                      <button
+                        class="text-red-400 hover:text-red-300 transition-colors delete-btn"
+                        data-id={post.id}
+                      >
+                        刪除
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )
+          }
         </tbody>
       </table>
     </div>
