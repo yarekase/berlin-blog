@@ -430,7 +430,8 @@ if (DB) {
     // ===== 登出 =====
     logoutBtn?.addEventListener("click", () => logout());
 
-    // 初始化頁面
-    renderPosts();
+    // 初始化頁面：
+    // 這裡不需要呼叫 renderPosts()，因為 Astro 已經在伺服器端渲染好文章列表了。
+    // 呼叫它會導致無限重新整理迴圈。
   });
 </script>
