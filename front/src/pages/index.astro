@@ -1,10 +1,12 @@
 ---
+// 1. 導入佈局組件與資料管理工具
 import Layout from "../layouts/Layout.astro";
 import { postManager, type Post, type Category } from "../utils/postManager";
 
-// 從 Cloudflare Runtime 環境中取得 D1 資料庫
+// 2. 環境變數處理：從 Cloudflare Runtime 環境中取得 D1 資料庫實例
 const { DB } = Astro.locals.env || {};
 
+// 3. 資料狀態初始化
 let posts: Post[] = [];
 let categories: Category[] = [];
 
@@ -15,14 +17,14 @@ if (DB) {
   categories = await postManager.getCategories(DB);
 }
 
-// 定義資料邏輯：第一篇為特色文章，之後的三篇為一般文章
+// 4. 頁面佈局邏輯：將文章拆分為「特色文章 (第一篇)」與「近期文章 (接下來的三篇)」
 const featuredPost = posts[0];
 const recentPosts = posts.slice(1, 4);
 ---
 
 <Layout title="子迂的蠹酸齋">
-  <!-- 最小高度螢幕高 自定義黑色背景 自定義白色文字 字體使用無襯線體 內邊間距24(最最下面，墊高內容) -->
   <main class="min-h-screen bg-void-black text-stucco-white font-display pb-24">
+    <!-- A. 頂部搜尋區塊：提供關鍵字檢索功能 -->
     <!-- 搜尋區塊容器 -->
     <div class="relative w-full max-w-md mb-8 group">
       <!-- 搜尋圖示 (Lucide Icon 風格) -->
@@ -61,6 +63,7 @@ const recentPosts = posts.slice(1, 4);
       </div>
     </div>
 
+    <!-- B. 英雄圖 (Hero Section)：視覺焦點，通常放置品牌大圖 -->
     <!-- 首頁圖區，寬滿版，高32(128px) relative子元素的基準點 border邊界線有底線 邊界線顏色白色透明 -->
     <div class="w-full h-32 relative border-b border-white/10">
       <!-- 預計要放圖 -->
@@ -73,7 +76,7 @@ const recentPosts = posts.slice(1, 4);
 
     <!-- 內容區 最大寬度1200px 外邊界自動 x軸兩側預留6(24px) -->
     <div class="max-w-300 mx-auto px-6">
-      <!-- 自介區域 -->
+      <!-- C. 作者資訊/自介區域：呈現部落格主人的身份與社交狀態 -->
       <div
         class="relative -mt-4 mb-12 flex flex-row items-end gap-6 md:flex-nowrap"
       >
@@ -105,7 +108,7 @@ const recentPosts = posts.slice(1, 4);
         </button>
       </div>
 
-      <!-- 分類導航 -->
+      <!-- D. 分類導航欄：橫向捲動的分類清單，方便讀者按主題篩選 -->
       <nav
         class="flex flex-nowrap gap-10 border-y border-white/5 py-4 mb-16 overflow-x-auto no-scrollbar w-full relative"
       >
@@ -125,7 +128,7 @@ const recentPosts = posts.slice(1, 4);
         }
       </nav>
 
-      <!-- 特色文章區 -->
+      <!-- E. 特色文章區：顯示最新或權重最高的一篇文章，版面較大 -->
       <section class="mb-24 min-h-100">
         {
           featuredPost ? (
@@ -177,6 +180,7 @@ const recentPosts = posts.slice(1, 4);
         }
       </section>
 
+      <!-- F. 近期文章網格：以 3 欄位 (桌面端) 顯示接下來的文章清單 -->
       <section class="grid grid-cols-1 md:grid-cols-3 gap-10 min-h-75">
         {
           recentPosts.length > 0 ? (
@@ -219,7 +223,7 @@ const recentPosts = posts.slice(1, 4);
 </Layout>
 
 <style>
-  /* 空心字 */
+  /* 輔助樣式：自定義空心文字效果 */
   .text-outline {
     -webkit-text-stroke: 1px rgba(241, 245, 249, 0.5);
     color: transparent;
