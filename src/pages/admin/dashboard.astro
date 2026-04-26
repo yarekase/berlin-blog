@@ -11,9 +11,10 @@ import EditModal from "../../components/EditModal.astro";
 import SettingsModal from "../../components/SettingsModal.astro";
 import "../../styles/editor.css";
 import { postManager, type Post } from "../../utils/postManager";
+import { env } from 'cloudflare:workers';
 
 // 伺服器端抓取資料
-const { DB } = Astro.locals.env || {};
+const  DB  = (env as any).DB || {};
 let posts: Post[] = [];
 
 if (DB) {
