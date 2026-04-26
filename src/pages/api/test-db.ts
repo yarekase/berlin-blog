@@ -13,7 +13,7 @@ export const GET: APIRoute = async () => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: "找不到資料庫綁定。請檢查 wrangler.toml 的 binding 是否為 'DB'。",
+        error: "Cloudflare 環境中找不到 'DB' 綁定，請確認專案設定。",
       }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );

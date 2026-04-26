@@ -19,9 +19,12 @@ let posts: Post[] = [];
 if (DB) {
   try {
     posts = await postManager.getPosts(DB);
+    console.log("伺服器端獲取文章成功:", posts);
   } catch (error) {
     console.error("伺服器端獲取文章失敗:", error);
   }
+} else {
+  console.warn("伺服器端未找到 'DB' 綁定，無法獲取文章資料。");
 }
 ---
 
