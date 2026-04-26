@@ -23,15 +23,13 @@ export const GET: APIRoute = async () => {
     // 執行查詢
     const { results } = await db.prepare("SELECT * FROM posts").all();
     
-    // 獲取資料庫資訊以驗證連線類型
-    const dbVersion = await db.prepare("PRAGMA user_version").first();
+   
 
     return new Response(
       JSON.stringify({
         success: true,
         meta: {
           engine: "D1",
-          user_version: dbVersion,
         },
         count: results.length,
         data: results,
