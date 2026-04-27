@@ -347,9 +347,10 @@ if (DB) {
             .join("");
         } catch (error) {
           console.error("獲取分類列表失敗:", error);
-          alert("獲取分類列表失敗，請檢查網路連線或伺服器狀態。");
+          // 暫時改用文字提示，讓使用者知道分類無法載入，但仍可編輯其他內容
+          categoriesContainer.innerHTML = `<span class="text-red-500 text-sm">暫時無法載入分類，您可以繼續編輯其他內容。</span>`;
           // editModal.classList.add("hidden"); // 如果分類載入失敗，隱藏模態框
-          return;
+          
         }
 
         initEditor();
