@@ -8,16 +8,16 @@
 <!-- 模態框最外層容器：控制顯示/隱藏、背景遮罩和居中佈局 -->
 <div
   id="editModal"
-  class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+  class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
 >
   <div
-    class="bg-void-black border border-white/10 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+    class="bg-void-black border border-white/10 rounded-lg max-w-300 w-full max-h-[95vh] overflow-y-auto"
   >
     <!-- 模態框頭部：包含標題和關閉按鈕 -->
     <div
       class="sticky top-0 bg-void-black border-b border-white/10 px-6 py-4 flex items-center justify-between"
     >
-      <h3 class="text-xl font-bold" id="modalTitle">新增文章3</h3>
+      <h3 class="text-xl font-bold" id="modalTitle"></h3>
       <button
         id="closeModalBtn"
         class="text-slate-400 hover:text-white transition-colors"
@@ -52,20 +52,6 @@
           type="text"
           id="author_name"
           name="author_name"
-          class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
-          required
-        />
-      </div>
-
-      <div>
-        <!-- 網址路徑 (Slug) 輸入框 -->
-        <label for="slug" class="block text-sm font-medium text-slate-400 mb-2"
-          >網址路徑 (Slug)</label
-        >
-        <input
-          type="text"
-          id="slug"
-          name="slug"
           class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
           required
         />
