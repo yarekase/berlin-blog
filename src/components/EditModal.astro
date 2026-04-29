@@ -187,7 +187,7 @@
   const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 
   const modal = $("editModal");
-  const form = $("postForm") as HTMLFormElement;
+  const form = $<HTMLFormElement>("postForm");
   const categoriesContainer = $("categoriesContainer");
   const modalTitle = $("modalTitle");
   const submitBtn = $("submitBtn");
@@ -207,8 +207,13 @@
     
     try {
       // 每次開啟都確認分類清單（確保資料最新）
-      const { data } = await axios.get<Category[]>("/categories");
-      allCategories = data;
+      try {
+        const { data } = await axios.get<Category[]>("/categories");
+        allCategories = data;
+      }catch(err){
+        console.error("API 抓取失敗，分類歸0", err);
+        allCategories = [];
+      }
 
       if (id) {
         // 【編輯模式】
@@ -327,4 +332,6 @@
       alert(error.response?.data?.error || "保存失敗，請檢查權限");
     }
   };
+
+  
 </script>
