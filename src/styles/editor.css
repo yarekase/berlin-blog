@@ -65,3 +65,43 @@ textarea:focus {
 .ce-conversion-toolbar__buttons {
   color: white;
 }
+
+/* 讓編輯器內部的 H1 真正變大 */
+h1.ce-header {
+  font-size: 2.25rem !important; /* text-4xl */
+  font-weight: 800 !important;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+/* 讓編輯器內部的 H2 變大 */
+h2.ce-header {
+  font-size: 1.875rem !important; /* text-3xl */
+  font-weight: 700 !important;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+/* H3 樣式 (新增) */
+h3.ce-header {
+  font-size: 1.5rem !important; /* text-2xl */
+  font-weight: 600 !important;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+/* H4 樣式 (新增) */
+h4.ce-header {
+  font-size: 1.25rem !important; /* text-xl */
+  font-weight: 600 !important;
+  margin-top: 0.75rem;
+  margin-bottom: 0.3rem;
+}
+
+/* 提升工具列的層級，避免被你的 editModal (z-50) 擋住 */
+.ce-inline-toolbar, 
+.ce-settings, 
+.ce-toolbox {
+  z-index: 100 !important;
+}

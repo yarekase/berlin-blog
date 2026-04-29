@@ -14,24 +14,52 @@ export async function initEditor(data: any = null): Promise<void> {
     // 如果已有編輯器，先銷毀
     await destroyEditor();
 
-    // 動態導入 Editor.js 和工具
-    const { default: EditorJS } = await import("@editorjs/editorjs");
-    const { default: Header } = await import("@editorjs/header");
-    const { default: List } = await import("@editorjs/list");
-    const { default: Quote } = await import("@editorjs/quote");
-    const { default: Delimiter } = await import("@editorjs/delimiter");
-    const { default: Embed } = await import("@editorjs/embed");
-    const { default: Image } = await import("@editorjs/image");
-    const { default: Marker } = await import("@editorjs/marker");
+    let initialData = data;
+    if (!initialData) {
+      const savedDraft = localStorage.getItem("editor_draft");
+      if (savedDraft) {
+        try {
+        initialData = JSON.parse(savedDraft);
+        console.log("載入未儲存的資料");
+        } catch(e) {
+          console.error("無法解析未儲存的資料，將使用空白編輯器",e);
+        }
+      }
+    }
+
+    const [
+      { default: EditorJS },
+      { default: Header },
+      { default: List },
+      { default: Quote },
+      { default: Delimiter },
+      { default: Embed },
+      { default: Image },
+      { default: Marker }
+    ] = await Promise.all([
+      import("@editorjs/editorjs"),
+      import("@editorjs/header"),
+      import("@editorjs/list"),
+      import("@editorjs/quote"),
+      import("@editorjs/delimiter"),
+      import("@editorjs/embed"),
+      import("@editorjs/image"),
+      import("@editorjs/marker")
+    ]);
 
     editor = new EditorJS({
       holder: "editorjs",
-      data: data,
+      data: initialData,
       placeholder: "開始寫作...",
       tools: {
         header: {
           class: Header as any,
           inlineToolbar: true,
+          config: {
+            placeholder: '輸入標題...',
+            levels: [1, 2, 3, 4], // 這裡定義 H1 到 H4，讓你可以切換標題大小
+            defaultLevel: 2,      // 預設為 H2
+          }
         },
         list: {
           class: List as any,
@@ -55,13 +83,20 @@ export async function initEditor(data: any = null): Promise<void> {
             endpoints: {
               byFile: "/api/posts/upload", // 指向你的後端路徑
             },
+            field: 'file',
+            types: 'image/*',
           },
+          
         },
         marker: {
           class: Marker,
           shortcut: "CMD+SHIFT+M", // 也可以設定快速鍵
         },
       },
+      onChange: async () => {
+          const content = await editor.save();
+          localStorage.setItem("editor_draft", JSON.stringify(content));
+        },
     } as any);
   } catch (error) {
     console.error("Editor.js 初始化失敗:", error);
@@ -76,7 +111,9 @@ export async function initEditor(data: any = null): Promise<void> {
 export async function saveEditorContent(): Promise<any> {
   try {
     if (editor) {
-      return await editor.save();
+      const savedData =await editor.save();
+      localStorage.setItem("editor_draft", JSON.stringify(savedData)); // 暫存內容到 localStorage
+      return savedData;
     } else {
       // 使用回退 textarea
       const fallbackEditor = document.getElementById(

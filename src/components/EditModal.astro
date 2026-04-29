@@ -8,7 +8,7 @@
 <!-- 模態框最外層容器：控制顯示/隱藏、背景遮罩和居中佈局 -->
 <div
   id="editModal"
-  class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+  class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center p-4 backdrop-blur-sm"
 >
   <div
     class="bg-void-black border border-white/10 rounded-lg max-w-300 w-full max-h-[95vh] overflow-y-auto"
@@ -83,20 +83,27 @@
           placeholder="可留空，系統會自動從內容生成"></textarea>
       </div>
 
-      <div>
-        <!-- 封面圖 URL 輸入框 -->
-        <label
-          for="cover_image"
-          class="block text-sm font-medium text-slate-400 mb-2"
-          >封面圖 URL</label
-        >
-        <input
-          type="url"
-          id="cover_image"
-          name="cover_image"
-          class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
-          placeholder="R2 URL"
-        />
+      <div class="space-y-2">
+        <!-- 封面圖上傳區塊 -->
+        <label class="block text-sm font-medium text-slate-400">封面圖上傳</label>
+  
+        <div class="relative border-2 border-dashed border-white/20 rounded-lg p-4 hover:border-primary transition-colors group cursor-pointer">
+          <input 
+          type="file"
+          id="cover_upload"
+          name="cover_upload"
+          class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+          accept="image/jpeg, image/png, image/webp, image/heic, image/heif" />
+    
+          <div class="text-center">
+            <p class="text-slate-400 group-hover:text-white transition-colors">點擊或拖拽圖片至此</p>
+            <p class="text-xs text-slate-500">支援 HEIC, HEIF, JPG, PNG, WebP</p>
+          </div>
+        </div>
+  
+        <div id="preview_container" class="mt-4 hidden">
+          <img id="image_preview" src="#" class="w-full h-48 object-cover rounded border border-white/20" />
+        </div>
       </div>
 
       <div>
@@ -155,8 +162,8 @@
         </button>
         <button
           type="button"
+          id="cancelModalBtn"
           class="flex-1 bg-void-black border border-white/20 text-white px-6 py-2 rounded font-bold hover:border-white/40 transition-all"
-          onclick="document.getElementById('editModal').classList.add('hidden')"
         >
           取消
         </button>
@@ -164,3 +171,160 @@
     </form>
   </div>
 </div>
+
+<script>
+  /**
+   * 【高內聚邏輯封裝】
+   * 此腳本負責處理 EditModal 的所有生命週期：從開啟、編輯器初始化、資料抓取到表單提交。
+   * 這樣 dashboard.astro 就不需要知道編輯器是如何運作的。
+   */
+  import axios from "axios";
+  import { getNickname } from "../utils/auth";
+  import { type Post, type Category } from "../utils/postManager";
+  import { initEditor, saveEditorContent, destroyEditor } from "../utils/editorManager";
+
+  // 內部 DOM 選取輔助函數
+  const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
+
+  const modal = $("editModal");
+  const form = $("postForm") as HTMLFormElement;
+  const categoriesContainer = $("categoriesContainer");
+  const modalTitle = $("modalTitle");
+  const submitBtn = $("submitBtn");
+
+  let currentPostId: string | null = null; // 紀錄目前是否處於「編輯模式」
+  let allCategories: Category[] = [];    // 快取分類清單
+
+  // --- 1. 初始化與開啟邏輯 ---
+
+  /**
+   * 開啟模態框的統一入口
+   * @param id 如果有 id 則進入「編輯模式」，否則為「新增模式」
+   */
+  async function openModal(id: string | null = null) {
+    currentPostId = id;
+    form.reset();
+    
+    try {
+      // 每次開啟都確認分類清單（確保資料最新）
+      const { data } = await axios.get<Category[]>("/categories");
+      allCategories = data;
+
+      if (id) {
+        // 【編輯模式】
+        modalTitle.textContent = "編輯文章";
+        submitBtn.textContent = "更新文章";
+        
+        // 抓取該篇文章的詳細內容
+        const { data: post } = await axios.get<Post>(`/admin/posts/${id}`);
+        
+        // 填充表單欄位
+        ($("title") as HTMLInputElement).value = post.title;
+        ($("author_name") as HTMLInputElement).value = post.author_name;
+        ($("summary") as HTMLTextAreaElement).value = post.summary || "";
+        (($("status") as unknown) as HTMLSelectElement).value = post.status;
+        
+        renderCategories(post.categories.map(c => c.id));
+        
+        // 初始化編輯器並載入 JSON 內容
+        await initEditor(post.content ? JSON.parse(post.content) : null);
+      } else {
+        // 【新增模式】
+        modalTitle.textContent = "新增文章";
+        submitBtn.textContent = "發布文章";
+        
+        // 預設填入當前暱稱
+        ($("author_name") as HTMLInputElement).value = getNickname();
+        
+        renderCategories([]);
+        
+        // 稍微延遲初始化編輯器，確保 DOM 已完全顯示以避免 Editor.js 渲染錯誤
+        setTimeout(() => initEditor(), 50);
+      }
+
+      // 顯示模態框
+      modal.classList.replace("hidden", "flex");
+    } catch (err) {
+      alert("無法載入資料，請檢查網路狀態");
+      console.error(err);
+    }
+  }
+
+  function closeModal() {
+    modal.classList.replace("flex", "hidden");
+    destroyEditor(); // 關閉時必須銷毀實例，釋放記憶體並避免下次開啟衝突
+    currentPostId = null;
+  }
+
+  /**
+   * 渲染分類核取方塊
+   */
+  function renderCategories(selectedIds: number[]) {
+    categoriesContainer.innerHTML = allCategories.map(cat => `
+      <label class="flex items-center space-x-2 text-sm text-slate-300">
+        <input type="checkbox" value="${cat.id}" ${selectedIds.includes(cat.id) ? "checked" : ""} 
+               class="rounded border-white/20 bg-void-black text-primary focus:ring-primary">
+        <span>${cat.name}</span>
+      </label>
+    `).join("");
+  }
+
+  // --- 2. 事件監聽 ---
+
+  /**
+   * 使用自定義事件 (Custom Event) 實現「低耦合」
+   * 外部腳本 (adminDashboard.ts) 只需要發送這個事件，不需要 import 本組件的 function
+   */
+  window.addEventListener("open-edit-modal", (e: any) => {
+    openModal(e.detail?.id);
+  });
+
+  $("closeModalBtn").onclick = closeModal;
+  $("cancelModalBtn").onclick = closeModal;
+
+  // 點擊半透明背景時關閉
+  modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+  // --- 3. 提交邏輯 ---
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("adminToken");
+    
+    // 1. 取得編輯器 JSON 資料
+    const contentData = await saveEditorContent();
+    
+    // 2. 取得選中的分類 ID
+    const selectedCatIds = Array.from(categoriesContainer.querySelectorAll('input:checked'))
+      .map(i => parseInt((i as HTMLInputElement).value));
+
+    // 3. 準備提交內容
+    const payload = {
+      title: ($("title") as HTMLInputElement).value,
+      author_name: ($("author_name") as HTMLInputElement).value,
+      content: JSON.stringify(contentData),
+      summary: ($("summary") as HTMLTextAreaElement).value,
+      status: (($("status")as unknown) as HTMLSelectElement).value,
+      categories: allCategories.filter(c => selectedCatIds.includes(c.id))
+    };
+
+    try {
+      if (currentPostId) {
+        // 更新現有文章
+        await axios.put("/admin/posts", { id: currentPostId, updates: payload }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } else {
+        // 新增文章
+        await axios.post("/admin/posts", payload, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+      
+      // 操作成功後刷新頁面（這是最簡單的資料同步方式）
+      window.location.reload();
+    } catch (error: any) {
+      alert(error.response?.data?.error || "保存失敗，請檢查權限");
+    }
+  };
+</script>
