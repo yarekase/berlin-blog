@@ -9,7 +9,6 @@
 
 import { Hono } from "hono";
 import type { APIRoute } from "astro";
-import { env } from "cloudflare:workers";
 import { postManager, type Category } from "../../utils/postManager";
 import type { Env } from "../../env";
 
@@ -162,7 +161,9 @@ app.delete("/", async (c) => {
 app.post("/upload", async (c) => {
   try {
     const body = await c.req.parseBody();
-    const file = body["image"] as File;
+    // 修正：在 editorManager.ts 中 config.field 設定為 'file'
+    // 這裡必須讀取 'file' 欄位才能拿到圖片
+    const file = body["file"] as File;
 
     if (!file) {
       return c.json({ success: 0, message: "找不到檔案" }, 400);
@@ -197,6 +198,9 @@ app.post("/upload", async (c) => {
  * ALL 會攔截所有請求並交由 Hono 的內部路由處理
  */
 export const ALL: APIRoute = async (context) => {
-  // 使用 Cloudflare Workers 原生 env 確保綁定注入
-  return app.fetch(context.request, env);
+  // 在 Astro Cloudflare Adapter 中，Bindings 儲存在 context.locals.runtime.env
+  // 我們必須將這個 env 傳遞給 Hono，這樣 c.env.DB 才有值
+  const runtime = (context.locals as any).runtime;
+  
+  return app.fetch(context.request, runtime.env);
 };

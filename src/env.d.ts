@@ -12,10 +12,11 @@ export interface Env {
 declare global {
   namespace App {
     interface Locals {
-      /** 現在環境變數直接掛在 env 底下 */
-      env: Env;
-      cf: import("@cloudflare/workers-types").CfProperties;
-      ctx: import("@cloudflare/workers-types").ExecutionContext;
+      runtime: {
+        env: Env;
+        cf: import("@cloudflare/workers-types").CfProperties;
+        ctx: import("@cloudflare/workers-types").ExecutionContext;
+      };
     }
   }
 }
