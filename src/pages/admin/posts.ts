@@ -56,6 +56,29 @@ app.get("/categories", async (c) => {
 });
 
 // ==========================================
+// [POST] 新增分類
+// ==========================================
+
+app.post("/categories", async (c) => {
+  try {
+    const { name } = await c.req.json(); // 接收前端 axios.post 傳來的資料
+    
+    if (!name) return c.json({ error: "名稱為必填" }, 400);
+
+    // 呼叫 postManager 裡面的邏輯 (等等我們要去補寫這個 method)
+    const newCategory = await postManager.createCategory(c.env.DB, name);
+    
+    return c.json(newCategory, 201); // 成功建立回傳 201
+  } catch (error: any) {
+    // 檢查是否為重複資料導致的錯誤
+    if (error.message.includes("已存在")) {
+      return c.json({ error: error.message }, 409);
+    }
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+// ==========================================
 // [GET] 獲取單篇文章詳情
 // ==========================================
 app.get("/:id", async (c) => {
