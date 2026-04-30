@@ -195,6 +195,19 @@
   let currentPostId: string | null = null; // 紀錄目前是否處於「編輯模式」
   let allCategories: Category[] = [];    // 快取分類清單
 
+  /**
+   * 渲染分類核取方塊
+   */
+  function renderCategories(selectedIds: number[]) {
+    categoriesContainer.innerHTML = allCategories.map(cat => `
+      <label class="flex items-center space-x-2 text-sm text-slate-300">
+        <input type="checkbox" value="${cat.id}" ${selectedIds.includes(cat.id) ? "checked" : ""} 
+               class="rounded border-white/20 bg-void-black text-primary focus:ring-primary">
+        <span>${cat.name}</span>
+      </label>
+    `).join("");
+  }
+
   // --- 1. 初始化與開啟邏輯 ---
 
   /**
@@ -261,18 +274,7 @@
     currentPostId = null;
   }
 
-  /**
-   * 渲染分類核取方塊
-   */
-  function renderCategories(selectedIds: number[]) {
-    categoriesContainer.innerHTML = allCategories.map(cat => `
-      <label class="flex items-center space-x-2 text-sm text-slate-300">
-        <input type="checkbox" value="${cat.id}" ${selectedIds.includes(cat.id) ? "checked" : ""} 
-               class="rounded border-white/20 bg-void-black text-primary focus:ring-primary">
-        <span>${cat.name}</span>
-      </label>
-    `).join("");
-  }
+
 
   // --- 2. 事件監聽 ---
 
