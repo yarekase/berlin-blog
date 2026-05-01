@@ -370,36 +370,36 @@ export class PostManager {
    */
   async createCategory(DB: D1Database, name: string): Promise<Category> {
   // 生成 Slug
-  const slug = name
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\u4e00-\u9fa5a-zA-Z0-9-]/g, '')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    const slug = name
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\u4e00-\u9fa5a-zA-Z0-9-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
 
-  // 1. 檢查重複 (D1 的語法)
-  const existing = await DB.prepare(
-    `SELECT id FROM categories WHERE name = ? OR slug = ?`
-  ).bind(name, slug).first();
+    // 1. 檢查重複 (D1 的語法)
+    const existing = await DB.prepare(
+      `SELECT id FROM categories WHERE name = ? OR slug = ?`
+    ).bind(name, slug).first();
 
-  if (existing) {
-    throw new Error("分類名稱或 Slug 已存在");
+    if (existing) {
+      throw new Error("分類名稱或 Slug 已存在");
+    }
+
+    // 2. 插入資料
+    const result = await DB.prepare(
+      `INSERT INTO categories (name, slug, sort_order) VALUES (?, ?, ?)`
+    ).bind(name, slug, 99).run();
+
+    if (!result.success) throw new Error("資料庫寫入失敗");
+
+    return {
+      id: result.meta.last_row_id as number,
+      name,
+      slug,
+      sort_order: 99
+    };
   }
-
-  // 2. 插入資料
-  const result = await DB.prepare(
-    `INSERT INTO categories (name, slug, sort_order) VALUES (?, ?, ?)`
-  ).bind(name, slug, 99).run();
-
-  if (!result.success) throw new Error("資料庫寫入失敗");
-
-  return {
-    id: result.meta.last_row_id as number,
-    name,
-    slug,
-    sort_order: 99
-  };
-}
 }
 
 export const postManager = new PostManager();

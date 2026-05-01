@@ -188,10 +188,11 @@
    * 此腳本負責處理 EditModal 的所有生命週期：從開啟、編輯器初始化、資料抓取到表單提交。
    * 這樣 dashboard.astro 就不需要知道編輯器是如何運作的。
    */
-  import axios from "axios";
   import { getNickname } from "../utils/auth";
   import { type Post, type Category } from "../utils/postManager";
   import { initEditor, saveEditorContent, destroyEditor } from "../utils/editorManager";
+  import "../styles/editor.css"; // 確保編輯器樣式被加載
+  import api from "../utils/api"; // 使用封裝好的 API 實例
 
   // 內部 DOM 選取輔助函數
   const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
@@ -233,7 +234,8 @@
     try {
       // 每次開啟都確認分類清單（確保資料最新）
       try {
-        const { data } = await axios.get<Category[]>("/categories");
+        // baseURL 已經是 /admin/posts，所以這裡只需寫 /categories
+        const { data } = await api.get<Category[]>("/categories");
         allCategories = data;
       }catch(err){
         console.error("API 抓取失敗，分類歸0", err);
@@ -246,7 +248,7 @@
         submitBtn.textContent = "更新文章";
         
         // 抓取該篇文章的詳細內容
-        const { data: post } = await axios.get<Post>(`/admin/posts/${id}`);
+        const { data: post } = await api.get<Post>(`/${id}`);
         
         // 填充表單欄位
         ($("title") as HTMLInputElement).value = post.title;
@@ -308,7 +310,6 @@
 
   form.onsubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("adminToken");
     
     // 1. 取得編輯器 JSON 資料
     const contentData = await saveEditorContent();
@@ -330,14 +331,10 @@
     try {
       if (currentPostId) {
         // 更新現有文章
-        await axios.put("/admin/posts", { id: currentPostId, updates: payload }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.put("/", { id: currentPostId, updates: payload });
       } else {
         // 新增文章
-        await axios.post("/admin/posts", payload, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.post("/", payload);
       }
       
       // 操作成功後刷新頁面（這是最簡單的資料同步方式）
@@ -364,7 +361,7 @@
 
   try {
     // 2. 正式發送 API 到後端
-    const { data: newCategory } = await axios.post<Category>("/categories", { name });
+    const { data: newCategory } = await api.post<Category>("/categories", { name });
 
     // 3. 成功後，更新前端的資料源 (這時 newCategory 包含真正的資料庫 ID)
     allCategories.push(newCategory);
