@@ -10,6 +10,7 @@
 import { Hono } from "hono";
 import type { APIRoute } from "astro";
 import { postManager, type Category } from "../../utils/postManager";
+import { authManager } from "../../utils/auth";
 import type { Env } from "../../env";
 
 const app = new Hono<{ Bindings: Env }>();
@@ -52,6 +53,21 @@ app.get("/categories", async (c) => {
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
   }
+});
+
+// ==========================================
+// [POST] 管理員登入
+// ==========================================
+app.post("/login", async (c) => {
+  const { email, password } = await c.req.json();
+  const result = await authManager.verifyLogin(c.env.DB, email, password);
+  if (result) {
+    const token = await authManager.generateJWT(
+      { id: result.id, email },
+      c.env.ADMIN_PASSWORD);
+    return c.json({ success: true, token, nickname: result.nickname });
+  }
+  return c.json({ error: "登入失敗：帳號或密碼錯誤" }, 401);
 });
 
 // ==========================================

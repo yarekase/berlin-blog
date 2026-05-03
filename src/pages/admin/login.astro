@@ -1,9 +1,10 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 
+
 // 從 Cloudflare 環境變數獲取，若無則使用預設值
-const { ADMIN_EMAIL = "admin@example.com", ADMIN_PASSWORD = "admin123" } =
-  Astro.locals.env || {};
+// const { ADMIN_EMAIL = "admin@example.com", ADMIN_PASSWORD = "admin123" } =
+//   Astro.locals.env || {};
 ---
 
 <Layout title="後台登入 - 子迂的蠹酸齋">
@@ -65,26 +66,34 @@ const { ADMIN_EMAIL = "admin@example.com", ADMIN_PASSWORD = "admin123" } =
   </main>
 </Layout>
 
-<script define:vars={{ ADMIN_EMAIL, ADMIN_PASSWORD }}>
-  const loginForm = document.getElementById("loginForm");
-  if (loginForm) {
-    loginForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+<script>
+  import api from "../../utils/api";
 
-      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        localStorage.setItem("adminToken", "authenticated");
+  const loginForm = document.getElementById("loginForm") as HTMLFormElement;
+  const errorMsg = document.getElementById("errorMsg");
+  
+  loginForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = (document.getElementById("email") as HTMLInputElement).value;
+    const password = (document.getElementById("password") as HTMLInputElement).value;
+
+    try {
+      const response = await api.post("/login", { email, password });
+      if (response.data.success) {
+        localStorage.setItem("adminToken", response.data.token);
+        localStorage.setItem("adminNickname", response.data.nickname);
         window.location.href = "/admin/dashboard";
       } else {
-        const errorMsg = document.getElementById("errorMsg");
-        if (errorMsg) {
-          errorMsg.textContent = "信箱或密碼錯誤";
-          errorMsg.classList.remove("hidden");
-        }
+        throw new Error(response.data.error || "登入失敗");
       }
-    });
-  }
+    } catch (error: any) {
+      if (errorMsg) {
+        errorMsg.textContent = error.message || "登入失敗，請稍後再試";
+        errorMsg.classList.remove("hidden");
+      }
+    }
+  });
 </script>
 
 <style>
