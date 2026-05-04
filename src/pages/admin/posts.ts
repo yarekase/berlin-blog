@@ -12,6 +12,7 @@ import type { APIRoute } from "astro";
 import { postManager, type Category } from "../../utils/postManager";
 import { authManager } from "../../utils/auth";
 import type { Env } from "../../env";
+import type { AdminPayload } from "../../utils/auth";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -53,6 +54,17 @@ app.get("/categories", async (c) => {
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
   }
+});
+
+// ==========================================
+// [GET] 獲取個人暱稱
+// ==========================================
+app.get("/api/admin/profile", async (c) => {
+  const payload = c.get("jwtPayload") as AdminPayload;
+  const admin = await c.env.DB.prepare("SELECT nickname FROM admins WHERE id = ?")
+    .bind(payload.sub)
+    .first();
+  return c.json(admin);
 });
 
 // ==========================================
@@ -149,6 +161,30 @@ app.put("/", async (c) => {
     return c.json({ success: true });
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
+  }
+});
+
+// ==========================================
+// [PUT] 更新使用者暱稱
+// ==========================================
+app.put("/api/admin/profile", async (c) => {
+  // 1. 從 JWT 中取得使用者 ID (假設你已經設定好 jwt 中間件)
+  const payload = c.get("jwtPayload") as AdminPayload;
+  const adminId = payload.sub; // 這是你在 generateJWT 時放進去的 user.id
+
+  const { nickname } = await c.req.json();
+
+  if (!nickname) return c.json({ error: "暱稱不能為空" }, 400);
+
+  try {
+    // 2. 更新資料庫
+    await c.env.DB.prepare("UPDATE admins SET nickname = ? WHERE id = ?")
+      .bind(nickname, adminId)
+      .run();
+
+    return c.json({ success: true, nickname });
+  } catch (e) {
+    return c.json({ error: "更新失敗" }, 500);
   }
 });
 

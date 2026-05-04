@@ -188,11 +188,15 @@
    * 此腳本負責處理 EditModal 的所有生命週期：從開啟、編輯器初始化、資料抓取到表單提交。
    * 這樣 dashboard.astro 就不需要知道編輯器是如何運作的。
    */
-  import { getNickname } from "../utils/auth";
+  import { authManager } from "../utils/auth";
   import { type Post, type Category } from "../utils/postManager";
   import { initEditor, saveEditorContent, destroyEditor } from "../utils/editorManager";
   import "../styles/editor.css"; // 確保編輯器樣式被加載
   import api from "../utils/api"; // 使用封裝好的 API 實例
+
+  const getNickname = () => authManager.getNickname();
+  const nickname = getNickname();
+ 
 
   // 內部 DOM 選取輔助函數
   const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
@@ -266,7 +270,7 @@
         submitBtn.textContent = "發布文章";
         
         // 預設填入當前暱稱
-        ($("author_name") as HTMLInputElement).value = getNickname();
+        ($("author_name") as HTMLInputElement).value = nickname || "";
         
         renderCategories([]);
         

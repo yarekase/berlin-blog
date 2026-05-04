@@ -3,7 +3,7 @@
  * 負責處理儀表板的全域邏輯，例如身份驗證、登出、以及將請求「分發」給對應的模態框。
  */
 import api from "../utils/api";
-import { checkAuth, logout, setNickname, getNickname } from "../utils/auth";
+import {authManager} from "../utils/auth";
 
 /**
  * DOM 輔助函數
@@ -20,19 +20,20 @@ function $<T>(id: string, required = true): T {
  */
 export function initDashboard() {
   // 1. 權限檢查：如果 localStorage 沒有 Token，直接導向登入頁
-  checkAuth();
+  authManager.checkAuth();
 
   // 取得頁面上的 DOM 元素
   const settingsModal = $<HTMLDivElement>("settingsModal");
-  const newPostBtn = document.getElementById("newPostBtn");
-  const settingsBtn = document.getElementById("settingsBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const settingsForm = document.getElementById("settingsForm") as HTMLFormElement;
+  const newPostBtn = $<HTMLButtonElement>("newPostBtn");
+  const settingsBtn = $<HTMLButtonElement>("settingsBtn");
+  const logoutBtn = $<HTMLButtonElement>("logoutBtn");
+  const settingsForm = $<HTMLFormElement>("settingsForm");
+  const nicknameInput = $<HTMLInputElement>("nickname");
 
   // --- 2. 文章列表動作監聽 (使用「事件委託」 Event Delegation) ---
   // 為什麼不直接在每個按鈕綁監聽？
   // 因為文章列表是動態生成的，或者數量很多。在父容器綁一個監聽器更有效率。
-  const postsListContainer = document.getElementById("postsList");
+  const postsListContainer = $<HTMLDivElement>("postsList");
   postsListContainer?.addEventListener("click", (e) => {
     const target = e.target as HTMLElement;
     const id = target.getAttribute("data-id");
@@ -58,20 +59,32 @@ export function initDashboard() {
   // --- 4. 使用者設定邏輯 (暱稱修改) ---
   settingsBtn?.addEventListener("click", () => {
     // 打開設定視窗前，先填入目前的暱稱
-    $<HTMLInputElement>("nickname").value = getNickname();
+    $<HTMLInputElement>("nickname").value = authManager.getNickname();
     settingsModal.classList.replace("hidden", "flex");
   });
 
-  settingsForm?.addEventListener("submit", (e) => {
+  settingsForm?.addEventListener("submit",async (e) => {
     e.preventDefault();
     // 儲存暱稱至 localStorage (僅影響本地顯示，通常是為了讓「作者名稱」預設填入)
-    setNickname($<HTMLInputElement>("nickname").value);
-    settingsModal.classList.replace("flex", "hidden");
-    alert("設定已保存");
+    const newNickname = nicknameInput.value.trim();
+    if (!newNickname) {
+      alert("暱稱不能為空");
+      return;
+    }
+
+    try {
+      await api.put("/profile", { nickname: newNickname });
+      authManager.setNickname(newNickname);
+      settingsModal.classList.replace("flex", "hidden");
+      alert("設定已保存");
+      window.location.reload(); // 刷新頁面以更新顯示的暱稱
+    } catch (error) {
+      alert("保存設定時發生錯誤");
+  }
   });
 
   // 登出邏輯：清除 Token 並轉址
-  logoutBtn?.addEventListener("click", () => logout());
+  logoutBtn?.addEventListener("click", () => authManager.logout());
 }
 
 /**
