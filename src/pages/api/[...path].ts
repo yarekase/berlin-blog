@@ -15,7 +15,7 @@ import type { Env } from "../../env";
 import type { AdminPayload } from "../../utils/auth";
 import { env } from "cloudflare:workers";
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono<{ Bindings: Env }>().basePath('/api');
 
 app.get("/test", (c) => c.text("Hono is working!"));
 
