@@ -4,7 +4,7 @@ import axios from "axios";
 // 1. 建立實例
 const api = axios.create({
   // 因為你的 Hono 定義在 src/pages/admin/posts.ts，所以 base 是 /admin/posts
-  baseURL: "/api/posts", 
+  baseURL: "/api", 
   headers: {
     "Content-Type": "application/json",
   },
