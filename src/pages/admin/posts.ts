@@ -59,7 +59,7 @@ app.get("/categories", async (c) => {
 // ==========================================
 // [GET] 獲取個人暱稱
 // ==========================================
-app.get("/api/admin/profile", async (c) => {
+app.get("/profile", async (c) => {
   const payload = c.get("jwtPayload") as AdminPayload;
   const admin = await c.env.DB.prepare("SELECT nickname FROM admins WHERE id = ?")
     .bind(payload.sub)
@@ -167,7 +167,7 @@ app.put("/", async (c) => {
 // ==========================================
 // [PUT] 更新使用者暱稱
 // ==========================================
-app.put("/api/admin/profile", async (c) => {
+app.put("/profile", async (c) => {
   // 1. 從 JWT 中取得使用者 ID (假設你已經設定好 jwt 中間件)
   const payload = c.get("jwtPayload") as AdminPayload;
   const adminId = payload.sub; // 這是你在 generateJWT 時放進去的 user.id
