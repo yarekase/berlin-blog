@@ -17,6 +17,8 @@ import { env } from "cloudflare:workers";
 
 const app = new Hono<{ Bindings: Env }>();
 
+app.get("/test", (c) => c.text("Hono is working!"));
+
 // ==========================================
 // [驗證中間件] 檢查管理員身分
 // ==========================================
