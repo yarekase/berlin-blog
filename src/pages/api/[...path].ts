@@ -13,6 +13,7 @@ import { postManager, type Category } from "../../utils/postManager";
 import { authManager } from "../../utils/auth";
 import type { Env } from "../../env";
 import type { AdminPayload } from "../../utils/auth";
+import { env } from "cloudflare:workers";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -252,7 +253,5 @@ app.post("/upload", async (c) => {
 export const ALL: APIRoute = async (context) => {
   // 在 Astro Cloudflare Adapter 中，Bindings 儲存在 context.locals.runtime.env
   // 我們必須將這個 env 傳遞給 Hono，這樣 c.env.DB 才有值
-  const runtime = (context.locals as any).runtime;
-  
-  return app.fetch(context.request, runtime.env);
+  return app.fetch(context.request, env);
 };
