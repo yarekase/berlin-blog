@@ -80,7 +80,9 @@ import Layout from "../../layouts/Layout.astro";
 
     try {
       const response = await api.post("/login", { email, password });
-      
+      console.log("完整的 response 物件:", response);
+      console.log("後端回傳的內容 (data):", response.data);
+
       if (response.data.success) {
         localStorage.setItem("adminToken", response.data.token);
         localStorage.setItem("adminNickname", response.data.nickname);
