@@ -4,7 +4,9 @@ import Layout from "../layouts/Layout.astro";
 import { postManager, type Post, type Category } from "../utils/postManager";
 
 // 2. 環境變數處理：從 Cloudflare Runtime 環境中取得 D1 資料庫實例
-const { DB } = Astro.locals.env || {};
+import { env } from "cloudflare:workers";
+import { type Env } from "../env";
+const DB = (env as unknown as Env).DB;
 
 // 3. 資料狀態初始化
 let posts: Post[] = [];
