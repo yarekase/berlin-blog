@@ -80,6 +80,7 @@ import Layout from "../../layouts/Layout.astro";
 
     try {
       const response = await api.post("/login", { email, password });
+      
       if (response.data.success) {
         localStorage.setItem("adminToken", response.data.token);
         localStorage.setItem("adminNickname", response.data.nickname);
