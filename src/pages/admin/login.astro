@@ -86,11 +86,11 @@ import Layout from "../../layouts/Layout.astro";
         localStorage.setItem("adminNickname", response.data.nickname);
         window.location.href = "/admin/dashboard";
       } else {
-        throw new Error(response.data.error || "登入失敗");
+        throw new Error(response.data.error || "登入失敗，這裡是if線");
       }
     } catch (error: any) {
       if (errorMsg) {
-        errorMsg.textContent = error.message || "登入失敗，請稍後再試";
+        errorMsg.textContent = error.message || "登入失敗，這裡是catch線";
         errorMsg.classList.remove("hidden");
       }
     }
