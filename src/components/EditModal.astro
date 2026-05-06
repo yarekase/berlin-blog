@@ -122,7 +122,7 @@
           class="block text-sm font-medium text-slate-400 mb-2">內容</span>
         <div
           id="editorjs"
-          class="min-h-[400px] border border-white/20 rounded p-4 bg-void-black text-white"
+          class="min-h-100 border border-white/20 rounded p-4 bg-void-black text-white"
         >
         </div>
         <textarea id="content" name="content" class="hidden"></textarea>
@@ -205,7 +205,7 @@
   const form = $<HTMLFormElement>("postForm");
   const categoriesContainer = $("categoriesContainer");
   const modalTitle = $("modalTitle");
-  const submitBtn = $("submitBtn");
+  const submitBtn = $<HTMLButtonElement>("submitBtn");
   const newCatInput = $<HTMLInputElement>("newCategoryInput");
   const addCatBtn = $("addCategoryBtn");
 
@@ -314,6 +314,11 @@
 
   form.onsubmit = async (e) => {
     e.preventDefault();
+
+    submitBtn.disabled = true;
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.textContent = "儲存中...";
+    
     
     // 1. 取得編輯器 JSON 資料
     const contentData = await saveEditorContent();
@@ -330,7 +335,10 @@
       summary: ($("summary") as HTMLTextAreaElement).value,
       status: (($("status")as unknown) as HTMLSelectElement).value,
       categories: allCategories.filter(c => selectedCatIds.includes(c.id))
+      cover_image: coverImageUrl
     };
+
+
 
     try {
       if (currentPostId) {
@@ -340,6 +348,7 @@
         // 新增文章
         await api.post("/", payload);
       }
+      
       
       // 操作成功後刷新頁面（這是最簡單的資料同步方式）
       window.location.reload();
