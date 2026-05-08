@@ -208,9 +208,14 @@
   const submitBtn = $<HTMLButtonElement>("submitBtn");
   const newCatInput = $<HTMLInputElement>("newCategoryInput");
   const addCatBtn = $("addCategoryBtn");
+  const coverInput = $<HTMLInputElement>("cover_upload");
+  const previewContainer = $("preview_container");
+  const imagePreview = $<HTMLImageElement>("image_preview");
+
 
   let currentPostId: string | null = null; // 紀錄目前是否處於「編輯模式」
   let allCategories: Category[] = [];    // 快取分類清單
+  let existingCoverImage = ""; // 紀錄現有封面圖 URL（編輯模式下用於判斷是否更換）
 
   /**
    * 渲染分類核取方塊
@@ -225,6 +230,23 @@
     `).join("");
   }
 
+  /**
+   * 封面圖預覽邏輯
+     - 使用 URL.createObjectURL 來生成本地預覽
+     - 編輯模式下如果已有封面圖，則直接顯示該圖片
+   */
+  coverInput.onchange = async () => {
+    const file = coverInput.files?.[0];
+    if (file) {
+      imagePreview.src= URL.createObjectURL(file);
+      previewContainer.classList.remove("hidden");
+    } else {
+      imagePreview.src = "#";
+      previewContainer.classList.add("hidden");
+    }
+  }
+
+
   // --- 1. 初始化與開啟邏輯 ---
 
   /**
@@ -234,9 +256,11 @@
   async function openModal(id: string | null = null) {
     currentPostId = id;
     form.reset();
+    previewContainer.classList.add("hidden");
+    existingCoverImage = "";
     
     try {
-      // 每次開啟都確認分類清單（確保資料最新）
+       // 每次開啟都確認分類清單（確保資料最新）
       try {
         // baseURL 已經是 /admin/posts，所以這裡只需寫 /categories
         const { data } = await api.get<Category[]>("/categories");
@@ -259,6 +283,12 @@
         ($("author_name") as HTMLInputElement).value = post.author_name;
         ($("summary") as HTMLTextAreaElement).value = post.summary || "";
         (($("status") as unknown) as HTMLSelectElement).value = post.status;
+        existingCoverImage = post.cover_image || "";
+
+        if(post.cover_image){
+          imagePreview.src = post.cover_image;
+          previewContainer.classList.remove("hidden");
+        }
         
         renderCategories(post.categories.map(c => c.id));
         
@@ -318,7 +348,21 @@
     submitBtn.disabled = true;
     const originalBtnText = submitBtn.textContent;
     submitBtn.textContent = "儲存中...";
-    
+
+    try {
+      let finalCoverImageUrl = existingCoverImage; // 預設為現有封面圖 URL
+      if (coverInput.files?.[0]) {
+        // 如果有新圖檔，則上傳並取得新 URL
+        const formData = new FormData();
+        formData.append("cover_image", coverInput.files[0]);
+        
+        const uploadRes = await api.post("/upload", formData);
+        if(uploadRes.data.success === 1){
+          finalCoverImageUrl = uploadRes.data.url; // 後端應回傳 { success: true, url: "新圖片的公開 URL" }
+        } else {
+          throw new Error("封面圖上傳失敗");
+        }
+      }
     
     // 1. 取得編輯器 JSON 資料
     const contentData = await saveEditorContent();
@@ -334,11 +378,9 @@
       content: JSON.stringify(contentData),
       summary: ($("summary") as HTMLTextAreaElement).value,
       status: (($("status")as unknown) as HTMLSelectElement).value,
-      categories: allCategories.filter(c => selectedCatIds.includes(c.id))
-      cover_image: coverImageUrl
+      categories: allCategories.filter(c => selectedCatIds.includes(c.id)),
+      cover_image: finalCoverImageUrl
     };
-
-
 
     try {
       if (currentPostId) {
@@ -355,7 +397,12 @@
     } catch (error: any) {
       alert(error.response?.data?.error || "保存失敗，請檢查權限");
     }
+  } finally {() => {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalBtnText;
+  }};
   };
+  ;
 
 
   // 新增分類按鈕監聽器
