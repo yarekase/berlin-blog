@@ -1,0 +1,43 @@
+---
+/**
+ * CoverSection.astro
+ * 處理封面圖上傳與預覽
+ */
+---
+
+<div class="space-y-3">
+  <label class="block text-sm font-medium text-slate-400">封面圖片</label>
+  
+  <div class="relative group">
+    <div class="border-2 border-dashed border-white/20 rounded-xl p-8 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer text-center">
+      <input 
+        type="file" 
+        id="cover_upload" 
+        name="cover_upload" 
+        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+        accept="image/*" 
+      />
+      <div class="space-y-2">
+        <div class="text-3xl mb-2">📸</div>
+        <p class="text-sm text-slate-400 group-hover:text-slate-200">
+          點擊或將圖片拖拽至此處上傳
+        </p>
+        <p class="text-xs text-slate-500">建議尺寸：1200 x 630 (1.91:1)</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="preview_container" class="mt-4 hidden animate-in fade-in duration-300">
+    <div class="relative group rounded-lg overflow-hidden border border-white/10">
+      <img 
+        id="image_preview" 
+        src="#" 
+        alt="封面預覽" 
+        class="w-full h-56 object-cover bg-slate-800"
+      />
+      <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <span class="text-white text-xs font-bold bg-black/60 px-3 py-1 rounded-full">點擊上方重新上傳</span>
+      </div>
+    </div>
+  </div>
+</div>

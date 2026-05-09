@@ -1,0 +1,56 @@
+---
+import CategorySection from './CategorySection.astro';
+import CoverSection from './CoverSection.astro';
+---
+
+<div id="editModal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center p-4 backdrop-blur-sm">
+  <div class="bg-void-black border border-white/10 rounded-lg max-w-300 w-full max-h-[95vh] overflow-y-auto">
+    <div class="sticky top-0 bg-void-black border-b border-white/10 px-6 py-4 flex items-center justify-between">
+      <h3 class="text-xl font-bold" id="modalTitle"></h3>
+      <button id="closeModalBtn" class="text-slate-400 hover:text-white">✕</button>
+    </div>
+
+    <form id="postForm" class="p-6 space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" id="title" placeholder="文章標題" class="..." required />
+        <input type="text" id="author_name" placeholder="作者名稱" class="..." required />
+      </div>
+
+      <CategorySection />
+      <CoverSection />
+
+      <div id="editorjs" class="min-h-80 border border-white/20 rounded p-4 bg-void-black"></div>
+
+      <div class="flex gap-4 pt-4 sticky bottom-0 bg-void-black pb-2">
+        <button type="submit" id="submitBtn" class="...">保存</button>
+        <button type="button" id="cancelModalBtn" class="...">取消</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  import { createModalHandler } from './modalLogic.ts';
+  
+  const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
+
+  const elements = {
+    modal: $("editModal"),
+    form: $<HTMLFormElement>("postForm"),
+    modalTitle: $("modalTitle"),
+    submitBtn: $<HTMLButtonElement>("submitBtn"),
+    coverInput: $<HTMLInputElement>("cover_upload"),
+    imagePreview: $<HTMLImageElement>("image_preview"),
+    previewContainer: $("preview_container"),
+    categoriesContainer: $("categoriesContainer"),
+    newCatInput: $<HTMLInputElement>("newCategoryInput"),
+    statusSelect: ($("status") as any) as HTMLSelectElement,
+  };
+
+  const handler = createModalHandler(elements);
+
+  window.addEventListener("open-edit-modal", (e: any) => handler.openModal(e.detail?.id));
+  elements.form.onsubmit = handler.handleSubmit;
+  $("closeModalBtn").onclick = handler.closeModal;
+  $("cancelModalBtn").onclick = handler.closeModal;
+</script>
