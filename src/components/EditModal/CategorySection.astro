@@ -1,0 +1,33 @@
+---
+/**
+ * CategorySection.astro
+ * 處理文章分類的選擇與動態新增
+ */
+---
+
+<div class="space-y-4">
+  <span class="block text-sm font-medium text-slate-400">分類 (可多選)</span>
+  
+  <div class="flex items-center space-x-2">
+    <input 
+      type="text" 
+      id="newCategoryInput" 
+      placeholder="輸入新分類名稱" 
+      class="flex-1 px-3 py-1.5 rounded border border-white/20 bg-void-black text-sm text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+    >
+    <button 
+      type="button" 
+      id="addCategoryBtn" 
+      class="rounded bg-primary px-4 py-1.5 text-sm font-bold text-white hover:bg-primary/80 active:scale-95 transition-all"
+    >
+      新增
+    </button>
+  </div>
+
+  <div 
+    id="categoriesContainer" 
+    class="grid grid-cols-2 gap-2 border border-white/10 p-4 rounded-lg max-h-40 overflow-y-auto bg-black/20"
+  >
+    <p class="text-xs text-slate-500 col-span-2 text-center py-2">正在載入分類...</p>
+  </div>
+</div>
