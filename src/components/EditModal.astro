@@ -334,7 +334,7 @@
       content: JSON.stringify(contentData),
       summary: ($("summary") as HTMLTextAreaElement).value,
       status: (($("status")as unknown) as HTMLSelectElement).value,
-      categories: allCategories.filter(c => selectedCatIds.includes(c.id))
+      categories: allCategories.filter(c => selectedCatIds.includes(c.id)),
       cover_image: coverImageUrl
     };
 
