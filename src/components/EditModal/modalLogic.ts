@@ -83,9 +83,9 @@ export function createModalHandler(els: ModalElements) {
       };
 
       if (currentPostId) {
-        await api.put("/posts", { id: currentPostId, updates: payload });
+        await api.put("/", { id: currentPostId, updates: payload });
       } else {
-        await api.post("/posts", payload);
+        await api.post("/", payload);
       }
       window.location.reload();
     } catch (error:any) {
