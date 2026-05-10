@@ -11,6 +11,9 @@ export interface ModalElements {
   categoriesContainer: HTMLElement;
   newCatInput: HTMLInputElement;
   statusSelect: HTMLSelectElement;
+  titleInput: HTMLInputElement;
+  authorInput: HTMLInputElement;
+  summaryInput: HTMLTextAreaElement;
 }
 
 export interface PostPayload {

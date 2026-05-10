@@ -32,9 +32,9 @@ export function createModalHandler(els: ModalElements) {
       if (id) {
         els.modalTitle.textContent = "編輯文章";
         const { data: post } = await api.get<Post>(`/${id}`);
-        (els.form.querySelector("#title") as HTMLInputElement).value = post.title;
-        (els.form.querySelector("#author_name") as HTMLInputElement).value = post.author_name;
-        (els.form.querySelector("#summary") as HTMLTextAreaElement).value = post.summary || "";
+        els.titleInput.value = post.title;
+        els.authorInput.value = post.author_name;
+        els.summaryInput.value = post.summary || "";
         els.statusSelect.value = post.status;
         existingCoverImage = post.cover_image;
 
@@ -73,10 +73,10 @@ export function createModalHandler(els: ModalElements) {
         .map(i => parseInt((i as HTMLInputElement).value));
 
       const payload = {
-        title: (els.form.querySelector("#title") as HTMLInputElement).value,
-        author_name: (els.form.querySelector("#author_name") as HTMLInputElement).value,
+        title: els.titleInput.value,
+        author_name: els.authorInput.value,
         content: JSON.stringify(contentData),
-        summary: (els.form.querySelector("#summary") as HTMLTextAreaElement).value,
+        summary: els.summaryInput.value,
         status: els.statusSelect.value,
         categories: allCategories.filter(c => selectedCatIds.includes(c.id)),
         cover_image: finalCoverImage

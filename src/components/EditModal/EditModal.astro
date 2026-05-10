@@ -45,6 +45,9 @@ import CoverSection from './CoverSection.astro';
     categoriesContainer: $("categoriesContainer"),
     newCatInput: $<HTMLInputElement>("newCategoryInput"),
     statusSelect: ($("status") as any) as HTMLSelectElement,
+    titleInput: $<HTMLInputElement>("title"),
+  authorInput: $<HTMLInputElement>("author_name"),
+  summaryInput: $<HTMLTextAreaElement>("summary"),
   };
 
   const handler = createModalHandler(elements);
