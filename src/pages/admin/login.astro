@@ -84,6 +84,9 @@ import Layout from "../../layouts/Layout.astro";
       console.log("後端回傳的內容 (data):", response.data);
 
       if (response.data.success) {
+        // 設定 Cookie，伺服器端才抓得到。max-age 單位為秒 (這裡設定 1 天)
+        document.cookie = `adminToken=${response.data.token}; path=/; max-age=86400*7; SameSite=Strict`;
+        
         localStorage.setItem("adminToken", response.data.token);
         localStorage.setItem("adminNickname", response.data.nickname);
         window.location.href = "/admin/dashboard";

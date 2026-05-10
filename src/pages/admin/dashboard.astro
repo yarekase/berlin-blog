@@ -17,6 +17,12 @@ import { env } from 'cloudflare:workers';
 const  DB  = (env as any).DB || {};
 let posts: Post[] = [];
 
+const token = Astro.cookies.get("adminToken")?.value;
+
+if (!token) {
+  return Astro.redirect("/admin/login");
+}
+
 if (DB) {
   try {
     posts = await postManager.getPosts(DB);

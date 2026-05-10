@@ -35,7 +35,7 @@ export function createModalHandler(els: ModalElements) {
         (els.form.querySelector("#title") as HTMLInputElement).value = post.title;
         (els.form.querySelector("#author_name") as HTMLInputElement).value = post.author_name;
         (els.form.querySelector("#summary") as HTMLTextAreaElement).value = post.summary || "";
-        (els.form.querySelector("#status") as HTMLSelectElement).value = post.status;
+        els.statusSelect.value = post.status;
         existingCoverImage = post.cover_image;
 
         if (post.cover_image) {
