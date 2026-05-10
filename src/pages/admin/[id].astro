@@ -1,0 +1,93 @@
+---
+/**
+ * 文章內容顯示頁面
+ * 路徑：/posts/[id]
+ */
+import Layout from "../../layouts/Layout.astro";
+import { postManager } from "../../utils/postManager";
+import { env } from 'cloudflare:workers';
+
+const { id } = Astro.params;
+const DB = (env as any).DB;
+
+// 1. 安全檢查：如果沒有 ID 或資料庫連線失敗
+if (!id || !DB) {
+  return Astro.redirect("/404");
+}
+
+let post;
+try {
+  // 2. 從資料庫獲取文章詳情
+  post = await postManager.getPost(DB, id);
+} catch (error) {
+  console.error("獲取文章失敗:", error);
+}
+
+// 3. 如果找不到文章，跳轉至 404
+if (!post) {
+  return Astro.redirect("/404");
+}
+---
+
+<Layout title={`${post.title} - 子迂的蠹酸齋`}>
+  <main class="min-h-screen bg-void-black text-stucco-white font-display pb-24">
+    <!-- 文章主體 -->
+    <article class="max-w-3xl mx-auto px-6 pt-20">
+      
+      <!-- 文章標題與資訊 -->
+      <header class="mb-12 border-b border-white/5 pb-12">
+        <div class="flex items-center space-x-2 text-primary text-sm font-bold mb-4 uppercase tracking-widest">
+          {/* 
+              因為 categories 是一個陣列，我們取第一個分類顯示。
+              如果 post.categories 不存在或長度為 0，則顯示 "未分類"。
+          */}
+          <span># {post.categories && post.categories.length > 0 
+            ? post.categories[0].name 
+            : "未分類"}</span>
+        </div>
+        
+        <h1 class="text-4xl md:text-5xl font-bold mb-8 text-white leading-tight">
+          {post.title}
+        </h1>
+
+        <div class="flex items-center text-slate-400 text-sm space-x-6">
+          <span class="flex items-center">
+            <span class="opacity-50 mr-2">BY</span> {post.author_name}
+          </span>
+          <time datetime={post.created_at} class="flex items-center">
+            <span class="opacity-50 mr-2">DATE</span> {new Date(post.created_at).toLocaleDateString('zh-TW')}
+          </time>
+        </div>
+      </header>
+
+      <!-- 封面圖 -->
+      {post.cover_image && (
+        <div class="mb-16 rounded-xl overflow-hidden shadow-2xl border border-white/10">
+          <img 
+            src={post.cover_image} 
+            alt={post.title} 
+            class="w-full h-auto object-cover max-h-[500px]"
+          />
+        </div>
+      )}
+
+      <!-- 文章內容渲染區 -->
+      <div class="prose prose-invert prose-primary max-w-none prose-lg article-content">
+        {/* 
+            注意：Editor.js 資料建議在儲存前轉為 HTML，
+            或者在這裡寫一個渲染 JSON Blocks 的邏輯。
+        */}
+        <div set:html={post.content} />
+      </div>
+
+      <!-- 文章底部 -->
+      <footer class="mt-24 pt-12 border-t border-white/10 flex justify-between items-center">
+        <a href="/" class="text-slate-400 hover:text-primary transition-all flex items-center group">
+          <span class="mr-2 transform group-hover:-translate-x-1 transition-transform">←</span>
+          返回首頁
+        </a>
+      </footer>
+
+    </article>
+  </main>
+</Layout>
