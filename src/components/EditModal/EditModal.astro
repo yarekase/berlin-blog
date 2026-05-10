@@ -17,6 +17,22 @@ import CoverSection from './CoverSection.astro';
       </div>
 
       <CategorySection />
+
+      <div>
+        <!-- 摘要 (SEO 用) 文字區域 -->
+        <label
+          for="summary"
+          class="block text-sm font-medium text-slate-400 mb-2"
+          >摘要 (SEO 用)</label
+        >
+        <textarea
+          id="summary"
+          name="summary"
+          rows="3"
+          class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+          placeholder="可留空，系統會自動從內容生成"></textarea>
+      </div>
+      
       <CoverSection />
 
       <div id="editorjs" class="min-h-80 border border-white/20 rounded p-4 bg-void-black"></div>
