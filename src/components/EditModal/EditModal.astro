@@ -32,10 +32,42 @@ import CoverSection from './CoverSection.astro';
           class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
           placeholder="可留空，系統會自動從內容生成"></textarea>
       </div>
-      
+
       <CoverSection />
 
       <div id="editorjs" class="min-h-80 border border-white/20 rounded p-4 bg-void-black"></div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <!-- 狀態選擇下拉菜單 -->
+          <label
+            for="status"
+            class="block text-sm font-medium text-slate-400 mb-2">狀態</label
+          >
+          <select
+            id="status"
+            name="status"
+            class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+          >
+            <option value="draft">草稿</option>
+            <option value="published">發佈</option>
+          </select>
+        </div>
+        <div>
+          <!-- 發佈日期時間選擇器 -->
+          <label
+            for="publishedAt"
+            class="block text-sm font-medium text-slate-400 mb-2"
+            >發佈日期</label
+          >
+          <input
+            type="datetime-local"
+            id="publishedAt"
+            name="publishedAt"
+            class="w-full px-4 py-2 bg-void-black border border-white/20 rounded text-white focus:outline-none focus:border-primary transition-colors"
+          />
+        </div>
+      </div>
 
       <div class="flex gap-4 pt-4 sticky bottom-0 bg-void-black pb-2">
         <button type="submit" id="submitBtn" class="...">保存</button>
