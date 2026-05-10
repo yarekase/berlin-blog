@@ -88,7 +88,10 @@ export function createModalHandler(els: ModalElements) {
         await api.post("/", payload);
       }
       window.location.reload();
-    } catch (error) {
+    } catch (error:any) {
+      console.error("完整錯誤資訊:", error); // 在控制台印出具體細節
+      // 嘗試抓取後端回傳的錯誤訊息
+      const errorMsg = error.response?.data?.message || error.message || "未知錯誤";
       alert("保存失敗");
       els.submitBtn.disabled = false;
       els.submitBtn.textContent = "保存";
