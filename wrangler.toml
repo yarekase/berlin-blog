@@ -21,3 +21,4 @@ ip = "127.0.0.1"
 [vars]
 ADMIN_EMAIL = "admin@example.com"
 ADMIN_PASSWORD = "admin123"
+R2_PUBLIC_DOMAIN = "https://pub-2471c8cc4df348ba85d7772e44349294.r2.dev"

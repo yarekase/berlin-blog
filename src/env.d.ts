@@ -6,7 +6,8 @@ export interface Env {
   DB: D1Database;
   MY_BUCKET: R2Bucket;
   ADMIN_EMAIL: string;
-  ADMIN_PASSWORD: string;
+  JWT_SECRET: string;
+  R2_PUBLIC_DOMAIN: string;
 }
 
 declare global {
