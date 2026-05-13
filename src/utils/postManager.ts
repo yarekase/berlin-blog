@@ -144,6 +144,7 @@ export class PostManager {
       cover_image: string;
       status: "draft" | "published";
       categories: Category[];
+      published_at?: string;
     },
   ): Promise<void> {
     try {
@@ -170,7 +171,7 @@ export class PostManager {
         draft_token,
         now,
         now,
-        postData.status === "published" ? now : null,
+        postData.status === "published" ? postData.published_at : null,
       );
 
       // 建立多對多關聯 SQL
@@ -231,6 +232,7 @@ export class PostManager {
       summary: string;
       cover_image: string;
       status: "draft" | "published";
+      published_at?: string;
       categories: Category[];
     }>,
   ): Promise<void> {

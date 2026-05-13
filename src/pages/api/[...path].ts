@@ -14,7 +14,7 @@ import { authManager, type AdminPayload} from "../../utils/auth";
 import type { Env } from "../../env";
 import { env } from "cloudflare:workers";
 
-const app = new Hono<{ Bindings: Env, Variables: { admin: AdminPayload } }>().basePath('/api');
+const app = new Hono<{ Bindings: Env, Variables: { admin: AdminPayload } }>();
 
 app.get("/test", (c) => c.text("Hono is working!"));
 
@@ -177,6 +177,7 @@ app.post("/", async (c) => {
       cover_image: string;
       status: "draft" | "published";
       categories: Category[];
+      publishedAt?: string;
     };
     await postManager.addPost(c.env.DB, body);
     return c.json({ success: true }, 201);
