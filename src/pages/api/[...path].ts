@@ -23,7 +23,7 @@ app.get("/test", (c) => c.text("Hono is working!"));
 // ==========================================
 app.use("*", async (c, next) => {
   // 1. 放行登入路由，讓使用者能取得 Token
-  if (c.req.path === "/login" && c.req.method === "POST") {
+  if (c.req.path === "/api/login" && c.req.method === "POST") {
     return await next();
   }
   // 僅針對寫入操作 (POST, PUT, DELETE) 進行攔截
