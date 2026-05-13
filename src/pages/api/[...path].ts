@@ -119,7 +119,7 @@ app.post("/login", async (c) => {
       c.env.JWT_SECRET);
     return c.json({ success: true, token, nickname: result.nickname });
   }
-  return c.json({ error: "登入失敗：帳號或密碼錯誤" }, 401);
+  return c.json({ error: "登入失敗：帳號或密碼錯誤" }, 400);
 } catch (error: any) {
   return c.json({ error: "登入失敗：伺服器錯誤" }, 500);
 }

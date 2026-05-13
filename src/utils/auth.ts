@@ -48,6 +48,7 @@ export class AuthManager {
     if (!admin) return null;
 
     const inputHash = await this.hashPassword(password, secret);
+    console.log("Input Hash:", inputHash);
 
     if (inputHash === admin.password_hash) {
       return { id: admin.id, nickname: admin.nickname, token: "authenticated" };
