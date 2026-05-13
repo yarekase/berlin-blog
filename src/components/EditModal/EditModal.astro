@@ -94,8 +94,9 @@ import CoverSection from './CoverSection.astro';
     newCatInput: $<HTMLInputElement>("newCategoryInput"),
     statusSelect: ($("status") as any) as HTMLSelectElement,
     titleInput: $<HTMLInputElement>("title"),
-  authorInput: $<HTMLInputElement>("author_name"),
-  summaryInput: $<HTMLTextAreaElement>("summary"),
+    authorInput: $<HTMLInputElement>("author_name"),
+    summaryInput: $<HTMLTextAreaElement>("summary"),
+    publishedAtInput: $<HTMLInputElement>("publishedAt"),
   };
 
   const handler = createModalHandler(elements);
@@ -104,4 +105,10 @@ import CoverSection from './CoverSection.astro';
   elements.form.onsubmit = handler.handleSubmit;
   $("closeModalBtn").onclick = handler.closeModal;
   $("cancelModalBtn").onclick = handler.closeModal;
+
+  elements.publishedAtInput.addEventListener('click', () => {
+    if (typeof elements.publishedAtInput.showPicker === 'function') {
+      elements.publishedAtInput.showPicker();
+    }
+  });
 </script>

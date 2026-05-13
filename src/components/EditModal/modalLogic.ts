@@ -4,6 +4,12 @@ import { initEditor, saveEditorContent, destroyEditor } from "../../utils/editor
 import api from "../../utils/api";
 import type { ModalElements } from "./types";
 
+const formatDateTime = (date: Date) => {
+  const tzOffset = date.getTimezoneOffset() * 60000; // 偏移量
+  const localISOTime = new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
+  return localISOTime;
+};
+
 export function createModalHandler(els: ModalElements) {
   let currentPostId: string | null = null;
   let allCategories: Category[] = [];
@@ -32,6 +38,9 @@ export function createModalHandler(els: ModalElements) {
       if (id) {
         els.modalTitle.textContent = "編輯文章";
         const { data: post } = await api.get<Post>(`/${id}`);
+        if (post.published_at) {
+          els.publishedAtInput.value = formatDateTime(new Date(post.published_at));
+        }
         els.titleInput.value = post.title;
         els.authorInput.value = post.author_name;
         els.summaryInput.value = post.summary || "";
@@ -45,6 +54,7 @@ export function createModalHandler(els: ModalElements) {
         renderCategories(post.categories.map(c => c.id));
         await initEditor(post.content ? JSON.parse(post.content) : null);
       } else {
+        els.publishedAtInput.value = formatDateTime(new Date());
         els.modalTitle.textContent = "新增文章";
         (els.form.querySelector("#author_name") as HTMLInputElement).value = authManager.getNickname() || "";
         renderCategories([]);
@@ -79,7 +89,8 @@ export function createModalHandler(els: ModalElements) {
         summary: els.summaryInput.value,
         status: els.statusSelect.value,
         categories: allCategories.filter(c => selectedCatIds.includes(c.id)),
-        cover_image: finalCoverImage
+        cover_image: finalCoverImage,
+        published_at: els.publishedAtInput.value,
       };
 
       if (currentPostId) {
