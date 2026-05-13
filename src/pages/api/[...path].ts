@@ -22,6 +22,10 @@ app.get("/test", (c) => c.text("Hono is working!"));
 // [驗證中間件] 檢查管理員身分
 // ==========================================
 app.use("*", async (c, next) => {
+  // 1. 放行登入路由，讓使用者能取得 Token
+  if (c.req.path === "/login" && c.req.method === "POST") {
+    return await next();
+  }
   // 僅針對寫入操作 (POST, PUT, DELETE) 進行攔截
   if (["POST", "PUT", "DELETE"].includes(c.req.method)) {
     const authHeader = c.req.header("Authorization");
