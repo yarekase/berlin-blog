@@ -90,6 +90,51 @@ export function createModalHandler(els: ModalElements) {
     } catch (err) { alert("載入失敗"); }
   };
 
+  const handleAddCategory = async () => {
+    const name = els.newCatInput.value.trim();
+    if (!name) return alert("請輸入分類名稱");
+
+    // 1. 前端初步檢查：是否已經存在於目前的 allCategories 陣列中
+    const isDuplicate = allCategories.some(
+      cat => cat.name === name || cat.slug === name.toLowerCase()
+    );
+    
+    if (isDuplicate) {
+      return alert("這個分類已經存在囉！");
+    }
+
+    try {
+      // 2. 正式發送 API 到後端
+      const { data: newCategory } = await api.post<Category>("/categories", { name });
+
+      // 3. 成功後，更新前端的資料源 (這時 newCategory 包含真正的資料庫 ID)
+      allCategories.push(newCategory);
+
+      // 4. 取得目前已經勾選的 ID 陣列
+      const currentSelected = Array.from(
+        els.categoriesContainer.querySelectorAll('input[type="checkbox"]:checked')
+      ).map(el => Number((el as HTMLInputElement).value));
+
+      // 5. 將新分類的 ID 加入勾選清單
+      currentSelected.push(newCategory.id);
+
+      // 6. 重新渲染清單
+      renderCategories(currentSelected);
+
+      // 7. 清空輸入框
+      els.newCatInput.value = "";
+      
+    } catch (err: any) {
+      // 處理 API 回傳的重複報錯 (409) 或其他錯誤
+      if (err.response && err.response.status === 409) {
+        alert("新增失敗：分類名稱或 Slug 已被佔用");
+      } else {
+        alert("伺服器連線失敗，請稍後再試");
+      }
+      console.error(err);
+    }
+  };
+
   /**
    * 表單提交處理函數
    * @param e 事件對象
