@@ -15,6 +15,7 @@ export interface ModalElements {
   authorInput: HTMLInputElement;
   summaryInput: HTMLTextAreaElement;
   publishedAtInput: HTMLInputElement;
+  cancelBtn: HTMLButtonElement;
 }
 
 export interface PostPayload {

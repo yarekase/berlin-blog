@@ -97,14 +97,15 @@ import CoverSection from './CoverSection.astro';
     authorInput: $<HTMLInputElement>("author_name"),
     summaryInput: $<HTMLTextAreaElement>("summary"),
     publishedAtInput: $<HTMLInputElement>("publishedAt"),
+    cancelBtn: $<HTMLButtonElement>("cancelModalBtn"),
   };
 
   const handler = createModalHandler(elements);
 
   window.addEventListener("open-edit-modal", (e: any) => handler.openModal(e.detail?.id));
   elements.form.onsubmit = handler.handleSubmit;
-  $("closeModalBtn").onclick = handler.closeModal;
-  $("cancelModalBtn").onclick = handler.closeModal;
+  // 頂部 X 按鈕的關閉邏輯
+  document.getElementById("closeModalBtn")!.onclick = handler.closeModal;
 
   elements.publishedAtInput.addEventListener('click', () => {
     if (typeof elements.publishedAtInput.showPicker === 'function') {
