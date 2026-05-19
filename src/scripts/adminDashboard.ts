@@ -94,10 +94,7 @@ export function initDashboard() {
 async function deletePost(id: string) {
   if (!confirm("確定要刪除嗎？")) return;
   try {
-    // 改用 api 實例，會自動帶入 baseURL (/admin/posts) 與 Authorization Header
-    await api.delete("/", {
-      params: { id }
-    });
+    await api.delete(`/posts/${id}`);
     // 刪除成功後刷新頁面
     window.location.reload();
   } catch (error: any) {
