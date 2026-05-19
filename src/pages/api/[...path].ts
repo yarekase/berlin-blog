@@ -189,20 +189,19 @@ app.post("/posts", async (c) => {
 // ==========================================
 // [PUT] 更新文章
 // ==========================================
-app.put("/posts", async (c) => {
+app.put("/posts/:id", async (c) => {
   try {
-    const { id, updates } = (await c.req.json()) as {
-      id: string;
-      updates: Partial<{
-        title: string;
-        author_name: string;
-        content: string;
-        summary: string;
-        cover_image: string;
-        status: "draft" | "published";
-        categories: Category[];
+    const id = c.req.param("id"); // 從 URL 參數獲取 ID
+    const updates = (await c.req.json()) as Partial<{ // 修正：直接解析為 Partial<Post>
+      title: string;
+      author_name: string;
+      content: string;
+      summary: string;
+      cover_image: string;
+      status: "draft" | "published";
+      published_at?: string; // 確保包含 published_at
+      categories: Category[];
       }>;
-    };
     if (!id) return c.json({ error: "缺少 ID" }, 400);
 
     await postManager.updatePost(c.env.DB, id, updates);
@@ -254,10 +253,10 @@ app.put("/profile", async (c) => {
 // ==========================================
 // [DELETE] 刪除文章
 // ==========================================
-app.delete("/posts", async (c) => {
+app.delete("/posts/:id", async (c) => {
   try {
-    const id = c.req.query("id");
-    if (!id) return c.json({ error: "缺少 ID 參數" }, 400);
+    const id = c.req.param("id");
+    if (!id) return c.json({ error: "缺少文章 ID" }, 400);
 
     await postManager.deletePost(c.env.DB, id);
     return c.json({ success: true });

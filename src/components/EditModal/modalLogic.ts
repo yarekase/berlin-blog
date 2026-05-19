@@ -130,7 +130,7 @@ export function createModalHandler(els: ModalElements) {
       };
 
       if (currentPostId) {
-        await api.put("/posts", { id: currentPostId, updates: payload });
+        await api.put(`/posts/${currentPostId}`, payload); // 修正：ID 放在 URL，payload 直接作為請求體
         alert("文章更新成功！");
       } else {
         await api.post("/posts", payload);
