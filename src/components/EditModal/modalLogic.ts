@@ -37,7 +37,7 @@ export function createModalHandler(els: ModalElements) {
 
       if (id) {
         els.modalTitle.textContent = "編輯文章";
-        const { data: post } = await api.get<Post>(`/${id}`);
+        const { data: post } = await api.get<Post>(`/posts/${id}`);
         if (post.published_at) {
           els.publishedAtInput.value = formatDateTime(new Date(post.published_at));
         }
@@ -94,9 +94,9 @@ export function createModalHandler(els: ModalElements) {
       };
 
       if (currentPostId) {
-        await api.put("/", { id: currentPostId, updates: payload });
+        await api.put("/posts", { id: currentPostId, updates: payload });
       } else {
-        await api.post("/", payload);
+        await api.post("/posts", payload);
       }
       window.location.reload();
     } catch (error:any) {

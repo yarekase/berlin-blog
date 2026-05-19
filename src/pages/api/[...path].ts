@@ -14,7 +14,7 @@ import { authManager, type AdminPayload} from "../../utils/auth";
 import type { Env } from "../../env";
 import { env } from "cloudflare:workers";
 
-const app = new Hono<{ Bindings: Env, Variables: { admin: AdminPayload } }>();
+const app = new Hono<{ Bindings: Env, Variables: { admin: AdminPayload } }>().basePath("/api");
 
 app.get("/test", (c) => c.text("Hono is working!"));
 
@@ -48,7 +48,7 @@ app.use("*", async (c, next) => {
 // ==========================================
 // [GET] 獲取所有文章列表
 // ==========================================
-app.get("/", async (c) => {
+app.get("/posts", async (c) => {
   try {
     // 僅回傳不含 content 的輕量化列表，節省 D1 讀取成本
     const posts = await postManager.getPostsList(c.env.DB);
@@ -155,7 +155,7 @@ app.post("/categories", async (c) => {
 // ==========================================
 // [GET] 獲取單篇文章詳情
 // ==========================================
-app.get("/:id", async (c) => {
+app.get("/posts/:id", async (c) => {
   try {
     const id = c.req.param("id");
     const post = await postManager.getPost(c.env.DB, id);
@@ -168,7 +168,7 @@ app.get("/:id", async (c) => {
 // ==========================================
 // [POST] 新增文章
 // ==========================================
-app.post("/", async (c) => {
+app.post("/posts", async (c) => {
   try {
     const body = (await c.req.json()) as {
       title: string;
@@ -189,7 +189,7 @@ app.post("/", async (c) => {
 // ==========================================
 // [PUT] 更新文章
 // ==========================================
-app.put("/", async (c) => {
+app.put("/posts", async (c) => {
   try {
     const { id, updates } = (await c.req.json()) as {
       id: string;
@@ -254,7 +254,7 @@ app.put("/profile", async (c) => {
 // ==========================================
 // [DELETE] 刪除文章
 // ==========================================
-app.delete("/", async (c) => {
+app.delete("/posts", async (c) => {
   try {
     const id = c.req.query("id");
     if (!id) return c.json({ error: "缺少 ID 參數" }, 400);
