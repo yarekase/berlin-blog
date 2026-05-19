@@ -204,5 +204,5 @@ export function createModalHandler(els: ModalElements) {
   els.cancelBtn.onclick = closeModal;
 
   // 返回模態框操作函數
-  return { openModal, handleSubmit, closeModal };
+  return { openModal, handleSubmit, closeModal, handleAddCategory };
 }

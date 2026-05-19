@@ -98,6 +98,7 @@ import CoverSection from './CoverSection.astro';
     summaryInput: $<HTMLTextAreaElement>("summary"),
     publishedAtInput: $<HTMLInputElement>("publishedAt"),
     cancelBtn: $<HTMLButtonElement>("cancelModalBtn"),
+    addCatBtn: $<HTMLButtonElement>("addCategoryBtn"),
   };
 
   const handler = createModalHandler(elements);
@@ -106,6 +107,8 @@ import CoverSection from './CoverSection.astro';
   elements.form.onsubmit = handler.handleSubmit;
   // 頂部 X 按鈕的關閉邏輯
   document.getElementById("closeModalBtn")!.onclick = handler.closeModal;
+
+  elements.addCatBtn.addEventListener("click", handler.handleAddCategory);
 
   elements.publishedAtInput.addEventListener('click', () => {
     if (typeof elements.publishedAtInput.showPicker === 'function') {
