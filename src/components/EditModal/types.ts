@@ -16,6 +16,7 @@ export interface ModalElements {
   summaryInput: HTMLTextAreaElement;
   publishedAtInput: HTMLInputElement;
   cancelBtn: HTMLButtonElement;
+  addCatBtn: HTMLButtonElement;
 }
 
 export interface PostPayload {
