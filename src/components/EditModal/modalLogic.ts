@@ -79,9 +79,18 @@ export function createModalHandler(els: ModalElements) {
       } else {
         // 新增模式
         els.publishedAtInput.value = formatDateTime(new Date());
-        els.modalTitle.textContent = "新增文章";
+        els.modalTitle.textContent = "新增文章（草稿建立中...）";
         // 預設作者名稱為當前管理員的暱稱
         (els.form.querySelector("#author_name") as HTMLInputElement).value = authManager.getNickname() || "";
+        // 立刻向後端發送請求，建立一筆新的文章草稿，獲取 ID 後再載入編輯器，確保後續的內容保存和分類添加都能正確關聯到這筆草稿
+        const { data: draftPost } = await api.post<Post>("/posts", {
+          title: "未命名文章",
+          author_name: authManager.getNickname() || "匿名",
+          status: "draft"
+        });
+        currentPostId = draftPost.id;
+        els.modalTitle.textContent = "新增文章（草稿建立完成）";
+
         // 渲染空的分類選擇框
         renderCategories([]);
         setTimeout(() => initEditor(), 50);
