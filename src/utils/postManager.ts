@@ -148,7 +148,7 @@ export class PostManager {
     },
   ): Promise<void> {
     try {
-      const id = crypto.randomUUID().substring(0, 8); // 使用隨機 UUID 防止爬蟲猜測順序
+      const id = crypto.randomUUID(); // 使用隨機 UUID 防止爬蟲猜測順序
       const now = new Date().toISOString();
       const slug = id;
       const summary = this.generateSummary(postData.content);
