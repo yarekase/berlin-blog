@@ -6,7 +6,6 @@ import type { ModalElements } from "./types";
 import { CategoryService } from "./categoryService";
 import { formHelpers, formatDateTime } from "./formHelpers";
 
-
 // 創建模態框處理器，接收 DOM 元素集合作為參數
 export function createModalHandler(els: ModalElements) {
   // 當前正在編輯的文章 ID，null 表示新增文章
@@ -17,6 +16,8 @@ export function createModalHandler(els: ModalElements) {
   let existingCoverImage = "";
   // 區分新增與編輯模式的標誌
   let isEditMode = false;
+
+  const categoryService = new CategoryService(els);
 
   /**
    * 渲染分類選擇框
@@ -37,7 +38,7 @@ export function createModalHandler(els: ModalElements) {
    * @param id 文章 ID，如果為 null 則為新增模式
    */
   const openModal = async (id: string | null = null) => {
-    currentPostId = id;
+    
     els.form.reset(); // 重置表單
     els.previewContainer.classList.add("hidden"); // 隱藏圖片預覽區
     existingCoverImage = ""; // 清空已存在的封面圖片
@@ -49,6 +50,7 @@ export function createModalHandler(els: ModalElements) {
 
       if (id) {
         isEditMode = true; // 設置為編輯模式
+        currentPostId = id;
         // 編輯模式
         els.modalTitle.textContent = "編輯文章";
         // 根據 ID 獲取文章詳情
