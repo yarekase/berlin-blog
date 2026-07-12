@@ -3,15 +3,9 @@ import { type Post, type Category } from "../../utils/postManager";
 import { initEditor, saveEditorContent, destroyEditor } from "../../utils/editorManager";
 import api from "../../utils/api";
 import type { ModalElements } from "./types";
+import { CategoryService } from "./categoryService";
+import { formHelpers, formatDateTime } from "./formHelpers";
 
-// 格式化日期時間為 YYYY-MM-DDTHH:MM 格式，適用於 <input type="datetime-local">
-const formatDateTime = (date: Date) => {
-  // 獲取時區偏移量，並將其轉換為毫秒
-  const tzOffset = date.getTimezoneOffset() * 60000; // 偏移量
-  // 調整日期以匹配本地時間，然後格式化為 ISO 字符串並截取所需部分
-  const localISOTime = new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
-  return localISOTime;
-};
 
 // 創建模態框處理器，接收 DOM 元素集合作為參數
 export function createModalHandler(els: ModalElements) {
