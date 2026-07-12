@@ -255,7 +255,8 @@ export class PostManager {
       batchQueries.push(
         DB.prepare(
           `
-        UPDATE posts SET 
+        UPDATE posts 
+        SET 
           title = COALESCE(?, title),
           slug = COALESCE(?, slug),
           content = COALESCE(?, content),

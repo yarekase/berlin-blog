@@ -13,17 +13,21 @@ import "../../styles/editor.css";
 import { postManager, type Post } from "../../utils/postManager";
 import { env } from 'cloudflare:workers';
 
-// 伺服器端抓取資料
-const  DB  = (env as any).DB || {};
-let posts: Post[] = [];
 
+// 從 cookies 中獲取 adminToken，若不存在則重定向到登入頁面
 const token = Astro.cookies.get("adminToken")?.value;
 
 if (!token) {
   return Astro.redirect("/admin/login");
 }
 
-if (DB) {
+// 伺服器端抓取資料
+const  DB  = (env as any).DB;
+let posts: Post[] = [];
+
+
+
+if (DB && typeof DB.prepare === "function") {
   try {
     posts = await postManager.getPosts(DB);
     console.log("伺服器端獲取文章成功:", posts);
@@ -61,7 +65,6 @@ if (DB) {
   // 將邏輯抽離到外部檔案，保持 Astro 檔案簡潔
   import { initDashboard } from "../../scripts/adminDashboard";
   
-  document.addEventListener("DOMContentLoaded", () => {
-    initDashboard();
-  });
+  initDashboard();
+  
 </script>

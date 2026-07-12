@@ -4,13 +4,14 @@
  */
 import api from "../utils/api";
 import {authManager} from "../utils/auth";
+import {postAPI} from "../utils/postAPI";
 
 /**
  * DOM 輔助函數
  */
 function $<T>(id: string, required = true): T {
   const el = document.getElementById(id);
-  if (!el && required) throw new Error(`Necessary DOM element #${id} missing.`);
+  if (!el && required) throw new Error(`DOM元素#${id}不存在`);
   return el as unknown as T;
 }
 
@@ -29,26 +30,49 @@ export function initDashboard() {
   const logoutBtn = $<HTMLButtonElement>("logoutBtn");
   const settingsForm = $<HTMLFormElement>("settingsForm");
   const nicknameInput = $<HTMLInputElement>("nickname");
+  const postsListContainer = $<HTMLDivElement>("postsList");
+
+  if (!settingsModal || !newPostBtn || !settingsBtn || !settingsForm || !postsListContainer) {
+    throw new Error("必要的 DOM 元素不存在，請檢查 HTML 結構");
+  }
 
   // --- 2. 文章列表動作監聽 (使用「事件委託」 Event Delegation) ---
-  // 為什麼不直接在每個按鈕綁監聽？
-  // 因為文章列表是動態生成的，或者數量很多。在父容器綁一個監聽器更有效率。
-  const postsListContainer = $<HTMLDivElement>("postsList");
   postsListContainer?.addEventListener("click", (e) => {
     const target = e.target as HTMLElement;
-    const id = target.getAttribute("data-id");
-    if (!id) return;
 
-    // 點擊「編輯」
-    if (target.classList.contains("edit-btn")) {
-      // 【解耦機制】使用自定義事件 CustomEvent
-      // 好處：dashboard.ts 不需要知道 EditModal.astro 內部怎麼實作的。
-      // 只要發出「我要開模態框」的信號，那邊有聽到的話就會自己打開。
-      window.dispatchEvent(new CustomEvent("open-edit-modal", { detail: { id } }));
-    } 
-    // 點擊「刪除」
-    else if (target.classList.contains("delete-btn")) deletePost(id);
-  });
+    // 使用closest，當點擊子元素時，系統會往上找class為edit-btn或delete-btn的父元素，這樣可以確保點擊到按鈕的任何位置都能觸發事件
+    const editBtn = target.closest(".edit-btn");
+    const deleteBtn = target.closest(".delete-btn");
+
+    if (editBtn){
+      const id = editBtn.getAttribute("data-id");
+      if (id) {
+        window.dispatchEvent(new CustomEvent("open-edit-modal", { detail: { id } }));
+      } else{
+        console.error("編輯按鈕缺少 data-id 屬性");
+      }}
+        
+        
+    if (deleteBtn) {
+        const id = deleteBtn.getAttribute("data-id");
+        if (!id) {
+          console.error("刪除按鈕缺少 data-id 屬性");
+          return;
+        }
+        if (confirm("確定要刪除這篇文章嗎？")) {
+          postAPI.deletePost(id)
+            .then(() => {
+              alert("文章已刪除");
+              window.location.reload(); // 刪除後刷新頁面
+            })
+            .catch((err) => {
+              console.error("刪除文章失敗", err);
+              alert("刪除文章失敗，請稍後再試");
+            });
+        }
+      }
+    }
+  );
 
   // --- 3. 新增文章按鈕 ---
   newPostBtn?.addEventListener("click", () => {
@@ -59,7 +83,7 @@ export function initDashboard() {
   // --- 4. 使用者設定邏輯 (暱稱修改) ---
   settingsBtn?.addEventListener("click", () => {
     // 打開設定視窗前，先填入目前的暱稱
-    $<HTMLInputElement>("nickname").value = authManager.getNickname();
+    nicknameInput.value = authManager.getNickname();
     settingsModal.classList.replace("hidden", "flex");
   });
 
@@ -87,17 +111,3 @@ export function initDashboard() {
   logoutBtn?.addEventListener("click", () => authManager.logout());
 }
 
-/**
- * 刪除文章的 API 呼叫
- * @param id 文章 UUID
- */
-async function deletePost(id: string) {
-  if (!confirm("確定要刪除嗎？")) return;
-  try {
-    await api.delete(`/posts/${id}`);
-    // 刪除成功後刷新頁面
-    window.location.reload();
-  } catch (error: any) {
-    alert("刪除失敗");
-  }
-}

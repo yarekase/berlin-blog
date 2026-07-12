@@ -104,7 +104,7 @@ import CoverSection from './CoverSection.astro';
 
   const handler = createModalHandler(elements);
 
-  window.addEventListener("open-edit-modal", (e: any) => handler.openModal(e.detail?.id));
+  window.addEventListener("open-edit-modal", (e: any) => handler.openModal(e.detail.id));
   elements.form.onsubmit = handler.handleSubmit;
   // 頂部 X 按鈕的關閉邏輯
   document.getElementById("closeModalBtn")!.onclick = handler.closeModal;
