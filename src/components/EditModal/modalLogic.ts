@@ -21,6 +21,8 @@ export function createModalHandler(els: ModalElements) {
   let allCategories: Category[] = [];
   // 編輯文章時已存在的封面圖片 URL
   let existingCoverImage = "";
+  // 區分新增與編輯模式的標誌
+  let isEditMode = false;
 
   /**
    * 渲染分類選擇框
@@ -52,6 +54,7 @@ export function createModalHandler(els: ModalElements) {
       allCategories = cats;
 
       if (id) {
+        isEditMode = true; // 設置為編輯模式
         // 編輯模式
         els.modalTitle.textContent = "編輯文章";
         // 根據 ID 獲取文章詳情
@@ -77,7 +80,7 @@ export function createModalHandler(els: ModalElements) {
         // 初始化 Editor.js 並載入文章內容
         await initEditor(post.content ? JSON.parse(post.content) : null);
       } else {
-        // 新增模式
+        isEditMode = false; // 設置為新增模式
         els.publishedAtInput.value = formatDateTime(new Date());
         els.modalTitle.textContent = "新增文章（草稿建立中...）";
         // 預設作者名稱為當前管理員的暱稱
@@ -90,13 +93,22 @@ export function createModalHandler(els: ModalElements) {
         });
         currentPostId = draftPost.id;
         els.modalTitle.textContent = "新增文章（草稿建立完成）";
+        els.titleInput.value = draftPost.title;
+        els.authorInput.value = draftPost.author_name;
+        els.statusSelect.value = draftPost.status;
+        els.publishedAtInput.value = formatDateTime(new Date(draftPost.created_at));
 
         // 渲染空的分類選擇框
         renderCategories([]);
         setTimeout(() => initEditor(), 50);
       }
+      // 建立完成後打開彈窗
       els.modal.classList.replace("hidden", "flex");
-    } catch (err) { alert("載入失敗"); }
+    } catch (err) { 
+      console.error("載入模態框資料失敗", err);
+      alert("載入失敗");
+      currentPostId = null;
+    }
   };
 
   const handleAddCategory = async () => {
@@ -150,6 +162,11 @@ export function createModalHandler(els: ModalElements) {
    */
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
+    // 防禦性檢查有沒有正確建立ID
+    if (!currentPostId) {
+      alert("文章 ID 不存在，無法保存");
+      return;
+    }
     els.submitBtn.disabled = true; // 禁用提交按鈕防止重複提交
     els.submitBtn.textContent = "儲存中..."; // 更改按鈕文本
 
@@ -183,13 +200,10 @@ export function createModalHandler(els: ModalElements) {
         published_at: els.publishedAtInput.value,
       };
 
-      if (currentPostId) {
-        await api.put(`/posts/${currentPostId}`, payload); // 修正：ID 放在 URL，payload 直接作為請求體
-        alert("文章更新成功！");
-      } else {
-        await api.post("/posts", payload);
-        alert("文章新增成功！");
-      }
+      
+      await api.put(`/posts/${currentPostId}`, payload); // 修正：ID 放在 URL，payload 直接作為請求體
+      alert("文章更新成功！");
+      
       localStorage.removeItem("editor_draft"); // 提交成功後清空 localStorage 中的草稿
       window.location.reload(); // 刷新頁面以顯示最新數據
     } catch (error:any) {
