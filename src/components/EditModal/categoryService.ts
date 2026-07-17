@@ -16,6 +16,7 @@ export class CategoryService {
     this.allCategories = data;
   }
 
+  // 渲染分類選擇框，並根據傳入的 selectedIds 參數選中對應的分類
   render(selectedIds: number[]) {
     this.els.categoriesContainer.innerHTML = this.allCategories.map(cat => `
       <label class="flex items-center space-x-2 text-sm text-slate-300">

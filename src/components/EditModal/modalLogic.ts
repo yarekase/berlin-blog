@@ -10,81 +10,51 @@ import { formHelpers, formatDateTime } from "./formHelpers";
 export function createModalHandler(els: ModalElements) {
   // 當前正在編輯的文章 ID，null 表示新增文章
   let currentPostId: string | null = null;
-  // 所有可用的分類列表
-  let allCategories: Category[] = [];
   // 編輯文章時已存在的封面圖片 URL
   let existingCoverImage = "";
   // 區分新增與編輯模式的標誌
   let isEditMode = false;
 
+  // 初始化分類服務，負責管理分類的加載與渲染
   const categoryService = new CategoryService(els);
 
-  /**
-   * 渲染分類選擇框
-   * @param selectedIds 已經選中的分類 ID 列表
-   */
-  const renderCategories = (selectedIds: number[]) => {
-    els.categoriesContainer.innerHTML = allCategories.map(cat => `
-      <label class="flex items-center space-x-2 text-sm text-slate-300">
-        <input type="checkbox" value="${cat.id}" ${selectedIds.includes(cat.id) ? "checked" : ""} 
-               class="rounded border-white/20 bg-void-black text-primary focus:ring-primary">
-        <span>${cat.name}</span>
-      </label>
-    `).join("");
-  };
 
   /**
    * 打開模態框，用於新增或編輯文章
    * @param id 文章 ID，如果為 null 則為新增模式
    */
   const openModal = async (id: string | null = null) => {
-    
     els.form.reset(); // 重置表單
     els.previewContainer.classList.add("hidden"); // 隱藏圖片預覽區
     existingCoverImage = ""; // 清空已存在的封面圖片
 
     try {
       // 獲取所有分類
-      const { data: cats } = await api.get<Category[]>("/categories");
-      allCategories = cats;
+      await categoryService.loadCategories();
 
+      // 有id表示編輯模式
       if (id) {
-        isEditMode = true; // 設置為編輯模式
+        isEditMode = true;
         currentPostId = id;
-        // 編輯模式
         els.modalTitle.textContent = "編輯文章";
+
         // 根據 ID 獲取文章詳情
         const { data: post } = await api.get<Post>(`/posts/${id}`);
-        // 如果有發布時間，則格式化並填入發布時間輸入框
-        if (post.published_at) {
-          els.publishedAtInput.value = formatDateTime(new Date(post.published_at));
-        }
-        // 填充表單字段
-        els.titleInput.value = post.title;
-        els.authorInput.value = post.author_name;
-        els.summaryInput.value = post.summary || "";
-        els.statusSelect.value = post.status;
-        existingCoverImage = post.cover_image;
+        existingCoverImage = post.cover_image; // 記錄已存在的封面圖片
 
-        // 顯示封面圖片預覽
-        if (post.cover_image) {
-          els.imagePreview.src = post.cover_image;
-          els.previewContainer.classList.remove("hidden");
-        }
-        // 渲染分類選擇框，並選中文章已有的分類
-        renderCategories(post.categories.map(c => c.id));
-        // 初始化 Editor.js 並載入文章內容
-        await initEditor(post.content ? JSON.parse(post.content) : null);
-      } else {
-        isEditMode = false; // 設置為新增模式
-        els.publishedAtInput.value = formatDateTime(new Date());
+        formHelpers.fillForm(els, post, existingCoverImage); // 填充表單字段
+        categoryService.render(post.categories.map(c => c.id)); // 渲染分類選擇框，並選中已有分類
+        await initEditor(post.content ? JSON.parse(post.content) : null); // 初始化 Editor.js 並載入文章內容
+      }else {
+        // 新增模式
+        isEditMode = false; 
         els.modalTitle.textContent = "新增文章（草稿建立中...）";
         // 預設作者名稱為當前管理員的暱稱
-        (els.form.querySelector("#author_name") as HTMLInputElement).value = authManager.getNickname() || "";
+        const nickName = authManager.getNickname() || "";
         // 立刻向後端發送請求，建立一筆新的文章草稿，獲取 ID 後再載入編輯器，確保後續的內容保存和分類添加都能正確關聯到這筆草稿
         const { data: draftPost } = await api.post<Post>("/posts", {
           title: "未命名文章",
-          author_name: authManager.getNickname() || "匿名",
+          author_name: nickName,
           status: "draft"
         });
         currentPostId = draftPost.id;
@@ -95,60 +65,16 @@ export function createModalHandler(els: ModalElements) {
         els.publishedAtInput.value = formatDateTime(new Date(draftPost.created_at));
 
         // 渲染空的分類選擇框
-        renderCategories([]);
+        categoryService.render([]);
         setTimeout(() => initEditor(), 50);
       }
+
       // 建立完成後打開彈窗
       els.modal.classList.replace("hidden", "flex");
     } catch (err) { 
       console.error("載入模態框資料失敗", err);
       alert("載入失敗");
       currentPostId = null;
-    }
-  };
-
-  const handleAddCategory = async () => {
-    const name = els.newCatInput.value.trim();
-    if (!name) return alert("請輸入分類名稱");
-
-    // 1. 前端初步檢查：是否已經存在於目前的 allCategories 陣列中
-    const isDuplicate = allCategories.some(
-      cat => cat.name === name || cat.slug === name.toLowerCase()
-    );
-    
-    if (isDuplicate) {
-      return alert("這個分類已經存在囉！");
-    }
-
-    try {
-      // 2. 正式發送 API 到後端
-      const { data: newCategory } = await api.post<Category>("/categories", { name });
-
-      // 3. 成功後，更新前端的資料源 (這時 newCategory 包含真正的資料庫 ID)
-      allCategories.push(newCategory);
-
-      // 4. 取得目前已經勾選的 ID 陣列
-      const currentSelected = Array.from(
-        els.categoriesContainer.querySelectorAll('input[type="checkbox"]:checked')
-      ).map(el => Number((el as HTMLInputElement).value));
-
-      // 5. 將新分類的 ID 加入勾選清單
-      currentSelected.push(newCategory.id);
-
-      // 6. 重新渲染清單
-      renderCategories(currentSelected);
-
-      // 7. 清空輸入框
-      els.newCatInput.value = "";
-      
-    } catch (err: any) {
-      // 處理 API 回傳的重複報錯 (409) 或其他錯誤
-      if (err.response && err.response.status === 409) {
-        alert("新增失敗：分類名稱或 Slug 已被佔用");
-      } else {
-        alert("伺服器連線失敗，請稍後再試");
-      }
-      console.error(err);
     }
   };
 
@@ -179,23 +105,13 @@ export function createModalHandler(els: ModalElements) {
 
       // 保存 Editor.js 內容
       const contentData = await saveEditorContent(); //
-      // 獲取所有選中的分類 ID
-      const selectedCatIds = Array.from(els.categoriesContainer.querySelectorAll('input:checked'))
-        .map(i => parseInt((i as HTMLInputElement).value));
-
       // 構建文章數據 payload
-      const payload = {
-        title: els.titleInput.value,
-        author_name: els.authorInput.value,
-        content: JSON.stringify(contentData),
-        summary: els.summaryInput.value,
-        status: els.statusSelect.value,
-        // 過濾出選中的分類對象
-        categories: allCategories.filter(c => selectedCatIds.includes(c.id)),
-        cover_image: finalCoverImage,
-        published_at: els.publishedAtInput.value,
-      };
-
+      const payload = formHelpers.buildPayload(
+        els, 
+        contentData, 
+        categoryService.allCategories, 
+        finalCoverImage
+      );
       
       await api.put(`/posts/${currentPostId}`, payload); // 修正：ID 放在 URL，payload 直接作為請求體
       alert("文章更新成功！");
@@ -223,5 +139,10 @@ export function createModalHandler(els: ModalElements) {
   els.cancelBtn.onclick = closeModal;
 
   // 返回模態框操作函數
-  return { openModal, handleSubmit, closeModal, handleAddCategory };
+  return { 
+    openModal,
+    handleSubmit,
+    closeModal,
+    handleAddCategory: () => categoryService.handleAddCategory()
+    };
 }
