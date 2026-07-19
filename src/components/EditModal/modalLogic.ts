@@ -93,14 +93,22 @@ export function createModalHandler(els: ModalElements) {
     els.submitBtn.textContent = "儲存中..."; // 更改按鈕文本
 
     try {
-      let finalCoverImage = existingCoverImage;
+      let finalCoverImage: any = existingCoverImage;
       // 如果有選擇新的封面圖片，則上傳
       if (els.coverInput.files?.[0]) {
         const formData = new FormData();
         formData.append("file", els.coverInput.files[0]);
+
         const uploadRes = await api.post("/upload", formData);
         // 如果上傳成功，更新封面圖片 URL
-        if (uploadRes.data.success === 1) finalCoverImage = uploadRes.data.file.url;
+        if (uploadRes.data.success === 1){
+          finalCoverImage = {
+          original_key: uploadRes.data.file.original_key,
+          original_url: uploadRes.data.file.original_url,
+          webp_key: uploadRes.data.file.webp_key,
+          webp_url: uploadRes.data.file.webp_url,
+          };
+        }
       }
 
       // 保存 Editor.js 內容

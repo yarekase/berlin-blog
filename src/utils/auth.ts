@@ -13,7 +13,7 @@ interface Admin {
 }
 
 export interface AdminPayload {
-  sub: number;    // 使用者 ID
+  sub: string;    // 使用者 ID
   email: string;  // 使用者信箱
   exp: number;    // 過期時間
   iat: number;    // 簽發時間
@@ -32,7 +32,7 @@ export class AuthManager {
 
   async generateJWT(user:{id:number, email:string}, secret: string): Promise<string> {
     const payload = {
-      sub: user.id,
+      sub: String(user.id),
       email: user.email,
       exp: Math.floor(Date.now() / 1000) +60*60*24, // 24小時後過期
       iat: Math.floor(Date.now() / 1000),
@@ -68,7 +68,7 @@ export class AuthManager {
     // 使用 secret 進行解碼與驗證
     const payload = await verify(token, secret, "HS256");
     return {
-      sub: Number(payload.sub),
+      sub: String(payload.sub),
       email: payload.email as string,
       exp: payload.exp as number,
       iat: payload.iat as number,
@@ -106,14 +106,14 @@ export class AuthManager {
 
   async getAdminProfile(DB: D1Database, adminId: number): Promise<{ id: number; email: string; nickname: string } | null> {
     const admin = await DB.prepare("SELECT id, email, nickname FROM admins WHERE id = ?")
-      .bind(adminId)
+      .bind(Number(adminId))
       .first<{ id: number; email: string; nickname: string }>();
     return admin || null;
   }
 
-  async updateAdminNickname(DB: D1Database, adminId: number, newNickname: string): Promise<void> {
+  async updateAdminNickname(DB: D1Database, adminId: string | number, newNickname: string): Promise<void> {
     await DB.prepare("UPDATE admins SET nickname = ? WHERE id = ?")
-      .bind(newNickname, adminId)
+      .bind(newNickname, Number(adminId))
       .run();
   }
 

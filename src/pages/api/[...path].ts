@@ -27,7 +27,7 @@ app.use("*", async (c, next) => {
     return await next();
   }
   // 僅針對寫入操作 (POST, PUT, DELETE) 進行攔截
-  if (["POST", "PUT", "DELETE"].includes(c.req.method)) {
+  if (["POST", "PUT", "DELETE"].includes(c.req.method) || c.req.path === "/api/profile") {
     const authHeader = c.req.header("Authorization");
     // 檢查是否有 Bearer Token
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -75,29 +75,11 @@ app.get("/categories", async (c) => {
 // ==========================================
 app.get("/profile", async (c) => {
   try {
-    const authHeader = c.req.header("Authorization");
-    const token = authHeader?.split(" ")[1];
-
-    if (!token) {
-      return c.json({ error: "未提供認證憑證，請先登入" }, 401);
-    }
-
-    // 驗證 JWT
-    const payload = await authManager.verifyJWT(token, c.env.JWT_SECRET);
-
-    if (!payload) {
-      return c.json({ error: "憑證無效或已過期，請重新登入" }, 401);
-    }
-
-    // 查詢資料庫
-    const admin = await c.env.DB.prepare("SELECT nickname, email FROM admins WHERE id = ?")
-      .bind(payload.sub)
-      .first();
-
+    const adminPayload = c.get("admin");
+    const admin = await authManager.getAdminProfile(c.env.DB, Number(adminPayload.sub));
     if (!admin) {
-      return c.json({ error: "找不到該管理員帳號" }, 404);
+      return c.json({ error: "管理員不存在" }, 404);
     }
-
     return c.json(admin);
 
   } catch (error) {
@@ -170,17 +152,10 @@ app.get("/posts/:id", async (c) => {
 // ==========================================
 app.post("/posts", async (c) => {
   try {
-    const body = (await c.req.json()) as {
-      title: string;
-      author_name: string;
-      content: string;
-      cover_image: string;
-      status: "draft" | "published";
-      categories: Category[];
-      publishedAt?: string;
-    };
-    await postManager.addPost(c.env.DB, body);
-    return c.json({ success: true }, 201);
+    const body = await c.req.json();
+    const newPost = await postManager.addPost(c.env.DB, body);
+    return c.json(newPost, 201);
+    
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
   }
@@ -216,34 +191,14 @@ app.put("/posts/:id", async (c) => {
 // ==========================================
 app.put("/profile", async (c) => {
   try {
-    const authHeader = c.req.header("Authorization");
-    const token = authHeader?.split(" ")[1];
-
-    if (!token) {
-      return c.json({ error: "未提供認證憑證，請先登入" }, 401);
-    }
-    const payload = await authManager.verifyJWT(token, c.env.JWT_SECRET);
-
-    if (!payload) {
-      return c.json({ error: "憑證無效或已過期，請重新登入" }, 401);
-    }
-
-    const adminId = payload.sub; // 這是你在 generateJWT 時放進去的 user.id
-
+    const adminPayload = c.get("admin");
+    const adminId = Number(adminPayload.sub);
     const { nickname } = await c.req.json();
-
     if (!nickname) return c.json({ error: "暱稱不能為空" }, 400);
-
-    try {
-      // 2. 更新資料庫
-      await c.env.DB.prepare("UPDATE admins SET nickname = ? WHERE id = ?")
-        .bind(nickname, adminId)
-        .run();
-
-      return c.json({ success: true, nickname });
-    } catch (e) {
-      return c.json({ error: "更新失敗" }, 500);
-    }
+    await c.env.DB.prepare("UPDATE admins SET nickname = ? WHERE id = ?")
+      .bind(nickname, adminId)
+      .run();
+    return c.json({ success: true, nickname });
   } catch (error: any) {
     return c.json({ error: "更新失敗：伺服器錯誤" }, 500);
   }
@@ -288,20 +243,24 @@ app.post("/upload", async (c) => {
     });
 
     // 2. 儲存 WebP 檔案 (供網頁快速顯示)
-    let publicUrl = "";
+    let webpPath = "";
     if (webpFile) {
-      const webpPath = `optimized/${uuid}.webp`;
+      webpPath = `optimized/${uuid}.webp`;
       await c.env.MY_BUCKET.put(webpPath, await webpFile.arrayBuffer(), {
         httpMetadata: { contentType: "image/webp" },
       });
       // 最終給 Editor.js 的網址使用 WebP 檔案
-      publicUrl = `${c.env.R2_PUBLIC_DOMAIN}/${webpPath}`;
-    } else {
-      // 如果沒提供 WebP，就退而求其次用原始檔網址
-      publicUrl = `${c.env.R2_PUBLIC_DOMAIN}/${originalPath}`;
     }
 
-    return c.json({ success: 1, file: { url: publicUrl } });
+    return c.json({ 
+      success: 1, 
+      file: {
+        original_key: originalPath,
+        original_url: `${c.env.R2_PUBLIC_DOMAIN}/${originalPath}`,
+        webp_key: webpPath || null,
+        webp_url: webpPath ? `${c.env.R2_PUBLIC_DOMAIN}/${webpPath}` : null
+      }
+    });
   } catch (error: any) {
     return c.json({ success: 0, message: error.message }, 500);
   }
