@@ -1,29 +1,25 @@
 ---
-/**
- * 文章內容顯示頁面
- * 路徑：/posts/[id]
- */
+// 1. 導入佈局組件與資料管理工具
 import Layout from "../../layouts/Layout.astro";
-import { postManager } from "../../utils/postManager";
-import { env } from 'cloudflare:workers';
+import type { Post } from "../../utils/postManager";
 
 const { id } = Astro.params;
-const DB = (env as any).DB;
+const apiURL = import.meta.env.PUBLIC_API_URL || "http://127.0.0.1:8787";
 
-// 1. 安全檢查：如果沒有 ID 或資料庫連線失敗
-if (!id || !DB) {
+if (!id) {
   return Astro.redirect("/404");
 }
 
-let post;
+let post: Post | undefined;
 try {
-  // 2. 從資料庫獲取文章詳情
-  post = await postManager.getPost(DB, id);
+  const postRes = await fetch(`${apiURL}/api/posts/${id}`);
+  if (postRes.ok) {
+    post = (await postRes.json()) as Post;
+  }
 } catch (error) {
   console.error("獲取文章失敗:", error);
 }
 
-// 3. 如果找不到文章，跳轉至 404
 if (!post) {
   return Astro.redirect("/404");
 }

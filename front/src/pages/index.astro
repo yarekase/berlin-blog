@@ -1,22 +1,32 @@
 ---
 // 1. 導入佈局組件與資料管理工具
 import Layout from "../layouts/Layout.astro";
-import { postManager, type Post, type Category } from "../utils/postManager";
+import type { Post, Category } from "../utils/postManager";
 
-// 2. 環境變數處理：從 Cloudflare Runtime 環境中取得 D1 資料庫實例
-import { env } from "cloudflare:workers";
-import { type Env } from "../env";
-const DB = (env as unknown as Env).DB;
+// 2. 環境變數處理：設定後端 Worker API 位址
+const apiURL = import.meta.env.PUBLIC_API_URL || "http://127.0.0.1:8787";
 
 // 3. 資料狀態初始化
 let posts: Post[] = [];
 let categories: Category[] = [];
 
-if (DB) {
-  const allPosts = await postManager.getPosts(DB);
-  // 僅顯示已發布的文章
-  posts = allPosts.filter((p) => p.status === "published");
-  categories = await postManager.getCategories(DB);
+try {
+  const postsRes = await fetch(`${apiURL}/api/posts`);
+  if (postsRes.ok) {
+    const allPosts = (await postsRes.json()) as Post[];
+    posts = allPosts.filter((p) => p.status === "published");
+  }
+} catch (error) {
+  console.error("無法自 API 獲取文章列表:", error);
+}
+
+try {
+  const catsRes = await fetch(`${apiURL}/api/categories`);
+  if (catsRes.ok) {
+    categories = (await catsRes.json()) as Category[];
+  }
+} catch (error) {
+  console.error("無法自 API 獲取分類列表:", error);
 }
 
 // 4. 頁面佈局邏輯：將文章拆分為「特色文章 (第一篇)」與「近期文章 (接下來的三篇)」

@@ -3,8 +3,7 @@ import axios from "axios";
 
 // 1. 建立實例
 const api = axios.create({
-  
-  baseURL: "/api", 
+  baseURL: import.meta.env.PUBLIC_API_URL || "/api", 
   headers: {
     "Content-Type": "application/json",
   },

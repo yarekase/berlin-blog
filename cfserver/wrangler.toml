@@ -1,0 +1,23 @@
+name = "berlin-blog-api"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "berlin-blog"
+database_id = "946b5da6-faea-476c-b5fc-26c9438dee74"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "MY_BUCKET"
+bucket_name = "berlin-blog"
+
+[dev]
+port = 8787
+ip = "127.0.0.1"
+
+[vars]
+ADMIN_EMAIL = "admin@example.com"
+ADMIN_PASSWORD = "admin123"
+R2_PUBLIC_DOMAIN = "https://pub-2471c8cc4df348ba85d7772e44349294.r2.dev"
+JWT_SECRET = "supersecretjwtkey"

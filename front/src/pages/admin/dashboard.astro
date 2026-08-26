@@ -10,8 +10,7 @@ import PostsList from "../../components/PostsList.astro";
 import EditModal from "../../components/EditModal/EditModal.astro";
 import SettingsModal from "../../components/SettingsModal.astro";
 import "../../styles/editor.css";
-import { postManager, type Post } from "../../utils/postManager";
-import { env } from 'cloudflare:workers';
+import type { Post } from "../../utils/postManager";
 
 
 // 從 cookies 中獲取 adminToken，若不存在則重定向到登入頁面
@@ -22,20 +21,23 @@ if (!token) {
 }
 
 // 伺服器端抓取資料
-const  DB  = (env as any).DB;
+const apiURL = import.meta.env.PUBLIC_API_URL || "http://127.0.0.1:8787";
 let posts: Post[] = [];
 
-
-
-if (DB && typeof DB.prepare === "function") {
-  try {
-    posts = await postManager.getPosts(DB);
-    console.log("伺服器端獲取文章成功:", posts);
-  } catch (error) {
-    console.error("伺服器端獲取文章失敗:", error);
+try {
+  const postsRes = await fetch(`${apiURL}/api/posts`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  if (postsRes.ok) {
+    posts = (await postsRes.json()) as Post[];
+    console.log("伺服器端獲取文章成功，篇數:", posts.length);
+  } else {
+    console.error("伺服器端獲取文章失敗，API 狀態碼:", postsRes.status);
   }
-} else {
-  console.warn("伺服器端未找到 'DB' 綁定，無法獲取文章資料。");
+} catch (error) {
+  console.error("伺服器端獲取文章失敗:", error);
 }
 ---
 
