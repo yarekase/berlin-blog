@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, primaryKey, check, index } from "drizzle-orm/sqlite-core";
 import { relations, sql } from "drizzle-orm";
 
 // ==========================================
@@ -14,6 +14,7 @@ export const admins = sqliteTable("admins", {
 
 // ==========================================
 // 文章表 (posts)
+// 注意：coverImageId沒有被做成FK，因此在刪除封面圖時，api要額外處理
 // ==========================================
 export const posts = sqliteTable("posts", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()), // 隨機 UUID 字串
@@ -29,7 +30,15 @@ export const posts = sqliteTable("posts", {
   updatedAt: text("updated_at").notNull().default(sql`(CURRENT_TIMESTAMP)`),
   publishedAt: text("published_at"),
 
-});
+},
+  // 檢查區
+  (table) => [
+    check(
+      "posts_status_check",
+      sql`${table.status} IN ('draft', 'published')`
+    ),
+  ]
+);
 
 // ==========================================
 // 分類表 (categories)
@@ -45,14 +54,24 @@ export const categories = sqliteTable("categories", {
 // 文章與分類關聯表 (post_categories, 多對多)
 // ==========================================
 export const postCategories = sqliteTable("post_categories", {
-  postId: text("post_id")
-    .notNull()
-    .references(() => posts.id, { onDelete: "cascade" }),
-  categoryId: integer("category_id")
-    .notNull()
-    .references(() => categories.id, { onDelete: "cascade" }),
-}, (table) =>
-  [primaryKey({ columns: [table.postId, table.categoryId] })]
+  postId:
+    text("post_id")
+      .notNull()
+      .references(() => posts.id, { onDelete: "cascade" }),
+  categoryId:
+    integer("category_id")
+      .notNull()
+      .references(() => categories.id, { onDelete: "cascade" }),
+},
+  (table) =>
+    [primaryKey({
+      columns: [table.postId, table.categoryId]
+    }),
+    index(
+      "idx_post_categories_category_id",
+    ).on(table.categoryId),
+    ]
+
 );
 
 
@@ -60,7 +79,8 @@ export const postCategories = sqliteTable("post_categories", {
 // ==========================================
 // 圖片表(images)，存放R2資料桶裡的原檔url以及轉換後的WebP url
 // ==========================================
-export const images = sqliteTable("images", {
+export const images = sqliteTable(
+  "images", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   postId: text("post_id")
     .notNull()
@@ -71,8 +91,19 @@ export const images = sqliteTable("images", {
   webpUrl: text("webp_url"),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: text("created_at").notNull().default(sql`(CURRENT_TIMESTAMP)`)
+},
+  (table) => [
 
-});
+    index("idx_images_post_id")
+      .on(table.postId),
+
+    index("idx_images_post_sort_order")
+      .on(
+        table.postId,
+        table.sortOrder
+      ),
+  ]
+);
 
 
 // ==========================================
