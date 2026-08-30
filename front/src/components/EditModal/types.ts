@@ -12,6 +12,7 @@ export interface ModalElements {
   newCatInput: HTMLInputElement;
   statusSelect: HTMLSelectElement;
   titleInput: HTMLInputElement;
+  slugInput: HTMLInputElement;
   authorInput: HTMLInputElement;
   summaryInput: HTMLTextAreaElement;
   publishedAtInput: HTMLInputElement;
@@ -21,6 +22,7 @@ export interface ModalElements {
 
 export interface PostPayload {
   title: string;
+  slug?: string;
   author_name: string;
   content: string;
   summary: string;

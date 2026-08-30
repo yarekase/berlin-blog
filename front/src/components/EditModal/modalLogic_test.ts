@@ -1,6 +1,6 @@
-// components/EditModal/modalLogic.ts
+// components/EditModal/modalLogic_test.ts
 import { authManager } from "../../utils/auth";
-import { type Post } from "../../utils/postManager";
+import { type Post, postAPI } from "../../utils/postManager";
 import { initEditor, saveEditorContent, destroyEditor } from "../../utils/editorManager";
 import api from "../../utils/api";
 import type { ModalElements } from "./types";
@@ -31,7 +31,7 @@ export function createModalHandler(els: ModalElements) {
         els.modalTitle.textContent = "編輯文章";
 
         const { data: post } = await api.get<Post>(`/posts/${id}`);
-        existingCoverImage = post.cover_image;
+        existingCoverImage = post.cover_image || "";
         
         formHelpers.fillForm(els, post, existingCoverImage);
         categoryService.render(post.categories.map(c => c.id));
@@ -52,6 +52,7 @@ export function createModalHandler(els: ModalElements) {
         els.modalTitle.textContent = "新增文章";
 
         els.titleInput.value = draftPost.title;
+        els.slugInput.value = draftPost.slug || "";
         els.authorInput.value = draftPost.author_name;
         els.statusSelect.value = draftPost.status;
         els.publishedAtInput.value = formatDateTime(new Date());
@@ -76,7 +77,7 @@ export function createModalHandler(els: ModalElements) {
     els.submitBtn.textContent = "儲存中...";
 
     try {
-      let finalCoverImage = existingCoverImage;
+      let finalCoverImage: any = existingCoverImage;
       if (els.coverInput.files?.[0]) {
         const formData = new FormData();
         formData.append("file", els.coverInput.files[0]);
@@ -94,7 +95,7 @@ export function createModalHandler(els: ModalElements) {
         finalCoverImage
       );
 
-      await api.put(`/posts/${currentPostId}`, payload);
+      await postAPI.updatePost(currentPostId, payload);
       alert(isEditMode ? "文章更新成功！" : "文章新增成功！");
 
       localStorage.removeItem("editor_draft");
