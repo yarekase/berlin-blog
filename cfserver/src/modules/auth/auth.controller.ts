@@ -11,6 +11,7 @@
 import type { Context } from "hono";
 import type { AppContext } from "../../types/env";
 import { authService } from "./auth.service";
+import { AppError } from "../../utils/appError";
 
 export class AuthController {
   /**
@@ -116,8 +117,14 @@ export class AuthController {
         c.env.JWT_SECRET
       );
 
-      return c.json({ success: true, user: result });
+      return c.json({ success: true, user: result }, 201);
     } catch (error: any) {
+      // 判斷錯誤類型
+      if (error instanceof AppError) {
+        // 投擲自訂錯誤，直接回傳給前端
+        return c.json({ error: error.message }, error.statusCode as any);
+      }
+      // 捕獲未預期的系統錯誤
       console.error("[AuthController.signup Error]:", error);
       return c.json({ error: "註冊失敗：伺服器錯誤" }, 500);
     }

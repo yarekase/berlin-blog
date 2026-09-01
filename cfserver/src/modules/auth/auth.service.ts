@@ -12,6 +12,7 @@ import { sign } from "hono/jwt";
 import { eq } from "drizzle-orm";
 import { getDb } from "../../db";
 import { admins } from "../../db/schema";
+import { AppError } from "../../utils/appError";
 
 export class AuthService {
   /**
@@ -102,7 +103,18 @@ export class AuthService {
    */
   async updateNickname(DB: D1Database, adminId: number, nickname: string) {
     const db = getDb(DB);
-    await db.update(admins).set({ nickname }).where(eq(admins.id, adminId));
+
+    if (!nickname || nickname.trim() === "") {
+      throw new AppError(400, "暱稱不能為空");
+    }
+
+    if (nickname.trim().length > 10) {
+      throw new AppError(400, "暱稱長度不能超過10個字");
+    }
+
+    await db.update(admins).set({ nickname: nickname.trim() }).where(eq(admins.id, adminId));
+
+    return { id: adminId, nickname: nickname.trim() };
   }
 
   /**
@@ -114,7 +126,7 @@ export class AuthService {
     // 檢查是否已存在管理員
     const existingAdmin = await db.query.admins.findFirst();
     if (existingAdmin) {
-      throw new Error("系統已有管理員帳號，無法重複註冊");
+      throw new AppError(400, "系統已有管理員帳號，無法重複註冊");
     }
 
     // 雜湊密碼
