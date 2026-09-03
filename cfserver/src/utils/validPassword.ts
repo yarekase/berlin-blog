@@ -16,7 +16,7 @@ export interface PasswordValidResult {
  */
 export function validPassword(password: string): PasswordValidResult {
 
-  // 2. 長度檢查 (8-12 碼)
+  // 1. 長度檢查 (8-12 碼)
   if (password.length < 8 || password.length > 12) {
     return {
       isValid: false,
