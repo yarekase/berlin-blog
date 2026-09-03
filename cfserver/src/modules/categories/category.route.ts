@@ -20,4 +20,10 @@ categoryRoute.get("/", (c) => categoryController.getCategories(c));
 // 2. [受保護] 新增分類
 categoryRoute.post("/", requireAuth, (c) => categoryController.createCategory(c));
 
+// 3. [受保護] 更新分類
+categoryRoute.put("/:id", requireAuth, (c) => categoryController.updateCategory(c));
+
+// 4. [受保護] 刪除分類
+categoryRoute.delete("/:id", requireAuth, (c) => categoryController.deleteCategory(c));
+
 export default categoryRoute;

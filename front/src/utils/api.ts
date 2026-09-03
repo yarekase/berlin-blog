@@ -11,8 +11,12 @@ const api = axios.create({
 
 // 2. 設定「請求攔截器」：發送前自動加上 Token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("adminToken"); // 取得登入時存入的字串[cite: 1, 4]
-  
+  // 從 cookie 讀取 adminToken（伺服器端用 cookie 做認證，不是 localStorage）
+  const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("adminToken="))
+    ?.split("=")[1];
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

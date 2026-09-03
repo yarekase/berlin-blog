@@ -37,6 +37,9 @@ export const postAPI = {
    */
   async getPostById(id: string): Promise<Post> {
     const response = await api.get<Post>(`/posts/${id}`);
+    if (!response.data) {
+      console.error("未找到該 ID 的文章")
+    }
     return response.data;
   },
 

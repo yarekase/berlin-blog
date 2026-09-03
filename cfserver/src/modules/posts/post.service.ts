@@ -11,6 +11,7 @@
 import { eq, or, desc, sql } from "drizzle-orm";
 import { getDb, type DbType } from "../../db";
 import * as schema from "../../db/schema";
+import { AppError } from "../../utils/appError";
 
 export interface CategoryDto {
   id: number;
@@ -42,12 +43,7 @@ export interface CreatePostDto {
   slug?: string;
   content?: string;
   summary?: string;
-  cover_image?: string | {
-    original_key: string;
-    original_url: string;
-    webp_key?: string | null;
-    webp_url?: string | null;
-  };
+  cover_image_id?: string;
   status?: "draft" | "published";
   categories?: { id: number }[];
   published_at?: string;
@@ -59,12 +55,7 @@ export interface UpdatePostDto {
   slug?: string;
   content?: string;
   summary?: string;
-  cover_image?: string | {
-    original_key: string;
-    original_url: string;
-    webp_key?: string | null;
-    webp_url?: string | null;
-  };
+  cover_image_id?: string | null;
   status?: "draft" | "published";
   categories?: { id: number }[];
   published_at?: string;
@@ -88,6 +79,7 @@ export class PostService {
 
   /**
    * 確保 Slug 唯一性：若資料庫已存在相同 Slug，則自動遞增後綴 (-2, -3...)
+   * 目前存在格式問題，請盡量保持標題或slug的獨立性
    */
   private async ensureUniqueSlug(
     db: DbType,
@@ -224,6 +216,8 @@ export class PostService {
     const title = input.title?.trim() || "未命名文章";
     const authorName = input.author_name?.trim() || "子迂";
 
+    console.log("傳進來的資料為:", input);
+
     const rawSlug = input.slug?.trim()
       ? this.generateSlug(input.slug)
       : this.generateSlug(title);
@@ -236,11 +230,19 @@ export class PostService {
     const now = new Date().toISOString();
 
     let coverImageId: string | null = null;
-    if (typeof input.cover_image === "string") {
-      coverImageId = input.cover_image;
-    } else if (input.cover_image && typeof input.cover_image === "object") {
-      coverImageId = input.cover_image.webp_url || input.cover_image.original_url || null;
+    if (typeof input.cover_image_id === "string") {
+      // 有傳入圖片 ID，驗證是否存在
+      const existing = await db.query.images.findFirst({
+        where: eq(schema.images.id, input.cover_image_id),
+      });
+      if (existing) {
+        coverImageId = input.cover_image_id;
+      } else {
+        throw new AppError(404, "圖片不存在");
+      }
     }
+    // cover_image_id 為 null 或 undefined（新增草稿時不傳封面）都視為無封面
+    // coverImageId 預設已是 null，不需額外處理
 
     // 1. 插入文章主表
     await db.insert(schema.posts).values({
@@ -286,37 +288,55 @@ export class PostService {
       updatedAt: now,
     };
 
-    if (updates.title !== undefined) updateData.title = updates.title;
+    // 全域格式檢查
+    if (updates.title === undefined ||
+      updates.slug === undefined ||
+      updates.author_name === undefined ||
+      updates.content === undefined ||
+      updates.summary === undefined ||
 
-    if (updates.slug !== undefined && updates.slug.trim() !== "") {
-      const rawSlug = this.generateSlug(updates.slug);
-      updateData.slug = await this.ensureUniqueSlug(db, rawSlug, id);
+      updates.status === undefined) throw new AppError(400, "前端格式錯誤");
+
+    // 標題
+    if (!updates.title || typeof updates.title !== "string") throw new AppError(400, "標題不可為空");
+    updateData.title = updates.title;
+
+    // 網址(若為空值或無法解析，則根據標題生成)
+    const slug = updates.slug?.trim() || "";
+    if (slug === "") {
+      const rawSlug = this.generateSlug(updates.title);
+      updates.slug = await this.ensureUniqueSlug(db, rawSlug);
+    } else {
+      updates.slug = await this.ensureUniqueSlug(db, slug);
+    }
+    updateData.slug = updates.slug;
+
+    // 作者
+    if (!updates.author_name || typeof updates.author_name !== "string") throw new AppError(400, "作者不可為空");
+    updateData.authorName = updates.author_name;
+
+    // 內容與摘要直接給上，前端傳什麼後端就存什麼
+    updateData.content = updates.content;
+    updateData.summary = updates.summary;
+
+    // 封面(有值就查資料庫後給值，沒值就設 null，不能是 undefined)
+    if (typeof updates.cover_image_id === "string") {
+      const existingCoverImage = db.query.images.findFirst({
+        where: eq(schema.images.id, updates.cover_image_id),
+      });
+      if (!existingCoverImage) throw new AppError(400, "圖片不存在");
+      updateData.coverImageId = updates.cover_image_id;
+    } else {
+      updateData.coverImageId = null;
     }
 
-    if (updates.author_name !== undefined) updateData.authorName = updates.author_name;
-    if (updates.content !== undefined) {
-      updateData.content = updates.content;
-      updateData.summary = updates.summary || this.generateSummary(updates.content);
-    } else if (updates.summary !== undefined) {
-      updateData.summary = updates.summary;
-    }
 
-    if (updates.cover_image !== undefined) {
-      if (typeof updates.cover_image === "string") {
-        updateData.coverImageId = updates.cover_image;
-      } else if (updates.cover_image && typeof updates.cover_image === "object") {
-        updateData.coverImageId =
-          updates.cover_image.webp_url || updates.cover_image.original_url || null;
-      } else {
-        updateData.coverImageId = null;
-      }
-    }
+    // 狀態(有值就更新，沒值就忽略)
+    updateData.status = updates.status;
 
-    if (updates.status !== undefined) {
-      updateData.status = updates.status;
-      if (updates.status === "published") {
-        updateData.publishedAt = updates.published_at || now;
-      }
+    // 若為 published 且給了 published_at，則使用目前時間
+    if (updates.status === "published") {
+      updateData.publishedAt = updates.published_at || now;
     }
 
     // 1. 更新主表
@@ -341,11 +361,21 @@ export class PostService {
   }
 
   /**
-   * [刪除] 刪除指定文章
+   * [刪除] 刪除指定文章(包含刪除封面圖)
    */
   async deletePost(D1: D1Database, id: string): Promise<void> {
     const db = getDb(D1);
+    const postData = await db.query.posts.findFirst({
+      where: eq(schema.posts.id, id),
+    });
+
+    if (!postData) throw new AppError(404, "文章不存在");
+
     await db.delete(schema.posts).where(eq(schema.posts.id, id));
+
+    if (postData.coverImageId) {
+      await db.delete(schema.images).where(eq(schema.images.id, postData.coverImageId));
+    }
   }
 }
 

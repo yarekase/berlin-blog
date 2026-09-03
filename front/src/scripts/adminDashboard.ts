@@ -20,10 +20,8 @@ function $<T>(id: string, required = true): T {
  * 這個函式會在瀏覽器端執行，負責綁定所有按鈕事件與權限檢查
  */
 export function initDashboard() {
-  // 1. 權限檢查：如果 localStorage 沒有 Token，直接導向登入頁
-  authManager.checkAuth();
-
   // 取得頁面上的 DOM 元素
+  // 注意：權限保護已在 SSR (dashboard.astro) 透過 cookie 完成，客戶端無需重複檢查
   const settingsModal = $<HTMLDivElement>("settingsModal");
   const newPostBtn = $<HTMLButtonElement>("newPostBtn");
   const settingsBtn = $<HTMLButtonElement>("settingsBtn");
@@ -31,10 +29,6 @@ export function initDashboard() {
   const settingsForm = $<HTMLFormElement>("settingsForm");
   const nicknameInput = $<HTMLInputElement>("nickname");
   const postsListContainer = $<HTMLDivElement>("postsList");
-
-  if (!settingsModal || !newPostBtn || !settingsBtn || !settingsForm || !postsListContainer) {
-    throw new Error("必要的 DOM 元素不存在，請檢查 HTML 結構");
-  }
 
   // --- 2. 文章列表動作監聽 (使用「事件委託」 Event Delegation) ---
   postsListContainer?.addEventListener("click", (e) => {
@@ -76,8 +70,8 @@ export function initDashboard() {
 
   // --- 3. 新增文章按鈕 ---
   newPostBtn?.addEventListener("click", () => {
-    // 同樣發送解耦事件，但不帶 id，讓模態框進入「新增模式」
-    window.dispatchEvent(new CustomEvent("open-edit-modal"));
+    // 發送解耦事件，帶 id: null 讓模態框進入「新增模式」
+    window.dispatchEvent(new CustomEvent("open-edit-modal", { detail: { id: null } }));
   });
 
   // --- 4. 使用者設定邏輯 (暱稱修改) ---

@@ -64,8 +64,15 @@ export function createModalHandler(els: ModalElements) {
         const nickName = authManager.getNickname() || "子迂";
 
         // 向後端發送請求在 D1 建立一筆空白草稿，取得由資料庫生成的 UUID
+        const today = new Date().toLocaleDateString("zh-TW", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).replace(/\//g, "-");
+        const defaultTitle = `未命名文章 ${today}`;
+
         const draftPost = await postAPI.createPost({
-          title: "未命名文章",
+          title: defaultTitle,
           author_name: nickName,
           status: "draft",
         });

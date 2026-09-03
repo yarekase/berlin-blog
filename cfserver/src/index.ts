@@ -11,6 +11,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import type { AppContext, Env } from "./types/env";
+import { AppError } from "./utils/appError";
 
 // 匯入各功能模組的子路由
 import authRoute from "./modules/auth/auth.route";
@@ -63,6 +64,46 @@ app.route("/categories", categoryRoute);
 
 // 上傳模組：支援 /api/upload (圖片儲存至 R2)
 app.route("/upload", uploadRoute);
+
+// ==============================================================================
+// 4. [全域錯誤處理 (Global Error Handling)]
+// ==============================================================================
+
+// 統一處理 API 拋出的錯誤 (包含自訂 AppError 與未預期的系統錯誤)
+app.onError((err, c) => {
+  // 1. 處理預期的商業邏輯錯誤 (AppError)
+  if (err instanceof AppError) {
+    return c.json(
+      {
+        success: false,
+        error: err.message,
+      },
+      err.statusCode as any
+    );
+  }
+
+  // 2. 處理未預期的系統錯誤 (如 D1 查詢崩潰、語法錯誤等)
+  console.error(`[Unhandled Error] [${c.req.method} ${c.req.url}]:`, err);
+
+  return c.json(
+    {
+      success: false,
+      error: "系統內部錯誤，請稍後再試",
+    },
+    500
+  );
+});
+
+// 統一處理 404 Not Found (打到未定義的 API 路由時)
+app.notFound((c) => {
+  return c.json(
+    {
+      success: false,
+      error: `請求的資源不存在: ${c.req.method} ${c.req.path}`,
+    },
+    404
+  );
+});
 
 export default app;
 export type { Env };

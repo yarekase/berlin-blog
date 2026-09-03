@@ -21,11 +21,11 @@ if (!token) {
 }
 
 // 伺服器端抓取資料
-const apiURL = import.meta.env.PUBLIC_API_URL || "http://127.0.0.1:8787";
+const apiURL = import.meta.env.PUBLIC_API_URL || "http://127.0.0.1:8787/api/";
 let posts: Post[] = [];
 
 try {
-  const postsRes = await fetch(`${apiURL}/api/posts`, {
+  const postsRes = await fetch(`${apiURL}/posts`, {
     headers: {
       "Authorization": `Bearer ${token}`
     }
