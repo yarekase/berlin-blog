@@ -216,8 +216,6 @@ export class PostService {
     const title = input.title?.trim() || "未命名文章";
     const authorName = input.author_name?.trim() || "子迂";
 
-    console.log("傳進來的資料為:", input);
-
     const rawSlug = input.slug?.trim()
       ? this.generateSlug(input.slug)
       : this.generateSlug(title);

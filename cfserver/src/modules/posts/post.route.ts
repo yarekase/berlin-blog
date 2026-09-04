@@ -23,7 +23,7 @@ postRoute.get("/", (c) => postController.getPosts(c));
 // 2. [公開] 單篇文章查詢 (支援 UUID 與中文 Slug)
 postRoute.get("/:id", (c) => postController.getPostById(c));
 
-// 3. [受保護] 新增文章
+// 3. [受保護] 新增文章（開啟空白文章）
 postRoute.post("/", requireAuth, (c) => postController.createPost(c));
 
 // 4. [受保護] 更新文章

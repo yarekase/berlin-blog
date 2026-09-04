@@ -1,7 +1,7 @@
 ---
 // 1. 導入佈局組件與資料管理工具
 import Layout from "../layouts/Layout.astro";
-import type { Post, Category } from "../utils/postManager";
+import type { Post, Category, Image } from "../utils/postManager";
 
 // 2. 環境變數處理：設定後端 Worker API 位址
 const apiURL = import.meta.env.PUBLIC_API_URL || "http://127.0.0.1:8787";
@@ -11,7 +11,7 @@ let posts: Post[] = [];
 let categories: Category[] = [];
 
 try {
-  const postsRes = await fetch(`${apiURL}/api/posts`);
+  const postsRes = await fetch(`${apiURL}/posts`);
   if (postsRes.ok) {
     const allPosts = (await postsRes.json()) as Post[];
     posts = allPosts.filter((p) => p.status === "published");
@@ -21,7 +21,7 @@ try {
 }
 
 try {
-  const catsRes = await fetch(`${apiURL}/api/categories`);
+  const catsRes = await fetch(`${apiURL}/categories`);
   if (catsRes.ok) {
     categories = (await catsRes.json()) as Category[];
   }
@@ -29,9 +29,21 @@ try {
   console.error("無法自 API 獲取分類列表:", error);
 }
 
+try {
+  const imagesRes = await fetch(`${apiURL}/images`);
+  if (imagesRes.ok) {
+    const images = (await imagesRes.json()) as Image[];
+    
+  }
+} catch (error) {
+  console.error("無法自 API 獲取圖片列表:", error);
+}
+
 // 4. 頁面佈局邏輯：將文章拆分為「特色文章 (第一篇)」與「近期文章 (接下來的三篇)」
 const featuredPost = posts[0];
-const recentPosts = posts.slice(1, 4);
+const recentPosts = posts.slice(0, 3);
+console.log("文章列表有", posts);
+console.log("近期文章有：", recentPosts);
 ---
 
 <Layout title="子迂的蠹酸齋">

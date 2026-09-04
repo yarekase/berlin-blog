@@ -39,6 +39,10 @@ try {
 } catch (error) {
   console.error("伺服器端獲取文章失敗:", error);
 }
+
+const totalCount = posts.length;
+const publishedCount = posts.filter(post => post.status === 'published').length;
+const draftCount = posts.filter(post => post.status === 'draft').length;
 ---
 
 <Layout title="後台儀表板 - 子迂的蠹酸齋">
@@ -49,7 +53,10 @@ try {
     <!-- 主要內容 -->
     <div class="max-w-350 mx-auto px-6 py-8">
       <!-- 儀表板統計 -->
-      <Statistics />
+      <Statistics 
+      totalCount={totalCount}
+      publishedCount={publishedCount}
+      draftCount={draftCount} />
 
       <!-- 文章管理區 -->
       <PostsList posts={posts} />

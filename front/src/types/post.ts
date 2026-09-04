@@ -49,6 +49,16 @@ export interface CreatePostPayload {
   published_at?: string;
 }
 
+/** 圖片介面 */
+export interface Image {
+  id: string; // UUID
+  post_id: string; // UUID
+  original_key: string;
+  original_url: string;
+  webp_key?: string | null;
+  webp_url?: string | null;
+}
+
 /** 更新文章之請求 Payload */
 export interface UpdatePostPayload {
   title?: string;
