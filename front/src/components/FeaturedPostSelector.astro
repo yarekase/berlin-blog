@@ -1,0 +1,83 @@
+---
+import type { Post } from "../types/post";
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+<section class="mb-12 border border-white/10 bg-void-black/50 p-6 sm:p-8" aria-labelledby="featured-post-title">
+  <div class="mb-6">
+    <p class="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-primary">Featured Post</p>
+    <h2 id="featured-post-title" class="text-2xl font-bold text-white">重點文章</h2>
+    <p class="mt-2 text-sm leading-6 text-slate-400">
+      選擇要顯示在首頁特色文章區的文章。
+    </p>
+  </div>
+
+  <form id="featuredPostForm" class="flex flex-col gap-4 sm:flex-row sm:items-end">
+    <div class="flex-1">
+      <label for="featuredPostSelect" class="mb-2 block text-sm font-medium text-slate-300">
+        文章標題
+      </label>
+      <select
+        id="featuredPostSelect"
+        name="post_id"
+        required
+        class="min-h-11 w-full rounded border border-white/20 bg-void-black px-4 py-2 text-base text-white focus:border-primary focus:outline-none"
+      >
+        <option value="">請選擇文章</option>
+        {posts.map((post: Post) => (
+          <option value={post.id}>{post.title}</option>
+        ))}
+      </select>
+    </div>
+
+    <button
+      type="submit"
+      class="min-h-11 rounded bg-primary px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/80 disabled:cursor-not-allowed disabled:opacity-50"
+      disabled={posts.length === 0}
+    >
+      確認
+    </button>
+  </form>
+
+  <p id="featuredPostMessage" class="mt-4 hidden text-sm" role="status" aria-live="polite"></p>
+</section>
+
+<script>
+  import api from "../utils/api";
+
+  const form = document.querySelector("#featuredPostForm");
+  const select = document.querySelector("#featuredPostSelect");
+  const message = document.querySelector("#featuredPostMessage");
+  const submitButton = form?.querySelector("button[type='submit']");
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!(select instanceof HTMLSelectElement) || !select.value || !message) return;
+
+    if (submitButton instanceof HTMLButtonElement) {
+      submitButton.disabled = true;
+    }
+    message.className = "mt-4 text-sm text-slate-400";
+    message.textContent = "儲存中...";
+
+    try {
+      await api.post("/posts/featured", { post_id: select.value });
+      message.className = "mt-4 text-sm text-green-400";
+      message.textContent = "重點文章已送出。";
+    } catch (error) {
+      console.error("設定重點文章失敗:", error);
+      message.className = "mt-4 text-sm text-red-400";
+      message.textContent = "送出失敗，請確認後端端點已啟用。";
+    } finally {
+      if (submitButton instanceof HTMLButtonElement) {
+        submitButton.disabled = false;
+      }
+    }
+  });
+</script>

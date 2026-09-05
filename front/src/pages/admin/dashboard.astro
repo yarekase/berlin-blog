@@ -6,6 +6,7 @@
 import Layout from "../../layouts/Layout.astro";
 import Navigation from "../../components/Navigation.astro";
 import Statistics from "../../components/Statistics.astro";
+import FeaturedPostSelector from "../../components/FeaturedPostSelector.astro";
 import PostsList from "../../components/PostsList.astro";
 import EditModal from "../../components/EditModal/EditModal.astro";
 import SettingsModal from "../../components/SettingsModal.astro";
@@ -57,6 +58,9 @@ const draftCount = posts.filter(post => post.status === 'draft').length;
       totalCount={totalCount}
       publishedCount={publishedCount}
       draftCount={draftCount} />
+
+      <!-- 重點文章設定 -->
+      <FeaturedPostSelector posts={posts} />
 
       <!-- 文章管理區 -->
       <PostsList posts={posts} />

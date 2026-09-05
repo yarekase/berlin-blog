@@ -42,49 +42,83 @@ try {
 // 4. 頁面佈局邏輯：將文章拆分為「特色文章 (第一篇)」與「近期文章 (接下來的三篇)」
 const featuredPost = posts[0];
 const recentPosts = posts.slice(0, 3);
+const hasAdminToken = Boolean(Astro.cookies.get("adminToken")?.value);
 console.log("文章列表有", posts);
 console.log("近期文章有：", recentPosts);
 ---
 
 <Layout title="子迂的蠹酸齋">
-  <main class="min-h-screen bg-void-black text-stucco-white font-display pb-24">
+  <main class="min-h-screen bg-void-black pb-24 font-display text-base text-stucco-white">
     <!-- A. 頂部搜尋區塊：提供關鍵字檢索功能 -->
-    <!-- 搜尋區塊容器 -->
-    <div class="relative w-full max-w-md mb-8 group">
-      <!-- 搜尋圖示 (Lucide Icon 風格) -->
-      <div
-        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 text-slate-500 group-focus-within:text-primary transition-colors"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
-      </div>
+    <div class="mb-8 flex w-full flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-start sm:gap-6">
+      <form action="/search" method="get" class="flex w-full max-w-2xl flex-col gap-3 sm:flex-row">
+        <div class="relative w-full group">
+          <div
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-slate-500 group-focus-within:text-primary transition-colors"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
 
-      <!-- 輸入框 -->
-      <input
-        type="text"
-        placeholder="搜尋文章、分類或關鍵字..."
-        class="w-full bg-white/5 border border-white/10 text-slate-200 text-sm rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-primary/50 focus:bg-white/10 focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-slate-600"
-      />
+          <input
+            id="postSearchInput"
+            type="text"
+            name="q"
+            placeholder="搜尋文章、分類或關鍵字..."
+            aria-label="搜尋文章、分類或關鍵字"
+            autocomplete="off"
+            required
+            pattern=".*\S.*"
+            class="w-full bg-white/5 border border-white/10 text-slate-200 text-sm rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-primary/50 focus:bg-white/10 focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-slate-600"
+          />
 
-      <!-- 裝飾用快捷鍵提示 (選配) -->
-      <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-        <kbd
-          class="hidden sm:inline-block px-2 py-1 text-xs font-semibold text-slate-500 bg-white/5 border border-white/10 rounded-md"
+          <button
+            type="submit"
+            class="absolute inset-y-1 right-1 flex items-center gap-2 rounded-lg bg-primary px-3 text-sm font-medium text-white transition-colors hover:bg-primary/80"
+          >
+            <span aria-hidden="true">⌕</span>
+            <span>搜尋</span>
+          </button>
+        </div>
+      </form>
+
+      <nav class="flex shrink-0 items-center justify-end gap-5 pt-1 sm:pt-2" aria-label="主要導覽">
+        <a
+          href="/posts"
+          class="whitespace-nowrap text-sm font-medium text-slate-400 transition-colors hover:text-primary"
         >
-          Search
-        </kbd>
-      </div>
+          所有文章
+        </a>
+        {
+          hasAdminToken ? (
+            <button
+              id="homepageLogoutBtn"
+              type="button"
+              class="whitespace-nowrap text-sm font-medium text-slate-400 transition-colors hover:text-primary"
+            >
+              登出
+            </button>
+          ) : (
+            <a
+              href="/admin/login"
+              class="whitespace-nowrap text-sm font-medium text-slate-400 transition-colors hover:text-primary"
+            >
+              登入
+            </a>
+          )
+        }
+      </nav>
     </div>
 
     <!-- B. 英雄圖 (Hero Section)：視覺焦點，通常放置品牌大圖 -->
@@ -99,10 +133,10 @@ console.log("近期文章有：", recentPosts);
     </div>
 
     <!-- 內容區 最大寬度1200px 外邊界自動 x軸兩側預留6(24px) -->
-    <div class="max-w-300 mx-auto px-6">
+    <div class="mx-auto max-w-300 px-4 sm:px-6">
       <!-- C. 作者資訊/自介區域：呈現部落格主人的身份與社交狀態 -->
       <div
-        class="relative -mt-4 mb-12 flex flex-row items-end gap-6 md:flex-nowrap"
+        class="relative -mt-4 mb-12 flex flex-col items-start gap-5 sm:flex-row sm:items-end sm:gap-6"
       >
         <!-- 大頭照 -->
         <img
@@ -112,9 +146,9 @@ console.log("近期文章有：", recentPosts);
         />
 
         <!-- 部落格名稱 -->
-        <div class="flex-1 self-end overflow-hidden">
+        <div class="flex-1 overflow-hidden sm:self-end">
           <h1
-            class="text-3xl overflow-hidden text-ellipsis whitespace-nowrap font-bold tracking-tight text-white mb-1"
+            class="mb-1 overflow-hidden text-ellipsis whitespace-nowrap text-3xl font-bold tracking-tight text-white"
           >
             子迂的蠢酸齋
           </h1>
@@ -126,7 +160,7 @@ console.log("近期文章有：", recentPosts);
 
         <!-- Follow 按鈕 -->
         <button
-          class="bg-[#222] text-primary px-6 py-2 rounded-full text-sm font-bold hover:bg-slate-600 transition-all self-end"
+          class="rounded-full bg-[#222] px-6 py-3 text-sm font-bold text-primary transition-all hover:bg-slate-600 sm:self-end"
         >
           Follow
         </button>
@@ -134,14 +168,14 @@ console.log("近期文章有：", recentPosts);
 
       <!-- D. 分類導航欄：橫向捲動的分類清單，方便讀者按主題篩選 -->
       <nav
-        class="flex flex-nowrap gap-10 border-y border-white/5 py-4 mb-16 overflow-x-auto no-scrollbar w-full relative"
+        class="relative mb-16 flex w-full flex-nowrap gap-6 overflow-x-auto border-y border-white/5 py-4 no-scrollbar sm:gap-10"
       >
         {
           categories.length > 0 ? (
             categories.map((category) => (
               <a
                 href={`/category/${category.slug}`}
-                class="text-sm font-medium text-slate-400 hover:text-primary tracking-wide transition-colors uppercase whitespace-nowrap"
+                class="whitespace-nowrap py-1 text-sm font-medium uppercase tracking-wide text-slate-400 transition-colors hover:text-primary"
               >
                 {category.name}
               </a>
@@ -158,7 +192,7 @@ console.log("近期文章有：", recentPosts);
           featuredPost ? (
             <a
               href={`/post/${featuredPost.slug}`}
-              class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center group cursor-pointer"
+              class="group grid cursor-pointer grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-12"
             >
               <div class="aspect-16/10 bg-[#151515] border border-white/10 overflow-hidden relative">
                 {featuredPost.cover_image ? (
@@ -175,15 +209,15 @@ console.log("近期文章有：", recentPosts);
               </div>
 
               <div class="flex flex-col gap-4">
-                <h2 class="text-4xl font-bold leading-[1.2] text-white group-hover:text-primary transition-colors">
+                <h2 class="text-3xl font-bold leading-tight text-white transition-colors group-hover:text-primary md:text-4xl">
                   {featuredPost.title}
                 </h2>
 
-                <p class="text-slate-400 text-lg leading-relaxed line-clamp-3">
+                <p class="text-base leading-8 text-slate-400 line-clamp-3 md:text-lg">
                   {featuredPost.summary}
                 </p>
 
-                <div class="flex items-center gap-2 text-xs text-slate-500 uppercase tracking-widest font-bold">
+                <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-500">
                   <span>{featuredPost.author_name}</span>
                   <span class="text-primary">·</span>
                   <span>
@@ -205,7 +239,7 @@ console.log("近期文章有：", recentPosts);
       </section>
 
       <!-- F. 近期文章網格：以 3 欄位 (桌面端) 顯示接下來的文章清單 -->
-      <section class="grid grid-cols-1 md:grid-cols-3 gap-10 min-h-75">
+      <section class="grid min-h-75 grid-cols-1 gap-8 md:grid-cols-3 md:gap-10">
         {
           recentPosts.length > 0 ? (
             recentPosts.map((post) => (
@@ -224,11 +258,11 @@ console.log("近期文章有：", recentPosts);
                   )}
                 </div>
 
-                <h4 class="text-xl font-bold text-white leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                <h4 class="text-lg font-bold leading-7 text-white transition-colors group-hover:text-primary line-clamp-2 md:text-xl">
                   {post.title}
                 </h4>
 
-                <div class="mt-4 text-[10px] text-slate-500 uppercase tracking-widest">
+                <div class="mt-4 text-xs uppercase tracking-widest text-slate-500">
                   {new Date(post.created_at).toLocaleDateString("zh-TW")}
                 </div>
               </a>
@@ -245,6 +279,19 @@ console.log("近期文章有：", recentPosts);
     </div>
   </main>
 </Layout>
+
+{hasAdminToken && (
+  <script>
+    const homepageLogoutButton = document.querySelector("#homepageLogoutBtn");
+
+    homepageLogoutButton?.addEventListener("click", () => {
+      document.cookie = "adminToken=; path=/; max-age=0; SameSite=Strict";
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("adminNickname");
+      window.location.reload();
+    });
+  </script>
+)}
 
 <style>
   /* 輔助樣式：自定義空心文字效果 */

@@ -1,0 +1,221 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import type { Post } from "../../types/post";
+
+const { id } = Astro.params;
+const configuredApiURL = import.meta.env.PUBLIC_API_URL || "http://127.0.0.1:8787";
+const apiBase = configuredApiURL.replace(/\/$/, "").endsWith("/api")
+  ? configuredApiURL.replace(/\/$/, "")
+  : `${configuredApiURL.replace(/\/$/, "")}/api`;
+
+if (!id) {
+  return Astro.redirect("/");
+}
+
+let post: Post | undefined;
+
+try {
+  const postRes = await fetch(`${apiBase}/posts/${encodeURIComponent(id)}`);
+  if (postRes.ok) {
+    post = (await postRes.json()) as Post;
+  }
+} catch (error) {
+  console.error("獲取文章失敗:", error);
+}
+
+if (!post || post.status !== "published") {
+  return Astro.redirect("/posts");
+}
+
+function escapeAttribute(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function renderContent(content: string): string {
+  try {
+    const data = JSON.parse(content) as { blocks?: Array<{ type: string; data?: Record<string, any> }> };
+    if (!Array.isArray(data.blocks)) return content;
+
+    return data.blocks
+      .map((block) => {
+        const blockData = block.data || {};
+        switch (block.type) {
+          case "header": {
+            const level = Math.min(Math.max(Number(blockData.level) || 2, 1), 4);
+            return `<h${level}>${blockData.text || ""}</h${level}>`;
+          }
+          case "paragraph":
+            return `<p>${blockData.text || ""}</p>`;
+          case "list": {
+            const tag = blockData.style === "ordered" ? "ol" : "ul";
+            const items = Array.isArray(blockData.items) ? blockData.items : [];
+            return `<${tag}>${items.map((item: string) => `<li>${item}</li>`).join("")}</${tag}>`;
+          }
+          case "quote":
+            return `<blockquote><p>${blockData.text || ""}</p>${blockData.caption ? `<cite>${blockData.caption}</cite>` : ""}</blockquote>`;
+          case "delimiter":
+            return "<hr />";
+          case "image": {
+            const url = blockData.file?.url || blockData.url;
+            if (!url) return "";
+            const caption = blockData.caption || "";
+            return `<figure><img src="${escapeAttribute(url)}" alt="${escapeAttribute(caption)}" />${caption ? `<figcaption>${caption}</figcaption>` : ""}</figure>`;
+          }
+          case "embed": {
+            const source = blockData.embed || blockData.source;
+            if (!source) return "";
+            return `<p><a href="${escapeAttribute(source)}" rel="noopener noreferrer" target="_blank">查看嵌入內容</a></p>`;
+          }
+          default:
+            return blockData.text ? `<p>${blockData.text}</p>` : "";
+        }
+      })
+      .join("");
+  } catch {
+    return content;
+  }
+}
+
+const renderedContent = renderContent(post.content);
+const category = post.categories?.[0]?.name || "未分類";
+---
+
+<Layout title={`${post.title}｜子迂的蠹酸齋`}>
+  <main class="min-h-screen bg-void-black pb-24 font-display text-stucco-white">
+    <article class="mx-auto max-w-3xl px-4 pt-12 sm:px-6 md:pt-24">
+      <header class="mb-12 border-b border-white/10 pb-10">
+        <a
+          href="/posts"
+          class="mb-8 inline-flex items-center gap-2 text-sm text-slate-400 transition-colors hover:text-primary"
+        >
+          <span aria-hidden="true">←</span>
+          返回所有文章
+        </a>
+        <p class="mb-4 text-xs font-bold uppercase tracking-[0.3em] text-primary">
+          {category}
+        </p>
+        <h1 class="text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl">
+          {post.title}
+        </h1>
+        <div class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-400">
+          <span>{post.author_name}</span>
+          <span class="text-primary">·</span>
+          <time datetime={post.created_at}>
+            {new Date(post.created_at).toLocaleDateString("zh-TW")}
+          </time>
+        </div>
+      </header>
+
+      {post.cover_image && (
+        <figure class="mb-14 overflow-hidden border border-white/10 bg-[#111]">
+          <img src={post.cover_image} alt={post.title} class="max-h-140 w-full object-cover" />
+        </figure>
+      )}
+
+      <div class="article-content text-base leading-8 text-slate-300 md:text-lg md:leading-9" set:html={renderedContent} />
+
+      <footer class="mt-20 border-t border-white/10 pt-8">
+        <a href="/posts" class="text-sm text-slate-400 transition-colors hover:text-primary">
+          ← 繼續閱讀其他文章
+        </a>
+      </footer>
+    </article>
+  </main>
+</Layout>
+
+<style>
+  .article-content :global(p) {
+    margin: 1.25rem 0;
+  }
+
+  .article-content :global(h1),
+  .article-content :global(h2),
+  .article-content :global(h3),
+  .article-content :global(h4) {
+    margin: 2.5rem 0 1rem;
+    color: white;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .article-content :global(h1) {
+    font-size: 2.25rem;
+  }
+
+  .article-content :global(h2) {
+    font-size: 1.875rem;
+  }
+
+  .article-content :global(h3) {
+    font-size: 1.5rem;
+  }
+
+  .article-content :global(ul),
+  .article-content :global(ol) {
+    margin: 1.25rem 0;
+    padding-left: 1.5rem;
+  }
+
+  .article-content :global(ul) {
+    list-style: disc;
+  }
+
+  .article-content :global(ol) {
+    list-style: decimal;
+  }
+
+  .article-content :global(li) {
+    margin: 0.5rem 0;
+  }
+
+  .article-content :global(blockquote) {
+    margin: 2rem 0;
+    border-left: 3px solid var(--color-primary);
+    padding-left: 1.25rem;
+    color: #cbd5e1;
+    font-style: italic;
+  }
+
+  .article-content :global(blockquote p) {
+    margin: 0;
+  }
+
+  .article-content :global(cite) {
+    display: block;
+    margin-top: 0.75rem;
+    color: #64748b;
+    font-size: 0.875rem;
+    font-style: normal;
+  }
+
+  .article-content :global(hr) {
+    margin: 2.5rem 0;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .article-content :global(figure) {
+    margin: 2rem 0;
+  }
+
+  .article-content :global(figure img) {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .article-content :global(figcaption) {
+    margin-top: 0.5rem;
+    color: #64748b;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .article-content :global(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>
