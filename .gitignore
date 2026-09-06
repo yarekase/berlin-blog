@@ -27,3 +27,6 @@ pnpm-debug.log*
 # wrangler folder
 .wrangler/
 */.wrangler/
+
+old_data/
+

@@ -39,12 +39,34 @@ try {
   console.error("無法自 API 獲取圖片列表:", error);
 }
 
-// 4. 頁面佈局邏輯：將文章拆分為「特色文章 (第一篇)」與「近期文章 (接下來的三篇)」
-const featuredPost = posts[0];
+// 4. 頁面佈局邏輯：將文章拆分為「特色文章 (自定義或最新的)」與「近期文章 (接下來的三篇)」
+const featuredPost = posts.find((p: Post) => p.pinOrder === 1);
 const recentPosts = posts.slice(0, 3);
-const hasAdminToken = Boolean(Astro.cookies.get("adminToken")?.value);
-console.log("文章列表有", posts);
-console.log("近期文章有：", recentPosts);
+// 5. 管理員身份驗證：帶入 Token 向後端 API 確認有效性
+const adminToken = Astro.cookies.get("adminToken")?.value;
+let hasAdminToken = false;
+
+if (adminToken) {
+  try {
+    const authRes = await fetch(`${apiURL}/auth/profile`, {
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+      },
+    });
+    if (authRes.ok) {
+      hasAdminToken = true;
+    } else {
+      // 若 Token 無效或已過期，自動清除 Cookie
+      Astro.cookies.delete("adminToken", { path: "/" });
+    }
+  } catch (error) {
+    console.error("無法向後端驗證管理員 Token:", error);
+  }
+}
+
+console.log("所有文章", posts);
+console.log("特色文章是：", featuredPost?.title);
+// console.log("近期文章有：", recentPosts);
 ---
 
 <Layout title="子迂的蠹酸齋">
@@ -94,21 +116,23 @@ console.log("近期文章有：", recentPosts);
       </form>
 
       <nav class="flex shrink-0 items-center justify-end gap-5 pt-1 sm:pt-2" aria-label="主要導覽">
-        <a
-          href="/posts"
-          class="whitespace-nowrap text-sm font-medium text-slate-400 transition-colors hover:text-primary"
-        >
-          所有文章
-        </a>
         {
           hasAdminToken ? (
-            <button
-              id="homepageLogoutBtn"
-              type="button"
-              class="whitespace-nowrap text-sm font-medium text-slate-400 transition-colors hover:text-primary"
-            >
-              登出
-            </button>
+            <>
+              <a
+                href="/admin/dashboard"
+                class="whitespace-nowrap text-sm font-medium text-slate-400 transition-colors hover:text-primary"
+              >
+                管理文章
+              </a>
+              <button
+                id="homepageLogoutBtn"
+                type="button"
+                class="whitespace-nowrap text-sm font-medium text-slate-400 transition-colors hover:text-primary"
+              >
+                登出
+              </button>
+            </>
           ) : (
             <a
               href="/admin/login"
@@ -164,6 +188,22 @@ console.log("近期文章有：", recentPosts);
         >
           Follow
         </button>
+      </div>
+
+      <!-- 頁面頁籤導覽：關於作者 & 所有文章 -->
+      <div class="mb-6 flex items-center gap-8 border-b border-white/10 pb-3">
+        <a
+          href="/about"
+          class="whitespace-nowrap text-base font-semibold text-slate-300 transition-colors hover:text-primary"
+        >
+          關於作者
+        </a>
+        <a
+          href="/posts"
+          class="whitespace-nowrap text-base font-semibold text-slate-300 transition-colors hover:text-primary"
+        >
+          所有文章
+        </a>
       </div>
 
       <!-- D. 分類導航欄：橫向捲動的分類清單，方便讀者按主題篩選 -->

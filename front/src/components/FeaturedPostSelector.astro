@@ -67,7 +67,7 @@ const { posts } = Astro.props;
     message.textContent = "儲存中...";
 
     try {
-      await api.post("/posts/featured", { post_id: select.value });
+      await api.put(`/posts/pin/${select.value}`, {});
       message.className = "mt-4 text-sm text-green-400";
       message.textContent = "重點文章已送出。";
     } catch (error) {

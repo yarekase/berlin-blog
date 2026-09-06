@@ -68,6 +68,25 @@ export class PostController {
   }
 
   /**
+   * [PUT] /pin/:id - 置頂文章
+   */
+  async pinPost(c: Context<AppContext>) {
+
+    const id = c.req.param("id");
+    if (!id) throw new AppError(400, "格式錯誤");
+    const updated = await postService.pinPost(c.env.DB, id);
+    return c.json({ success: true, post: updated });
+  }
+
+  /**
+   * [PUT] /pin/reset - 重置所有文章的置頂狀態
+   */
+  async resetPinOrder(c: Context<AppContext>) {
+    const updated = await postService.resetPinOrder(c.env.DB);
+    return c.json({ success: true, post: updated });
+  }
+
+  /**
    * [DELETE] /:id - 刪除文章
    */
   async deletePost(c: Context<AppContext>) {

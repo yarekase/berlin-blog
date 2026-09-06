@@ -29,7 +29,13 @@ postRoute.post("/", requireAuth, (c) => postController.createPost(c));
 // 4. [受保護] 更新文章
 postRoute.put("/:id", requireAuth, (c) => postController.updatePost(c));
 
-// 5. [受保護] 刪除文章
+// 5. [受保護] 置頂文章
+postRoute.put("/pin/:id", requireAuth, (c) => postController.pinPost(c));
+
+// 6. [受保護] 重置所有文章的置頂狀態
+postRoute.put("/pin/reset", requireAuth, (c) => postController.resetPinOrder(c));
+
+// 7. [受保護] 刪除文章
 postRoute.delete("/:id", requireAuth, (c) => postController.deletePost(c));
 
 export default postRoute;

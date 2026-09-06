@@ -29,6 +29,7 @@ export interface Post {
   created_at: string;
   published_at?: string | null;
   updated_at: string;
+  pinOrder: number;
 }
 
 /** 建立文章/草稿之請求 Payload */

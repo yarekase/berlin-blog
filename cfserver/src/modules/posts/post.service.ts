@@ -8,7 +8,7 @@
  * 3. 處理 Editor.js 摘要提取與關聯資料展開。
  */
 
-import { eq, or, desc, sql } from "drizzle-orm";
+import { eq, or, desc, sql, gt } from "drizzle-orm";
 import { getDb, type DbType } from "../../db";
 import * as schema from "../../db/schema";
 import { AppError } from "../../utils/appError";
@@ -35,6 +35,8 @@ export interface PostResponse {
   updated_at: string;
   published_at?: string | null;
   categories: CategoryDto[];
+
+  pinOrder: number;
 }
 
 export interface CreatePostDto {
@@ -47,6 +49,8 @@ export interface CreatePostDto {
   status?: "draft" | "published";
   categories?: { id: number }[];
   published_at?: string;
+
+  pinOrder?: number;
 }
 
 export interface UpdatePostDto {
@@ -59,6 +63,8 @@ export interface UpdatePostDto {
   status?: "draft" | "published";
   categories?: { id: number }[];
   published_at?: string;
+
+  pinOrder?: number;
 }
 
 export class PostService {
@@ -147,6 +153,8 @@ export class PostService {
       row.cover_image ||
       null;
 
+    const pinOrder = row.pinOrder ?? 0;
+
     return {
       id: row.id,
       title: row.title,
@@ -162,6 +170,7 @@ export class PostService {
       updated_at: row.updatedAt ?? row.updated_at ?? "",
       published_at: row.publishedAt ?? row.published_at ?? null,
       categories,
+      pinOrder,
     };
   }
 
@@ -252,6 +261,7 @@ export class PostService {
       summary,
       coverImageId,
       status,
+      pinOrder: input.pinOrder ?? 0,
       draftToken,
       createdAt: now,
       updatedAt: now,
@@ -337,6 +347,11 @@ export class PostService {
       updateData.publishedAt = updates.published_at || now;
     }
 
+    // 置頂順序 (若有傳入則更新)
+    if (updates.pinOrder !== undefined) {
+      updateData.pinOrder = updates.pinOrder;
+    }
+
     // 1. 更新主表
     await db.update(schema.posts).set(updateData).where(eq(schema.posts.id, id));
 
@@ -359,7 +374,45 @@ export class PostService {
   }
 
   /**
-   * [刪除] 刪除指定文章(包含刪除封面圖)
+   * [PUT] /pin/:id - 置頂置頂文章
+   */
+  async pinPost(D1: D1Database, id: string): Promise<{ success: boolean }> {
+    const db = getDb(D1);
+
+    // 檢查id是否存在於資料表裡
+    const existing = await db.query.posts.findFirst({
+      where: eq(schema.posts.id, id),
+    });
+    if (!existing) throw new AppError(404, "文章不存在");
+
+    // 先將排序清零
+    await db.update(schema.posts).set({
+      pinOrder: 0,
+    }).where(gt(schema.posts.pinOrder, 0));
+
+    // 將指定文章的pinOrder設為1(置頂)
+    await db.update(schema.posts).set({
+      pinOrder: 1,
+    }).where(eq(schema.posts.id, id));
+
+
+    return { success: true };
+  }
+
+  /**
+   * [PUT] /pin/reset - 重置所有文章的置頂狀態
+   */
+  async resetPinOrder(D1: D1Database): Promise<{ success: boolean }> {
+    const db = getDb(D1);
+    await db.update(schema.posts).set({
+      pinOrder: 0,
+    });
+    return { success: true };
+  }
+
+
+  /**
+   * [DELETE] /:id - 刪除指定文章(包含刪除封面圖)
    */
   async deletePost(D1: D1Database, id: string): Promise<void> {
     const db = getDb(D1);

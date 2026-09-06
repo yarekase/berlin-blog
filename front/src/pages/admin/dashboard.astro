@@ -34,6 +34,9 @@ try {
   if (postsRes.ok) {
     posts = (await postsRes.json()) as Post[];
     console.log("伺服器端獲取文章成功，篇數:", posts.length);
+  } else if (postsRes.status === 401) {
+    Astro.cookies.delete("adminToken", { path: "/" });
+    return Astro.redirect("/admin/login");
   } else {
     console.error("伺服器端獲取文章失敗，API 狀態碼:", postsRes.status);
   }

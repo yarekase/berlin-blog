@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, primaryKey, check, index } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, primaryKey, check, index, uniqueIndex } from "drizzle-orm/sqlite-core";
 import { relations, sql } from "drizzle-orm";
 
 // ==========================================
@@ -25,6 +25,7 @@ export const posts = sqliteTable("posts", {
   summary: text("summary"),
   coverImageId: text("cover_image_id"),
   status: text("status", { enum: ["draft", "published"] }).notNull().default("draft"),
+  pinOrder: integer("pin_order").notNull().default(0),
   draftToken: text("draft_token"),
   createdAt: text("created_at").notNull().default(sql`(CURRENT_TIMESTAMP)`),
   updatedAt: text("updated_at").notNull().default(sql`(CURRENT_TIMESTAMP)`),
@@ -37,6 +38,9 @@ export const posts = sqliteTable("posts", {
       "posts_status_check",
       sql`${table.status} IN ('draft', 'published')`
     ),
+    uniqueIndex("unique_pinned_post_idx")
+      .on(table.pinOrder)
+      .where(sql`${table.pinOrder} > 0`),
   ]
 );
 
