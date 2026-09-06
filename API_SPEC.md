@@ -1,6 +1,6 @@
 # Berlin Blog — 前後端 API 資料規格文件
 
-> **更新日期**：2026-09-02  
+> **更新日期**：2026-09-05
 > **後端**：Cloudflare Workers + Hono (`cfserver/`)  
 > **前端**：Astro + Axios (`front/`)  
 > **基底路徑**：所有 API 路由均以 `/api` 為前綴
@@ -17,6 +17,7 @@
 6. [前端 API 客戶端與掛勾](#6-前端-api-客戶端與掛勾)
 7. [錯誤回應格式](#7-錯誤回應格式)
 8. [認證機制](#8-認證機制)
+9. [網站作業流程](#9-網站作業流程)
 
 ---
 
@@ -24,33 +25,33 @@
 
 ### `Category`（文章分類）
 
-| 欄位         | 型別     | 說明                       |
-| ------------ | -------- | -------------------------- |
-| `id`         | `number` | 分類 ID（整數，資料庫自增）|
-| `name`       | `string` | 分類名稱                   |
-| `slug`       | `string` | URL 友善識別碼             |
-| `sort_order` | `number` | 排序順序（預設 `99`）      |
+| 欄位         | 型別     | 說明                        |
+| ------------ | -------- | --------------------------- |
+| `id`         | `number` | 分類 ID（整數，資料庫自增） |
+| `name`       | `string` | 分類名稱                    |
+| `slug`       | `string` | URL 友善識別碼              |
+| `sort_order` | `number` | 排序順序（預設 `99`）       |
 
 ---
 
 ### `Post`（文章完整物件）
 
-| 欄位             | 型別                       | 必填 | 說明                                    |
-| ---------------- | -------------------------- | ---- | --------------------------------------- |
-| `id`             | `string`                   | ✅   | UUID（後端 D1 資料庫生成）              |
-| `title`          | `string`                   | ✅   | 文章標題                                |
-| `author_name`    | `string`                   | ✅   | 作者名稱                                |
-| `slug`           | `string`                   | ✅   | URL Slug（支援中文）                    |
-| `content`        | `string`                   | ✅   | Editor.js JSON 序列化字串               |
-| `summary`        | `string \| null`           | ❌   | 純文字摘要（前 120 字）                 |
-| `cover_image`    | `string \| null`           | ❌   | 封面圖片 URL（優先使用 WebP）           |
-| `cover_image_id` | `string \| null`           | ❌   | 封面圖片的 R2 Key 或 URL                |
-| `status`         | `"draft" \| "published"`   | ✅   | 發布狀態                                |
-| `draft_token`    | `string \| null`           | ❌   | 草稿識別 Token（UUID）                  |
-| `categories`     | `Category[]`               | ✅   | 關聯分類陣列                            |
-| `created_at`     | `string`                   | ✅   | 建立時間（ISO 8601）                    |
-| `updated_at`     | `string`                   | ✅   | 最後更新時間（ISO 8601）                |
-| `published_at`   | `string \| null`           | ❌   | 發布時間（ISO 8601）                    |
+| 欄位             | 型別                     | 必填 | 說明                          |
+| ---------------- | ------------------------ | ---- | ----------------------------- |
+| `id`             | `string`                 | ✅   | UUID（後端 D1 資料庫生成）    |
+| `title`          | `string`                 | ✅   | 文章標題                      |
+| `author_name`    | `string`                 | ✅   | 作者名稱                      |
+| `slug`           | `string`                 | ✅   | URL Slug（支援中文）          |
+| `content`        | `string`                 | ✅   | Editor.js JSON 序列化字串     |
+| `summary`        | `string \| null`         | ❌   | 純文字摘要（前 120 字）       |
+| `cover_image`    | `string \| null`         | ❌   | 封面圖片 URL（優先使用 WebP） |
+| `cover_image_id` | `string \| null`         | ❌   | 封面圖片的 R2 Key 或 URL      |
+| `status`         | `"draft" \| "published"` | ✅   | 發布狀態                      |
+| `draft_token`    | `string \| null`         | ❌   | 草稿識別 Token（UUID）        |
+| `categories`     | `Category[]`             | ✅   | 關聯分類陣列                  |
+| `created_at`     | `string`                 | ✅   | 建立時間（ISO 8601）          |
+| `updated_at`     | `string`                 | ✅   | 最後更新時間（ISO 8601）      |
+| `published_at`   | `string \| null`         | ❌   | 發布時間（ISO 8601）          |
 
 ---
 
@@ -58,12 +59,12 @@
 
 用於新增/更新文章時，傳遞剛上傳的圖片資訊：
 
-| 欄位           | 型別              | 必填 | 說明                      |
-| -------------- | ----------------- | ---- | ------------------------- |
-| `original_key` | `string`          | ✅   | R2 Bucket 中原始檔案路徑  |
-| `original_url` | `string`          | ✅   | 原始圖片的公開訪問 URL    |
-| `webp_key`     | `string \| null`  | ❌   | R2 Bucket 中 WebP 檔案路徑|
-| `webp_url`     | `string \| null`  | ❌   | WebP 圖片的公開訪問 URL   |
+| 欄位           | 型別             | 必填 | 說明                       |
+| -------------- | ---------------- | ---- | -------------------------- |
+| `original_key` | `string`         | ✅   | R2 Bucket 中原始檔案路徑   |
+| `original_url` | `string`         | ✅   | 原始圖片的公開訪問 URL     |
+| `webp_key`     | `string \| null` | ❌   | R2 Bucket 中 WebP 檔案路徑 |
+| `webp_url`     | `string \| null` | ❌   | WebP 圖片的公開訪問 URL    |
 
 ---
 
@@ -150,12 +151,12 @@
 
 #### Response（成功 `200`）
 
-| 欄位        | 型別     | 說明                    |
-| ----------- | -------- | ----------------------- |
-| `id`        | `number` | 管理員 ID（整數）       |
-| `email`     | `string` | 管理員信箱              |
-| `nickname`  | `string` | 管理員暱稱              |
-| `createdAt` | `string` | 建立時間（ISO 8601）    |
+| 欄位        | 型別     | 說明                 |
+| ----------- | -------- | -------------------- |
+| `id`        | `number` | 管理員 ID（整數）    |
+| `email`     | `string` | 管理員信箱           |
+| `nickname`  | `string` | 管理員暱稱           |
+| `createdAt` | `string` | 建立時間（ISO 8601） |
 
 ---
 
@@ -165,9 +166,9 @@
 
 #### Request Body
 
-| 欄位       | 型別     | 必填 | 驗證規則                  |
-| ---------- | -------- | ---- | ------------------------- |
-| `nickname` | `string` | ✅   | 不可為空字串，最多 10 個字|
+| 欄位       | 型別     | 必填 | 驗證規則                   |
+| ---------- | -------- | ---- | -------------------------- |
+| `nickname` | `string` | ✅   | 不可為空字串，最多 10 個字 |
 
 #### Response（成功 `200`）
 
@@ -177,11 +178,11 @@
 
 #### 錯誤回應
 
-| 狀態碼 | 說明                          |
-| ------ | ----------------------------- |
-| `400`  | 暱稱為空 / 暱稱超過 10 字     |
-| `401`  | 未提供 Token / Token 已失效   |
-| `500`  | 伺服器內部錯誤                |
+| 狀態碼 | 說明                        |
+| ------ | --------------------------- |
+| `400`  | 暱稱為空 / 暱稱超過 10 字   |
+| `401`  | 未提供 Token / Token 已失效 |
+| `500`  | 伺服器內部錯誤              |
 
 ---
 
@@ -205,9 +206,9 @@
 
 #### Path Parameter
 
-| 參數 | 型別     | 說明                                        |
-| ---- | -------- | ------------------------------------------- |
-| `id` | `string` | 文章 UUID **或** 文章 Slug（中英文皆可）    |
+| 參數 | 型別     | 說明                                     |
+| ---- | -------- | ---------------------------------------- |
+| `id` | `string` | 文章 UUID **或** 文章 Slug（中英文皆可） |
 
 #### Response（成功 `200`）
 
@@ -230,17 +231,17 @@
 
 可傳空物件 `{}` 快速建立草稿，所有欄位均為選填：
 
-| 欄位           | 型別                               | 必填 | 預設值           | 說明                                      |
-| -------------- | ---------------------------------- | ---- | ---------------- | ----------------------------------------- |
-| `title`        | `string`                           | ❌   | `"未命名文章"`   | 文章標題                                  |
-| `author_name`  | `string`                           | ❌   | `"子迂"`         | 作者名稱                                  |
-| `slug`         | `string`                           | ❌   | 由標題自動生成   | 自訂 URL Slug                             |
-| `content`      | `string`                           | ❌   | `{"blocks":[]}`  | Editor.js JSON 序列化字串                 |
-| `summary`      | `string`                           | ❌   | 從 content 提取  | 純文字摘要                                |
-| `cover_image`  | `string \| CoverImageObject`       | ❌   | `null`           | 封面圖片 URL 或圖片物件                   |
-| `status`       | `"draft" \| "published"`           | ❌   | `"draft"`        | 發布狀態                                  |
-| `categories`   | `{ id: number }[]`                 | ❌   | `[]`             | 分類 ID 陣列                              |
-| `published_at` | `string`                           | ❌   | 建立時間         | 發布時間（ISO 8601，僅 published 時有效） |
+| 欄位           | 型別                         | 必填 | 預設值          | 說明                                      |
+| -------------- | ---------------------------- | ---- | --------------- | ----------------------------------------- |
+| `title`        | `string`                     | ❌   | `"未命名文章"`  | 文章標題                                  |
+| `author_name`  | `string`                     | ❌   | `"子迂"`        | 作者名稱                                  |
+| `slug`         | `string`                     | ❌   | 由標題自動生成  | 自訂 URL Slug                             |
+| `content`      | `string`                     | ❌   | `{"blocks":[]}` | Editor.js JSON 序列化字串                 |
+| `summary`      | `string`                     | ❌   | 從 content 提取 | 純文字摘要                                |
+| `cover_image`  | `string \| CoverImageObject` | ❌   | `null`          | 封面圖片 URL 或圖片物件                   |
+| `status`       | `"draft" \| "published"`     | ❌   | `"draft"`       | 發布狀態                                  |
+| `categories`   | `{ id: number }[]`           | ❌   | `[]`            | 分類 ID 陣列                              |
+| `published_at` | `string`                     | ❌   | 建立時間        | 發布時間（ISO 8601，僅 published 時有效） |
 
 #### Response（成功 `201`）
 
@@ -254,15 +255,16 @@
 
 #### Path Parameter
 
-| 參數 | 型別     | 說明         |
-| ---- | -------- | ------------ |
-| `id` | `string` | 文章 UUID    |
+| 參數 | 型別     | 說明      |
+| ---- | -------- | --------- |
+| `id` | `string` | 文章 UUID |
 
 #### Request Body（`UpdatePostPayload`）
 
 結構與 `CreatePostPayload` 完全相同，所有欄位均為選填。
 
 > **`cover_image` 傳值說明**：
+>
 > - 傳 `string`：直接作為圖片 URL 存入資料庫
 > - 傳 `CoverImageObject`：取 `webp_url` 或 `original_url` 作為封面
 > - 傳 `null` / 不傳：清空封面圖
@@ -270,7 +272,7 @@
 #### Response（成功 `200`）
 
 ```json
-{ "success": true, "post": { /* 完整 Post 物件 */ } }
+{ "success": true, "post": {/* 完整 Post 物件 */} }
 ```
 
 ---
@@ -284,6 +286,26 @@
 ```json
 { "success": true, "message": "文章刪除成功" }
 ```
+
+### `POST /api/posts/featured` — 設定重點文章（待後端實作）
+
+**目前狀態**：前端後台已提供文章選擇器，確認後會呼叫此端點；後端目前尚未註冊路由或保存設定。
+
+**權限**：🔒 需要 JWT Token
+
+#### Request Body
+
+```json
+{ "post_id": "文章 UUID" }
+```
+
+#### 建議 Response（成功 `200`）
+
+```json
+{ "success": true, "post_id": "文章 UUID" }
+```
+
+> 後端完成後，建議新增單一設定資料（例如 `settings.featured_post_id`）或專用欄位，並讓公開首頁取得設定後顯示指定文章。
 
 ---
 
@@ -348,13 +370,13 @@
 
 #### Response（成功 `200`）
 
-| 欄位                | 型別              | 說明                             |
-| ------------------- | ----------------- | -------------------------------- |
-| `success`           | `1`（數字）       | 固定為 `1`（Editor.js 規範）     |
-| `file.original_key` | `string`          | R2 中原始圖片的 key 路徑         |
-| `file.original_url` | `string`          | 原始圖片公開 URL                 |
-| `file.webp_key`     | `string \| null`  | R2 中 WebP 圖片的 key 路徑       |
-| `file.webp_url`     | `string \| null`  | WebP 圖片公開 URL                |
+| 欄位                | 型別             | 說明                         |
+| ------------------- | ---------------- | ---------------------------- |
+| `success`           | `1`（數字）      | 固定為 `1`（Editor.js 規範） |
+| `file.original_key` | `string`         | R2 中原始圖片的 key 路徑     |
+| `file.original_url` | `string`         | 原始圖片公開 URL             |
+| `file.webp_key`     | `string \| null` | R2 中 WebP 圖片的 key 路徑   |
+| `file.webp_url`     | `string \| null` | WebP 圖片公開 URL            |
 
 ```json
 {
@@ -380,27 +402,28 @@
 
 ### Axios 實例設定（`front/src/utils/api.ts`）
 
-| 設定項          | 值                                                                       |
-| --------------- | ------------------------------------------------------------------------ |
-| `baseURL`       | `import.meta.env.PUBLIC_API_URL` 或 `/api`                               |
-| 預設 Header     | `Content-Type: application/json`                                         |
-| 請求攔截器      | 從 `localStorage.getItem("adminToken")` 讀取，加入 `Authorization: Bearer <token>` |
-| 回應 401 處理   | 清除 localStorage Token，強制跳轉至 `/admin/login`                       |
+| 設定項        | 值                                                                      |
+| ------------- | ----------------------------------------------------------------------- |
+| `baseURL`     | `import.meta.env.PUBLIC_API_URL` 或 `/api`                              |
+| 預設 Header   | `Content-Type: application/json`                                        |
+| 請求攔截器    | 從瀏覽器 Cookie `adminToken` 讀取，加入 `Authorization: Bearer <token>` |
+| 回應 401 處理 | 清除 localStorage Token，強制跳轉至 `/admin/login`                      |
 
 ---
 
 ### `postAPI` 方法對應表（`front/src/utils/postAPI.ts`）
 
-| 方法                                    | HTTP               | 說明                              |
-| --------------------------------------- | ------------------ | --------------------------------- |
-| `postAPI.getPosts()`                    | `GET /posts`       | 取得所有文章                      |
-| `postAPI.getPostById(id: string)`       | `GET /posts/:id`   | 依 UUID 取得單篇文章              |
-| `postAPI.createPost(payload?)`          | `POST /posts`      | 新增文章（可傳空 `{}` 建立草稿）  |
-| `postAPI.updatePost(id, payload)`       | `PUT /posts/:id`   | 更新文章                          |
-| `postAPI.deletePost(id: string)`        | `DELETE /posts/:id`| 刪除文章                          |
-| `postAPI.getCategories()`               | `GET /categories`  | 取得所有分類                      |
-| `postAPI.createCategory(name: string)`  | `POST /categories` | 新增分類                          |
-| `postAPI.uploadImage(file, webpFile?)`  | `POST /upload`     | 上傳圖片至 R2                     |
+| 方法                                       | HTTP                   | 說明                             |
+| ------------------------------------------ | ---------------------- | -------------------------------- |
+| `postAPI.getPosts()`                       | `GET /posts`           | 取得所有文章                     |
+| `postAPI.getPostById(id: string)`          | `GET /posts/:id`       | 依 UUID 取得單篇文章             |
+| `postAPI.createPost(payload?)`             | `POST /posts`          | 新增文章（可傳空 `{}` 建立草稿） |
+| `postAPI.updatePost(id, payload)`          | `PUT /posts/:id`       | 更新文章                         |
+| `postAPI.deletePost(id: string)`           | `DELETE /posts/:id`    | 刪除文章                         |
+| `postAPI.getCategories()`                  | `GET /categories`      | 取得所有分類                     |
+| `postAPI.createCategory(name: string)`     | `POST /categories`     | 新增分類                         |
+| `postAPI.uploadImage(file, webpFile?)`     | `POST /upload`         | 上傳圖片至 R2                    |
+| `api.post("/posts/featured", { post_id })` | `POST /posts/featured` | 設定重點文章（待後端實作）       |
 
 ---
 
@@ -408,18 +431,18 @@
 
 #### `openModal(id: string | null)` — 開啟彈窗
 
-| 情境                         | 呼叫 API                         | 資料型別          |
-| ---------------------------- | -------------------------------- | ----------------- |
-| **新增模式**（`id = null`）  | `postAPI.createPost({})`         | 回傳 `Post` 物件  |
-| **編輯模式**（`id = UUID`）  | `postAPI.getPostById(id)`        | 回傳 `Post` 物件  |
+| 情境                        | 呼叫 API                  | 資料型別         |
+| --------------------------- | ------------------------- | ---------------- |
+| **新增模式**（`id = null`） | `postAPI.createPost({})`  | 回傳 `Post` 物件 |
+| **編輯模式**（`id = UUID`） | `postAPI.getPostById(id)` | 回傳 `Post` 物件 |
 
 新增模式預設 Payload：
 
-| 欄位          | 型別     | 值                                      |
-| ------------- | -------- | --------------------------------------- |
-| `title`       | `string` | `"未命名文章"`                          |
+| 欄位          | 型別     | 值                                         |
+| ------------- | -------- | ------------------------------------------ |
+| `title`       | `string` | `"未命名文章"`                             |
 | `author_name` | `string` | 從 `localStorage.getItem("nickname")` 讀取 |
-| `status`      | `string` | `"draft"`                               |
+| `status`      | `string` | `"draft"`                                  |
 
 ---
 
@@ -427,17 +450,17 @@
 
 `formHelpers.buildPayload()` 收集的欄位：
 
-| 表單元素                    | 欄位名稱       | 型別                         | 說明                                           |
-| --------------------------- | -------------- | ---------------------------- | ---------------------------------------------- |
-| `els.titleInput.value`      | `title`        | `string`                     | 文章標題                                       |
-| `els.slugInput.value`       | `slug`         | `string \| undefined`        | 空字串則不傳，由後端從標題自動生成             |
-| `els.authorInput.value`     | `author_name`  | `string`                     | 作者名稱                                       |
-| Editor.js `saveEditorContent()` | `content`  | `string`                     | `JSON.stringify(editorData)`                   |
-| `els.summaryInput.value`    | `summary`      | `string`                     | 純文字摘要                                     |
-| `els.statusSelect.value`    | `status`       | `"draft" \| "published"`     | 發布狀態                                       |
-| `els.categoriesContainer` checked items | `categories` | `Category[]`  | 已勾選的分類物件陣列                           |
-| `els.coverInput.files[0]`   | `cover_image`  | `string \| CoverImageObject` | 有新圖：先 upload 再傳物件；否則傳既有 URL     |
-| `els.publishedAtInput.value`| `published_at` | `string \| undefined`        | `datetime-local` 格式，空字串時不傳            |
+| 表單元素                                | 欄位名稱       | 型別                         | 說明                                       |
+| --------------------------------------- | -------------- | ---------------------------- | ------------------------------------------ |
+| `els.titleInput.value`                  | `title`        | `string`                     | 文章標題                                   |
+| `els.slugInput.value`                   | `slug`         | `string \| undefined`        | 空字串則不傳，由後端從標題自動生成         |
+| `els.authorInput.value`                 | `author_name`  | `string`                     | 作者名稱                                   |
+| Editor.js `saveEditorContent()`         | `content`      | `string`                     | `JSON.stringify(editorData)`               |
+| `els.summaryInput.value`                | `summary`      | `string`                     | 純文字摘要                                 |
+| `els.statusSelect.value`                | `status`       | `"draft" \| "published"`     | 發布狀態                                   |
+| `els.categoriesContainer` checked items | `categories`   | `Category[]`                 | 已勾選的分類物件陣列                       |
+| `els.coverInput.files[0]`               | `cover_image`  | `string \| CoverImageObject` | 有新圖：先 upload 再傳物件；否則傳既有 URL |
+| `els.publishedAtInput.value`            | `published_at` | `string \| undefined`        | `datetime-local` 格式，空字串時不傳        |
 
 完整送出後呼叫：`postAPI.updatePost(currentPostId, payload)`
 
@@ -445,12 +468,12 @@
 
 ### `AuthManager`（`front/src/utils/auth.ts`）
 
-| 方法                                | 說明                                                   |
-| ----------------------------------- | ------------------------------------------------------ |
-| `authManager.checkAuth()`           | 若 localStorage 無 `adminToken`，跳轉 `/login`         |
-| `authManager.getNickname()`         | 從 `localStorage.getItem("nickname")` 讀取暱稱         |
-| `authManager.setNickname(nickname)` | 寫入 `localStorage.setItem("nickname", nickname)`      |
-| `authManager.logout()`              | 清除 `adminToken`、`adminNickname`，跳轉 `/login`      |
+| 方法                                | 說明                                              |
+| ----------------------------------- | ------------------------------------------------- |
+| `authManager.checkAuth()`           | 若 localStorage 無 `adminToken`，跳轉 `/login`    |
+| `authManager.getNickname()`         | 從 `localStorage.getItem("nickname")` 讀取暱稱    |
+| `authManager.setNickname(nickname)` | 寫入 `localStorage.setItem("nickname", nickname)` |
+| `authManager.logout()`              | 清除 `adminToken`、`adminNickname`，跳轉 `/login` |
 
 **LocalStorage 鍵名彙整**：
 
@@ -483,12 +506,12 @@
 
 ### JWT Token Payload 結構
 
-| 欄位    | 型別     | 說明                              |
-| ------- | -------- | --------------------------------- |
-| `sub`   | `string` | 管理員 ID（字串化整數）           |
-| `email` | `string` | 管理員信箱                        |
-| `exp`   | `number` | 過期時間（Unix 時間戳，效期 7 天）|
-| `iat`   | `number` | 簽發時間（Unix 時間戳）           |
+| 欄位    | 型別     | 說明                               |
+| ------- | -------- | ---------------------------------- |
+| `sub`   | `string` | 管理員 ID（字串化整數）            |
+| `email` | `string` | 管理員信箱                         |
+| `exp`   | `number` | 過期時間（Unix 時間戳，效期 7 天） |
+| `iat`   | `number` | 簽發時間（Unix 時間戳）            |
 
 ### 受保護端點請求 Header
 
@@ -496,7 +519,57 @@
 Authorization: Bearer <JWT Token>
 ```
 
-前端 Axios 實例自動從 `localStorage.getItem("adminToken")` 讀取並附加。
+前端 Axios 實例自動從瀏覽器 Cookie `adminToken` 讀取並附加。
+
+---
+
+## 9. 網站作業流程
+
+### 公開閱讀
+
+```text
+首頁 /
+  ├─ GET /api/posts + GET /api/categories
+  ├─ 搜尋表單 → /search?q=...
+  │              └─ GET /api/posts → 比對標題、分類、內文
+  ├─ 所有文章 → /posts?page=N
+  │              └─ GET /api/posts → 前端每頁切 10 篇
+  └─ 點擊文章 → /post/:slug
+                 └─ GET /api/posts/:slug → 顯示 Editor.js 內容
+```
+
+### 管理員操作
+
+```text
+/admin/login
+  └─ POST /api/login
+       └─ 寫入 adminToken Cookie
+            ↓
+/admin/dashboard
+  ├─ middleware 檢查 adminToken
+  ├─ GET /api/posts → 統計、重點文章選單、文章管理表格
+  ├─ 新增 → POST /api/posts → 取得 UUID
+  │          └─ POST /api/upload（可選）
+  │          └─ PUT /api/posts/:id
+  ├─ 編輯 → GET /api/posts/:id → PUT /api/posts/:id
+  ├─ 刪除 → DELETE /api/posts/:id
+  └─ 設定重點文章 → POST /api/posts/featured（待後端實作）
+```
+
+### 認證與登出
+
+1. 管理員登入成功後，前端以 `adminToken` Cookie 作為 SSR 與後台路由判斷依據。
+2. Axios 請求攔截器從 Cookie 取出 token，放入 `Authorization: Bearer <token>`。
+3. 後台 middleware 在 `/admin/*`（登入頁除外）檢查 Cookie，缺少 token 時導向 `/admin/login`。
+4. 首頁讀取 Cookie，已登入顯示「登出」，未登入顯示「登入」。
+5. 首頁登出會清除 `adminToken` Cookie 及瀏覽器端暱稱 / token 資料。
+
+### 資料與呈現規則
+
+- 公開頁面只呈現 `status = "published"` 的文章。
+- 文章列表 API 依 `created_at` 降冪排序。
+- 首頁目前以最新文章作為預設特色文章；重點文章後端功能完成後，應改用設定的 `featured_post_id`。
+- `content` 儲存為 Editor.js JSON 字串，文章閱讀頁負責轉換常用 block 為 HTML。
 
 ---
 
